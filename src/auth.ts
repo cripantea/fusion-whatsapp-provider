@@ -6,6 +6,9 @@ import { prisma } from "@/lib/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
+  // Necessario dietro un reverse proxy (Apache/Nginx): senza questo Auth.js rifiuta
+  // ogni richiesta con "UntrustedHost" perché non può verificare staticamente l'Host header.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
