@@ -2,9 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type SignupStatus = "idle" | "connecting" | "success" | "error" | "cancelled";
 
@@ -17,6 +25,8 @@ type EmbeddedSignupMessage = {
   };
 };
 
+type Tenant = { id: string; name: string };
+
 const GRAPH_SDK_VERSION = "v21.0";
 const FACEBOOK_SCOPE = "whatsapp_business_management,whatsapp_business_messaging";
 const FACEBOOK_MESSAGE_ORIGIN = "https://www.facebook.com";
@@ -24,19 +34,30 @@ const FACEBOOK_MESSAGE_ORIGIN = "https://www.facebook.com";
 export function FacebookEmbeddedSignup({
   appId,
   configId,
+  tenants,
+  activeTenantId,
 }: {
   appId: string | null;
   configId: string | null;
+  tenants: Tenant[];
+  activeTenantId: string;
 }) {
   const t = useTranslations("connections.embeddedSignup");
+  const router = useRouter();
 
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkFailed, setSdkFailed] = useState(false);
   const [status, setStatus] = useState<SignupStatus>("idle");
+  const [destinationTenantId, setDestinationTenantId] = useState(activeTenantId);
 
   // Meta invia waba_id/phone_number_id via postMessage durante il flusso Embedded Signup,
   // separatamente dal `code` OAuth restituito dal callback di FB.login().
   const signupDataRef = useRef<{ wabaId?: string; phoneNumberId?: string }>({});
+  const destinationTenantIdRef = useRef(destinationTenantId);
+
+  useEffect(() => {
+    destinationTenantIdRef.current = destinationTenantId;
+  }, [destinationTenantId]);
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -91,17 +112,21 @@ export function FacebookEmbeddedSignup({
         }
 
         const { wabaId, phoneNumberId } = signupDataRef.current;
+        const tenantId = destinationTenantIdRef.current;
 
         fetch("/api/auth/facebook/callback", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code, wabaId, phoneNumberId }),
+          body: JSON.stringify({ code, wabaId, phoneNumberId, tenantId }),
         })
           .then((res) => {
             if (!res.ok) throw new Error("callback failed");
             return res.json();
           })
-          .then(() => setStatus("success"))
+          .then(() => {
+            setStatus("success");
+            router.refresh();
+          })
           .catch(() => setStatus("error"));
       },
       {
@@ -112,7 +137,7 @@ export function FacebookEmbeddedSignup({
         extras: { sessionInfoVersion: "3" },
       }
     );
-  }, [configId]);
+  }, [configId, router]);
 
   const configMissing = !appId || !configId;
 
@@ -124,6 +149,33 @@ export function FacebookEmbeddedSignup({
         onLoad={handleSdkLoad}
         onError={() => setSdkFailed(true)}
       />
+
+      {tenants.length > 1 && (
+        <div className="flex flex-col gap-1.5 sm:max-w-xs">
+          <label className="text-sm font-medium">{t("destinationLabel")}</label>
+          <Select
+            value={destinationTenantId}
+            onValueChange={(value) => {
+              if (value) setDestinationTenantId(value);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue>
+                {(value: string) =>
+                  tenants.find((tenant) => tenant.id === value)?.name ?? value
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {tenants.map((tenant) => (
+                <SelectItem key={tenant.id} value={tenant.id}>
+                  {tenant.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <Button
         onClick={handleConnect}

@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from "next/server";
+
+import { auth } from "@/auth";
+import { assertTenantOwnedByAgency } from "@/lib/active-tenant";
+import { prisma } from "@/lib/prisma";
+
+export const runtime = "nodejs";
+
+type PatchBody = {
+  targetWebhookUrl?: unknown;
+};
+
+type NormalizedUrl = { ok: true; url: string | null } | { ok: false };
+
+function normalizeWebhookUrl(value: unknown): NormalizedUrl {
+  if (value === null || value === undefined || value === "") {
+    return { ok: true, url: null };
+  }
+
+  if (typeof value !== "string") {
+    return { ok: false };
+  }
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return { ok: false };
+    }
+    return { ok: true, url: parsed.toString() };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  let body: PatchBody;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const normalized = normalizeWebhookUrl(body.targetWebhookUrl);
+  if (!normalized.ok) {
+    return NextResponse.json(
+      { error: "targetWebhookUrl deve essere un URL http/https valido oppure vuoto" },
+      { status: 400 }
+    );
+  }
+
+  const connection = await prisma.whatsappConnection.findUnique({ where: { id } });
+  if (!connection) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Verifica che il tenant della connessione appartenga all'agency dell'utente loggato.
+  const ownedTenant = await assertTenantOwnedByAgency(
+    connection.tenantId,
+    session.user.agencyId
+  );
+  if (!ownedTenant) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const updated = await prisma.whatsappConnection.update({
+    where: { id },
+    data: { targetWebhookUrl: normalized.url },
+  });
+
+  return NextResponse.json({
+    status: "success",
+    connection: {
+      id: updated.id,
+      targetWebhookUrl: updated.targetWebhookUrl,
+    },
+  });
+}

@@ -38,7 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name ?? undefined,
-          tenantId: user.tenantId,
+          agencyId: user.agencyId,
         };
       },
     }),
@@ -46,13 +46,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.tenantId = user.tenantId;
+        token.agencyId = user.agencyId;
       }
       return token;
     },
     session({ session, token }) {
-      if (session.user && token.tenantId) {
-        session.user.tenantId = token.tenantId;
+      if (session.user && token.agencyId) {
+        session.user.agencyId = token.agencyId;
       }
       return session;
     },

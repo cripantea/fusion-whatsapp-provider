@@ -17,6 +17,14 @@
     "connections": "Connections",
     "settings": "Settings"
   },
+  "workspace": {
+    "switcherLabel": "Your workspaces",
+    "newWorkspace": "New client workspace",
+    "newWorkspaceDescription": "Create a new workspace for a client: you'll be able to assign their WhatsApp connections separately from other clients.",
+    "nameLabel": "Client name",
+    "namePlaceholder": "e.g. Acme Inc.",
+    "create": "Create workspace"
+  },
   "header": {
     "openMenu": "Open menu",
     "toggleTheme": "Toggle theme",
@@ -50,8 +58,16 @@
       "description": "The list of WhatsApp numbers configured for this workspace.",
       "waba": "WABA ID",
       "phoneNumber": "Number",
+      "webhook": "Target Webhook URL",
       "status": "Status",
       "empty": "No connection configured yet."
+    },
+    "webhookEditor": {
+      "placeholder": "https://your-endpoint.example.com/webhook",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Invalid URL or save failed"
     },
     "statusLabels": {
       "PENDING": "Pending",
@@ -62,6 +78,7 @@
     "embeddedSignup": {
       "title": "Link a new number",
       "description": "Start Meta's Embedded Signup flow to link a WhatsApp Business number to your workspace.",
+      "destinationLabel": "Assign to client workspace",
       "connectButton": "Connect WhatsApp Account",
       "connecting": "Connecting…",
       "sdkLoading": "Loading the Facebook SDK…",

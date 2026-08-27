@@ -17,28 +17,47 @@ enum WhatsappConnectionStatus {
   ERROR
 }
 
-model Tenant {
+// Un'Agency è l'account rivenditore (es. software house / agenzia) che si
+// registra sulla piattaforma. Gestisce N Tenant (workspace dei propri clienti finali).
+model Agency {
   id        String   @id @default(uuid())
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  users               User[]
+  users   User[]
+  tenants Tenant[]
+
+  @@map("agencies")
+}
+
+// Un Tenant rappresenta il workspace di UN cliente finale dell'agenzia
+// (un'azienda con una propria WABA). Le connessioni WhatsApp appartengono al Tenant.
+model Tenant {
+  id        String   @id @default(uuid())
+  agencyId  String   @map("agency_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  agency              Agency               @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   whatsappConnections WhatsappConnection[]
 
+  @@index([agencyId])
   @@map("tenants")
 }
 
+// Uno User è un membro dell'agenzia (es. staff della software house) e ha
+// accesso a tutti i Tenant/workspace-cliente della propria Agency.
 model User {
   id           String   @id @default(uuid())
-  tenantId     String   @map("tenant_id")
+  agencyId     String   @map("agency_id")
   email        String   @unique
   passwordHash String   @map("password_hash")
   name         String?
   createdAt    DateTime @default(now()) @map("created_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 
-  @@index([tenantId])
+  @@index([agencyId])
   @@map("users")
 }
 

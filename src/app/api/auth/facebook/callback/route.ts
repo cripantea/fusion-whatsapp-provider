@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import { assertTenantOwnedByAgency } from "@/lib/active-tenant";
 import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 const GRAPH_API_VERSION = "v21.0";
+// Configurabile per test/endpoint regionali; di default punta alla Graph API pubblica di Meta.
+const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
 
 type CallbackBody = {
   code?: string;
   wabaId?: string;
   phoneNumberId?: string;
+  tenantId?: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -34,17 +38,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { code, wabaId, phoneNumberId } = body;
+  const { code, wabaId, phoneNumberId, tenantId } = body;
 
-  if (!code || !wabaId || !phoneNumberId) {
+  if (!code || !wabaId || !phoneNumberId || !tenantId) {
     return NextResponse.json(
-      { error: "Missing required fields: code, wabaId, phoneNumberId" },
+      { error: "Missing required fields: code, wabaId, phoneNumberId, tenantId" },
       { status: 400 }
     );
   }
 
+  // Il workspace di destinazione deve appartenere all'agency dell'utente loggato:
+  // impedisce di assegnare una WABA a un tenant di un'altra agency.
+  const targetTenant = await assertTenantOwnedByAgency(tenantId, session.user.agencyId);
+  if (!targetTenant) {
+    return NextResponse.json(
+      { error: "Workspace di destinazione non valido" },
+      { status: 403 }
+    );
+  }
+
+  // Ownership check: se questo numero è già collegato a un altro tenant, blocca
+  // l'operazione invece di "rubare" silenziosamente la connessione.
+  const existingConnection = await prisma.whatsappConnection.findUnique({
+    where: { phoneNumberId },
+  });
+  if (existingConnection && existingConnection.tenantId !== targetTenant.id) {
+    return NextResponse.json(
+      { error: "Connessione già registrata da un altro account" },
+      { status: 403 }
+    );
+  }
+
   const tokenUrl = new URL(
-    `https://graph.facebook.com/${GRAPH_API_VERSION}/oauth/access_token`
+    `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/oauth/access_token`
   );
   tokenUrl.searchParams.set("client_id", appId);
   tokenUrl.searchParams.set("client_secret", appSecret);
@@ -67,10 +93,27 @@ export async function POST(request: NextRequest) {
     ? new Date(Date.now() + expiresInSeconds * 1000)
     : null;
 
+  // Sottoscrizione webhook obbligatoria: senza questa chiamata Meta non invierà
+  // MAI gli eventi di questa WABA al nostro webhook. Se fallisce, non salviamo nulla.
+  const subscribeUrl = new URL(
+    `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/${wabaId}/subscribed_apps`
+  );
+  subscribeUrl.searchParams.set("access_token", accessToken);
+
+  const subscribeResponse = await fetch(subscribeUrl, { method: "POST" });
+  const subscribeData = await subscribeResponse.json().catch(() => null);
+
+  if (!subscribeResponse.ok || subscribeData?.success !== true) {
+    return NextResponse.json(
+      { error: "Impossibile sottoscrivere gli eventi webhook per questa WABA" },
+      { status: 502 }
+    );
+  }
+
   let displayPhoneNumber = phoneNumberId;
   try {
     const phoneUrl = new URL(
-      `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}`
+      `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/${phoneNumberId}`
     );
     phoneUrl.searchParams.set("fields", "display_phone_number");
     phoneUrl.searchParams.set("access_token", accessToken);
@@ -95,13 +138,13 @@ export async function POST(request: NextRequest) {
       wabaId,
       displayPhoneNumber,
       status: "CONNECTED",
-      tenantId: session.user.tenantId,
+      tenantId: targetTenant.id,
       accessToken: encryptedAccessToken,
       tokenExpiresAt,
       lastHeartbeatAt: new Date(),
     },
     create: {
-      tenantId: session.user.tenantId,
+      tenantId: targetTenant.id,
       wabaId,
       phoneNumberId,
       displayPhoneNumber,

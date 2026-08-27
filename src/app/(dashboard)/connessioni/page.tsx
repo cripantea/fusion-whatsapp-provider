@@ -19,6 +19,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FacebookEmbeddedSignup } from "@/components/connections/facebook-embedded-signup";
+import { WebhookUrlEditor } from "@/components/connections/webhook-url-editor";
+import { getWorkspaceContext } from "@/lib/active-tenant";
 import { prisma } from "@/lib/prisma";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
@@ -35,8 +37,10 @@ export default async function ConnessioniPage() {
   }
 
   const t = await getTranslations("connections");
+  const { tenants, activeTenant } = await getWorkspaceContext(session.user.agencyId);
+
   const connections = await prisma.whatsappConnection.findMany({
-    where: { tenantId: session.user.tenantId },
+    where: { tenantId: activeTenant.id },
     orderBy: { createdAt: "desc" },
   });
 
@@ -56,7 +60,13 @@ export default async function ConnessioniPage() {
           <CardDescription>{t("embeddedSignup.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <FacebookEmbeddedSignup appId={appId} configId={configId} />
+          <FacebookEmbeddedSignup
+            key={activeTenant.id}
+            appId={appId}
+            configId={configId}
+            tenants={tenants}
+            activeTenantId={activeTenant.id}
+          />
         </CardContent>
       </Card>
 
@@ -71,6 +81,7 @@ export default async function ConnessioniPage() {
               <TableRow>
                 <TableHead>{t("linkedNumbers.waba")}</TableHead>
                 <TableHead>{t("linkedNumbers.phoneNumber")}</TableHead>
+                <TableHead>{t("linkedNumbers.webhook")}</TableHead>
                 <TableHead className="text-right">
                   {t("linkedNumbers.status")}
                 </TableHead>
@@ -80,7 +91,7 @@ export default async function ConnessioniPage() {
               {connections.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={3}
+                    colSpan={4}
                     className="h-24 text-center text-muted-foreground"
                   >
                     {t("linkedNumbers.empty")}
@@ -93,6 +104,12 @@ export default async function ConnessioniPage() {
                       {connection.wabaId}
                     </TableCell>
                     <TableCell>{connection.displayPhoneNumber}</TableCell>
+                    <TableCell className="min-w-64">
+                      <WebhookUrlEditor
+                        connectionId={connection.id}
+                        initialUrl={connection.targetWebhookUrl}
+                      />
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant={STATUS_VARIANT[connection.status] ?? "secondary"}>
                         {t(`statusLabels.${connection.status}`)}
