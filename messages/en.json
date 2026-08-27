@@ -86,7 +86,8 @@
       "configMissing": "Embedded Signup configuration is missing. Contact your administrator.",
       "cancelled": "Connection cancelled.",
       "success": "WhatsApp number linked successfully.",
-      "error": "Something went wrong while connecting. Please try again."
+      "error": "Something went wrong while connecting. Please try again.",
+      "limitReached": "You've reached the maximum number of connections for your plan. Upgrade to connect more."
     }
   },
   "settings": {
@@ -105,6 +106,39 @@
       "title": "Appearance",
       "description": "Choose the interface theme.",
       "themeLabel": "Light / dark theme"
+    },
+    "billing": {
+      "title": "Billing",
+      "subtitle": "Manage your agency's plan and available WhatsApp connections.",
+      "manageLink": "Go to Billing",
+      "currentPlan": {
+        "title": "Current plan",
+        "description": "Your agency's plan and subscription status."
+      },
+      "connectionsUsage": "{used} / {max} WhatsApp connections used",
+      "managePlan": "Manage subscription",
+      "redirecting": "Redirecting…",
+      "plans": {
+        "title": "Available plans",
+        "description": "Upgrade to link more WhatsApp numbers."
+      },
+      "maxConnections": "Up to {max} connections",
+      "upgradeTo": "Upgrade to {plan}",
+      "currentPlanLabel": "Current plan",
+      "planLabels": {
+        "DEVELOPER": "Developer",
+        "TEAM": "Team",
+        "AGENCY": "Agency",
+        "ENTERPRISE": "Enterprise"
+      },
+      "statusLabels": {
+        "INACTIVE": "Inactive",
+        "TRIALING": "Trialing",
+        "ACTIVE": "Active",
+        "PAST_DUE": "Past due",
+        "CANCELED": "Canceled",
+        "UNPAID": "Unpaid"
+      }
     }
   }
 }

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type SignupStatus = "idle" | "connecting" | "success" | "error" | "cancelled";
+type SignupStatus = "idle" | "connecting" | "success" | "error" | "cancelled" | "limit_reached";
 
 type EmbeddedSignupMessage = {
   type?: string;
@@ -119,11 +119,15 @@ export function FacebookEmbeddedSignup({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code, wabaId, phoneNumberId, tenantId }),
         })
-          .then((res) => {
-            if (!res.ok) throw new Error("callback failed");
-            return res.json();
-          })
-          .then(() => {
+          .then(async (res) => {
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+              if (data?.error === "Limit reached") {
+                setStatus("limit_reached");
+                return;
+              }
+              throw new Error("callback failed");
+            }
             setStatus("success");
             router.refresh();
           })
@@ -204,6 +208,9 @@ export function FacebookEmbeddedSignup({
       )}
       {status === "error" && (
         <p className="text-sm text-destructive">{t("error")}</p>
+      )}
+      {status === "limit_reached" && (
+        <p className="text-sm text-destructive">{t("limitReached")}</p>
       )}
     </div>
   );

@@ -17,12 +17,36 @@ enum WhatsappConnectionStatus {
   ERROR
 }
 
+enum PlanType {
+  DEVELOPER
+  TEAM
+  AGENCY
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
 // Un'Agency è l'account rivenditore (es. software house / agenzia) che si
 // registra sulla piattaforma. Gestisce N Tenant (workspace dei propri clienti finali).
 model Agency {
   id        String   @id @default(uuid())
   name      String
   createdAt DateTime @default(now()) @map("created_at")
+
+  stripeCustomerId     String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  planType             PlanType           @default(DEVELOPER) @map("plan_type")
+  subscriptionStatus   SubscriptionStatus @default(INACTIVE) @map("subscription_status")
+  // Default coerente con il piano DEVELOPER; aggiornato esplicitamente dal codice
+  // applicativo (checkout/webhook Stripe) ogni volta che il piano cambia.
+  maxConnections       Int                @default(1) @map("max_connections")
 
   users   User[]
   tenants Tenant[]

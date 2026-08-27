@@ -69,6 +69,26 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Limite piano: una nuova connessione (non una riautorizzazione di una già esistente)
+  // non può superare il numero massimo consentito dal piano dell'agency.
+  if (!existingConnection) {
+    const agency = await prisma.agency.findUnique({
+      where: { id: session.user.agencyId },
+      select: { maxConnections: true },
+    });
+
+    const currentConnections = await prisma.whatsappConnection.count({
+      where: { tenant: { agencyId: session.user.agencyId } },
+    });
+
+    if (agency && currentConnections >= agency.maxConnections) {
+      return NextResponse.json(
+        { error: "Limit reached", maxConnections: agency.maxConnections },
+        { status: 403 }
+      );
+    }
+  }
+
   const tokenUrl = new URL(
     `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/oauth/access_token`
   );

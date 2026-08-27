@@ -86,7 +86,8 @@
       "configMissing": "Configurazione Embedded Signup mancante. Contatta l'amministratore.",
       "cancelled": "Connessione annullata.",
       "success": "Numero WhatsApp collegato con successo.",
-      "error": "Si è verificato un errore durante la connessione. Riprova."
+      "error": "Si è verificato un errore durante la connessione. Riprova.",
+      "limitReached": "Hai raggiunto il numero massimo di connessioni previsto dal tuo piano. Passa a un piano superiore per collegarne altre."
     }
   },
   "settings": {
@@ -105,6 +106,39 @@
       "title": "Aspetto",
       "description": "Scegli il tema dell'interfaccia.",
       "themeLabel": "Tema chiaro / scuro"
+    },
+    "billing": {
+      "title": "Fatturazione",
+      "subtitle": "Gestisci il piano dell'agency e le connessioni WhatsApp disponibili.",
+      "manageLink": "Vai a Fatturazione",
+      "currentPlan": {
+        "title": "Piano attuale",
+        "description": "Il piano e lo stato dell'abbonamento della tua agency."
+      },
+      "connectionsUsage": "{used} / {max} connessioni WhatsApp utilizzate",
+      "managePlan": "Gestisci abbonamento",
+      "redirecting": "Reindirizzamento…",
+      "plans": {
+        "title": "Piani disponibili",
+        "description": "Passa a un piano superiore per collegare più numeri WhatsApp."
+      },
+      "maxConnections": "Fino a {max} connessioni",
+      "upgradeTo": "Passa a {plan}",
+      "currentPlanLabel": "Piano attuale",
+      "planLabels": {
+        "DEVELOPER": "Developer",
+        "TEAM": "Team",
+        "AGENCY": "Agency",
+        "ENTERPRISE": "Enterprise"
+      },
+      "statusLabels": {
+        "INACTIVE": "Inattivo",
+        "TRIALING": "Prova gratuita",
+        "ACTIVE": "Attivo",
+        "PAST_DUE": "Pagamento in ritardo",
+        "CANCELED": "Annullato",
+        "UNPAID": "Non pagato"
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import {
@@ -51,6 +52,18 @@ export default async function ImpostazioniPage() {
         </CardContent>
         <CardFooter>
           <Button>{t("workspace.save")}</Button>
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("billing.title")}</CardTitle>
+          <CardDescription>{t("billing.subtitle")}</CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button render={<Link href="/impostazioni/billing" />}>
+            {t("billing.manageLink")}
+          </Button>
         </CardFooter>
       </Card>
 
