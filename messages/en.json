@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "Fusion WhatsApp"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "connections": "Connections",
+    "settings": "Settings"
+  },
+  "header": {
+    "openMenu": "Open menu",
+    "toggleTheme": "Toggle theme",
+    "account": "My account",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "General overview of your WhatsApp connections.",
+    "stats": {
+      "activeConnections": "Active connections",
+      "messagesSent": "Messages sent (30d)",
+      "contacts": "Contacts",
+      "conversations": "Conversations"
+    },
+    "recentConnections": {
+      "title": "Recent connections",
+      "name": "Name",
+      "status": "Status",
+      "notConfigured": "Not configured",
+      "primaryNumber": "Primary number",
+      "supportNumber": "Support number"
+    }
+  },
+  "connections": {
+    "title": "Connections",
+    "subtitle": "Manage the WhatsApp numbers linked to your account.",
+    "linkedNumbers": {
+      "title": "Linked numbers",
+      "description": "The list of WhatsApp numbers configured for this workspace.",
+      "waba": "WABA ID",
+      "phoneNumber": "Number",
+      "status": "Status",
+      "empty": "No connection configured yet."
+    },
+    "statusLabels": {
+      "PENDING": "Pending",
+      "CONNECTED": "Connected",
+      "DISCONNECTED": "Disconnected",
+      "ERROR": "Error"
+    },
+    "embeddedSignup": {
+      "title": "Link a new number",
+      "description": "Start Meta's Embedded Signup flow to link a WhatsApp Business number to your workspace.",
+      "connectButton": "Connect WhatsApp Account",
+      "connecting": "Connecting…",
+      "sdkLoading": "Loading the Facebook SDK…",
+      "sdkError": "Could not load the Facebook SDK. Please try again later.",
+      "configMissing": "Embedded Signup configuration is missing. Contact your administrator.",
+      "cancelled": "Connection cancelled.",
+      "success": "WhatsApp number linked successfully.",
+      "error": "Something went wrong while connecting. Please try again."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your workspace information and account preferences.",
+    "workspace": {
+      "title": "Workspace",
+      "description": "General information about your workspace.",
+      "nameLabel": "Workspace name",
+      "namePlaceholder": "My company",
+      "emailLabel": "Contact email",
+      "emailPlaceholder": "team@company.com",
+      "save": "Save changes"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Choose the interface theme.",
+      "themeLabel": "Light / dark theme"
+    }
+  }
+}

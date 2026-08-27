@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum WhatsappConnectionStatus {
+  PENDING
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  whatsappConnections WhatsappConnection[]
+
+  @@map("tenants")
+}
+
+model WhatsappConnection {
+  id                  String                    @id @default(uuid())
+  tenantId            String                    @map("tenant_id")
+  wabaId              String                    @map("waba_id")
+  phoneNumberId       String                    @unique @map("phone_number_id")
+  displayPhoneNumber  String                    @map("display_phone_number")
+  status              WhatsappConnectionStatus  @default(PENDING)
+  targetWebhookUrl    String?                   @map("target_webhook_url")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("whatsapp_connections")
+}

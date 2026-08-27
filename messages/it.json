@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "Fusion WhatsApp"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "connections": "Connessioni",
+    "settings": "Impostazioni"
+  },
+  "header": {
+    "openMenu": "Apri il menu",
+    "toggleTheme": "Cambia tema",
+    "account": "Il mio account",
+    "settings": "Impostazioni",
+    "logout": "Esci"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Panoramica generale delle tue connessioni WhatsApp.",
+    "stats": {
+      "activeConnections": "Connessioni attive",
+      "messagesSent": "Messaggi inviati (30gg)",
+      "contacts": "Contatti",
+      "conversations": "Conversazioni"
+    },
+    "recentConnections": {
+      "title": "Connessioni recenti",
+      "name": "Nome",
+      "status": "Stato",
+      "notConfigured": "Non configurato",
+      "primaryNumber": "Numero principale",
+      "supportNumber": "Numero supporto"
+    }
+  },
+  "connections": {
+    "title": "Connessioni",
+    "subtitle": "Gestisci i numeri WhatsApp collegati al tuo account.",
+    "linkedNumbers": {
+      "title": "Numeri collegati",
+      "description": "L'elenco dei numeri WhatsApp configurati per questo workspace.",
+      "waba": "WABA ID",
+      "phoneNumber": "Numero",
+      "status": "Stato",
+      "empty": "Nessuna connessione configurata."
+    },
+    "statusLabels": {
+      "PENDING": "In attesa",
+      "CONNECTED": "Connesso",
+      "DISCONNECTED": "Disconnesso",
+      "ERROR": "Errore"
+    },
+    "embeddedSignup": {
+      "title": "Collega un nuovo numero",
+      "description": "Avvia il flusso di Embedded Signup di Meta per collegare un numero WhatsApp Business al tuo workspace.",
+      "connectButton": "Connetti Account WhatsApp",
+      "connecting": "Connessione in corso…",
+      "sdkLoading": "Caricamento dell'SDK di Facebook…",
+      "sdkError": "Impossibile caricare l'SDK di Facebook. Riprova più tardi.",
+      "configMissing": "Configurazione Embedded Signup mancante. Contatta l'amministratore.",
+      "cancelled": "Connessione annullata.",
+      "success": "Numero WhatsApp collegato con successo.",
+      "error": "Si è verificato un errore durante la connessione. Riprova."
+    }
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Gestisci le informazioni del workspace e le preferenze dell'account.",
+    "workspace": {
+      "title": "Workspace",
+      "description": "Informazioni generali sul tuo spazio di lavoro.",
+      "nameLabel": "Nome workspace",
+      "namePlaceholder": "La mia azienda",
+      "emailLabel": "Email di contatto",
+      "emailPlaceholder": "team@azienda.it",
+      "save": "Salva modifiche"
+    },
+    "appearance": {
+      "title": "Aspetto",
+      "description": "Scegli il tema dell'interfaccia.",
+      "themeLabel": "Tema chiaro / scuro"
+    }
+  }
+}
