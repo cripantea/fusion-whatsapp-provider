@@ -16,6 +16,10 @@ export function isPaidPlanType(value: string): value is PaidPlanType {
   return (PAID_PLAN_TYPES as readonly string[]).includes(value);
 }
 
+export function isPlanType(value: string): value is PlanType {
+  return (PLAN_TYPES as readonly string[]).includes(value);
+}
+
 export function getPriceIdForPlan(plan: PaidPlanType): string | undefined {
   switch (plan) {
     case "TEAM":

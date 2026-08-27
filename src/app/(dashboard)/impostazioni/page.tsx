@@ -61,7 +61,7 @@ export default async function ImpostazioniPage() {
           <CardDescription>{t("billing.subtitle")}</CardDescription>
         </CardHeader>
         <CardFooter>
-          <Button render={<Link href="/impostazioni/billing" />}>
+          <Button nativeButton={false} render={<Link href="/impostazioni/billing" />}>
             {t("billing.manageLink")}
           </Button>
         </CardFooter>

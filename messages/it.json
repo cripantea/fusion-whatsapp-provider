@@ -2,6 +2,54 @@
   "app": {
     "name": "Fusion WhatsApp"
   },
+  "landing": {
+    "nav": {
+      "login": "Accedi",
+      "register": "Inizia Gratis"
+    },
+    "hero": {
+      "title": "Infrastruttura WhatsApp & Coexistence per Sviluppatori",
+      "subtitle": "Connetti, gestisci e monitora la WhatsApp Business Cloud API per i tuoi clienti. Multi-tenant, sicuro, pronto per la produzione.",
+      "ctaPrimary": "Inizia Gratis",
+      "ctaSecondary": "Accedi"
+    },
+    "features": {
+      "title": "Tutto quello che serve per gestire WhatsApp Business su scala",
+      "coexistence": {
+        "title": "Coexistence senza perdere l'app mobile",
+        "description": "Monitoraggio automatico dell'heartbeat: i tuoi clienti restano su WhatsApp Business App e Cloud API insieme, senza interruzioni."
+      },
+      "webhook": {
+        "title": "Webhook Override ultra-veloce",
+        "description": "Un solo endpoint verso Meta, instradato automaticamente verso l'endpoint del cliente giusto tramite coda Redis e retry automatici."
+      },
+      "multitenant": {
+        "title": "Multi-tenant per agenzie",
+        "description": "Ogni cliente ha il proprio workspace isolato: connessioni, token e webhook separati sotto un'unica agenzia."
+      },
+      "noStorage": {
+        "title": "Zero storage di messaggi",
+        "description": "Non conserviamo il contenuto dei messaggi dei tuoi clienti: i payload vengono solo inoltrati, mai salvati."
+      }
+    },
+    "pricing": {
+      "title": "Un piano per ogni fase di crescita",
+      "subtitle": "Cambia piano in qualsiasi momento dalla dashboard.",
+      "upToConnections": "Fino a {count, plural, one {# connessione} other {# connessioni}}",
+      "cta": "Scegli piano",
+      "ctaFree": "Inizia Gratis",
+      "mostPopular": "Più scelto"
+    },
+    "footer": {
+      "tagline": "Infrastruttura WhatsApp Cloud API per software house e agenzie.",
+      "linksTitle": "Link utili",
+      "login": "Accedi",
+      "register": "Registrati",
+      "billing": "Piani e prezzi",
+      "compliance": "Fusion WhatsApp Provider è un'integrazione indipendente come Meta Tech Provider. Non è affiliata, sponsorizzata o approvata da Meta. WhatsApp e il logo WhatsApp sono marchi di Meta Platforms, Inc.",
+      "rights": "Tutti i diritti riservati."
+    }
+  },
   "auth": {
     "login": {
       "title": "Accedi",
@@ -10,6 +58,21 @@
       "passwordLabel": "Password",
       "submit": "Accedi",
       "error": "Email o password non validi."
+    },
+    "register": {
+      "title": "Crea il tuo account",
+      "subtitle": "Inizia gratis, fai l'upgrade quando vuoi.",
+      "agencyNameLabel": "Nome agenzia",
+      "agencyNamePlaceholder": "Es. Acme Software House",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "Almeno 8 caratteri",
+      "selectedPlan": "Piano selezionato: {plan}",
+      "submit": "Crea account",
+      "submitting": "Creazione in corso…",
+      "errorGeneric": "Si è verificato un errore. Riprova.",
+      "loginPrompt": "Hai già un account?",
+      "loginLink": "Accedi"
     }
   },
   "nav": {

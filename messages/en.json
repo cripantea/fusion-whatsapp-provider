@@ -2,6 +2,54 @@
   "app": {
     "name": "Fusion WhatsApp"
   },
+  "landing": {
+    "nav": {
+      "login": "Sign in",
+      "register": "Start Free"
+    },
+    "hero": {
+      "title": "WhatsApp Infrastructure & Coexistence for Developers",
+      "subtitle": "Connect, manage, and monitor the WhatsApp Business Cloud API for your clients. Multi-tenant, secure, production-ready.",
+      "ctaPrimary": "Start Free",
+      "ctaSecondary": "Sign in"
+    },
+    "features": {
+      "title": "Everything you need to run WhatsApp Business at scale",
+      "coexistence": {
+        "title": "Coexistence without losing the mobile app",
+        "description": "Automatic heartbeat monitoring: your clients keep using the WhatsApp Business App and the Cloud API together, without interruptions."
+      },
+      "webhook": {
+        "title": "Blazing-fast webhook override",
+        "description": "A single endpoint towards Meta, automatically routed to the right client endpoint via a Redis queue with automatic retries."
+      },
+      "multitenant": {
+        "title": "Multi-tenant for agencies",
+        "description": "Every client gets their own isolated workspace: separate connections, tokens, and webhooks under one agency."
+      },
+      "noStorage": {
+        "title": "Zero message storage",
+        "description": "We never store your clients' message content: payloads are only forwarded, never saved."
+      }
+    },
+    "pricing": {
+      "title": "A plan for every stage of growth",
+      "subtitle": "Change plan anytime from the dashboard.",
+      "upToConnections": "Up to {count, plural, one {# connection} other {# connections}}",
+      "cta": "Choose plan",
+      "ctaFree": "Start Free",
+      "mostPopular": "Most popular"
+    },
+    "footer": {
+      "tagline": "WhatsApp Cloud API infrastructure for software houses and agencies.",
+      "linksTitle": "Useful links",
+      "login": "Sign in",
+      "register": "Sign up",
+      "billing": "Plans & pricing",
+      "compliance": "Fusion WhatsApp Provider is an independent Meta Tech Provider integration. It is not affiliated with, sponsored by, or endorsed by Meta. WhatsApp and the WhatsApp logo are trademarks of Meta Platforms, Inc.",
+      "rights": "All rights reserved."
+    }
+  },
   "auth": {
     "login": {
       "title": "Sign in",
@@ -10,6 +58,21 @@
       "passwordLabel": "Password",
       "submit": "Sign in",
       "error": "Invalid email or password."
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Start for free, upgrade anytime.",
+      "agencyNameLabel": "Agency name",
+      "agencyNamePlaceholder": "e.g. Acme Software House",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHint": "At least 8 characters",
+      "selectedPlan": "Selected plan: {plan}",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "errorGeneric": "Something went wrong. Please try again.",
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Sign in"
     }
   },
   "nav": {
