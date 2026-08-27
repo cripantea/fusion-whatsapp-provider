@@ -20,10 +20,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { auth } from "@/auth";
+
+function getInitials(label: string): string {
+  return label.slice(0, 2).toUpperCase();
+}
 
 export async function Header() {
   const t = await getTranslations();
+  const session = await auth();
+  const accountLabel = session?.user?.name ?? session?.user?.email ?? "";
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -61,16 +69,16 @@ export async function Header() {
       <DropdownMenu>
         <DropdownMenuTrigger render={<Button variant="ghost" className="gap-2 px-2" />}>
           <Avatar className="size-8">
-            <AvatarFallback>FW</AvatarFallback>
+            <AvatarFallback>{getInitials(accountLabel || "FW")}</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t("header.account")}</DropdownMenuLabel>
+          <DropdownMenuLabel>{accountLabel || t("header.account")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem render={<Link href="/impostazioni" />}>
             {t("header.settings")}
           </DropdownMenuItem>
-          <DropdownMenuItem>{t("header.logout")}</DropdownMenuItem>
+          <LogoutMenuItem label={t("header.logout")} />
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

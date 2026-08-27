@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { auth } from "@/auth";
+import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -10,10 +12,14 @@ type CallbackBody = {
   code?: string;
   wabaId?: string;
   phoneNumberId?: string;
-  tenantId?: string;
 };
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const appId = process.env.FACEBOOK_APP_ID;
   const appSecret = process.env.FACEBOOK_APP_SECRET;
 
@@ -28,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { code, wabaId, phoneNumberId, tenantId } = body;
+  const { code, wabaId, phoneNumberId } = body;
 
   if (!code || !wabaId || !phoneNumberId) {
     return NextResponse.json(
@@ -55,6 +61,11 @@ export async function POST(request: NextRequest) {
   }
 
   const accessToken: string = tokenData.access_token;
+  const expiresInSeconds: number | undefined =
+    typeof tokenData.expires_in === "number" ? tokenData.expires_in : undefined;
+  const tokenExpiresAt = expiresInSeconds
+    ? new Date(Date.now() + expiresInSeconds * 1000)
+    : null;
 
   let displayPhoneNumber = phoneNumberId;
   try {
@@ -76,12 +87,7 @@ export async function POST(request: NextRequest) {
     // si prosegue comunque salvando la connessione con phoneNumberId come fallback.
   }
 
-  const existingTenant = tenantId
-    ? await prisma.tenant.findUnique({ where: { id: tenantId } })
-    : await prisma.tenant.findFirst({ orderBy: { createdAt: "asc" } });
-
-  const tenant =
-    existingTenant ?? (await prisma.tenant.create({ data: { name: "Default Workspace" } }));
+  const encryptedAccessToken = encrypt(accessToken);
 
   const connection = await prisma.whatsappConnection.upsert({
     where: { phoneNumberId },
@@ -89,14 +95,20 @@ export async function POST(request: NextRequest) {
       wabaId,
       displayPhoneNumber,
       status: "CONNECTED",
-      tenantId: tenant.id,
+      tenantId: session.user.tenantId,
+      accessToken: encryptedAccessToken,
+      tokenExpiresAt,
+      lastHeartbeatAt: new Date(),
     },
     create: {
-      tenantId: tenant.id,
+      tenantId: session.user.tenantId,
       wabaId,
       phoneNumberId,
       displayPhoneNumber,
       status: "CONNECTED",
+      accessToken: encryptedAccessToken,
+      tokenExpiresAt,
+      lastHeartbeatAt: new Date(),
     },
   });
 

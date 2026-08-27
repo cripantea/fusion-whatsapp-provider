@@ -22,20 +22,38 @@ model Tenant {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
+  users               User[]
   whatsappConnections WhatsappConnection[]
 
   @@map("tenants")
 }
 
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("users")
+}
+
 model WhatsappConnection {
-  id                  String                    @id @default(uuid())
-  tenantId            String                    @map("tenant_id")
-  wabaId              String                    @map("waba_id")
-  phoneNumberId       String                    @unique @map("phone_number_id")
-  displayPhoneNumber  String                    @map("display_phone_number")
-  status              WhatsappConnectionStatus  @default(PENDING)
-  targetWebhookUrl    String?                   @map("target_webhook_url")
-  createdAt           DateTime                  @default(now()) @map("created_at")
+  id                 String                   @id @default(uuid())
+  tenantId           String                   @map("tenant_id")
+  wabaId             String                   @map("waba_id")
+  phoneNumberId      String                   @unique @map("phone_number_id")
+  displayPhoneNumber String                   @map("display_phone_number")
+  status             WhatsappConnectionStatus @default(PENDING)
+  targetWebhookUrl   String?                  @map("target_webhook_url")
+  accessToken        String?                  @map("access_token")
+  tokenExpiresAt     DateTime?                @map("token_expires_at")
+  lastHeartbeatAt    DateTime?                @map("last_heartbeat_at")
+  createdAt          DateTime                 @default(now()) @map("created_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 

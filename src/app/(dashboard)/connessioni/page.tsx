@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 
+import { auth } from "@/auth";
 import {
   Card,
   CardContent,
@@ -27,8 +29,14 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = 
 };
 
 export default async function ConnessioniPage() {
+  const session = await auth();
+  if (!session) {
+    redirect("/login");
+  }
+
   const t = await getTranslations("connections");
   const connections = await prisma.whatsappConnection.findMany({
+    where: { tenantId: session.user.tenantId },
     orderBy: { createdAt: "desc" },
   });
 

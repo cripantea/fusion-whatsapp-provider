@@ -2,6 +2,16 @@
   "app": {
     "name": "Fusion WhatsApp"
   },
+  "auth": {
+    "login": {
+      "title": "Accedi",
+      "subtitle": "Accedi al tuo workspace Fusion WhatsApp.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Accedi",
+      "error": "Email o password non validi."
+    }
+  },
   "nav": {
     "dashboard": "Dashboard",
     "connections": "Connessioni",
