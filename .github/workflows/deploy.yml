@@ -58,6 +58,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           envs: DEPLOY_PATH
+          # Timeout di connessione SSH (default 30s: già sufficiente, alzato per un po' di margine
+          # in più contro la rete instabile osservata in passato) e timeout di esecuzione dello script
+          # (default 10m: troppo poco per una build Docker multi-stage sotto carico, vedi run 33178834941
+          # fallito con "Run Command Timeout" mentre era ancora nel mezzo del build).
+          timeout: 60s
+          command_timeout: 25m
           script: |
             set -euo pipefail
 
