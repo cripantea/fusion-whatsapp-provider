@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // SDK vanilla-JS distribuito così com'è a domini di terze parti (Step 9):
+    // codice ES5-style intenzionale, fuori dal dominio TS/React del resto dell'app.
+    "public/sdk/**",
   ]),
 ]);
 

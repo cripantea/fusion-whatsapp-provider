@@ -33,6 +33,12 @@ enum SubscriptionStatus {
   UNPAID
 }
 
+enum AppUserStatus {
+  INACTIVE
+  ACTIVE
+  REVOKED
+}
+
 // Un'Agency è l'account rivenditore (es. software house / agenzia) che si
 // registra sulla piattaforma. Gestisce N Tenant (workspace dei propri clienti finali).
 model Agency {
@@ -50,8 +56,47 @@ model Agency {
 
   users   User[]
   tenants Tenant[]
+  apps    App[]
 
   @@map("agencies")
+}
+
+// Un'App è un software di terze parti (es. "SinistroPro") che una software house
+// (Agency) integra con FusionWA tramite API Key, per conto dei propri clienti finali (AppUser).
+model App {
+  id        String    @id @default(uuid())
+  agencyId  String    @map("agency_id")
+  name      String
+  // Identificatore pubblico (prefisso fwa_live_...): safe da esporre lato client (SDK widget),
+  // usato per il lookup. Non è di per sé sufficiente ad autenticare le chiamate server-to-server.
+  apiKey    String    @unique @map("api_key")
+  // Hash bcrypt del secret generato una sola volta alla creazione: il valore in chiaro
+  // non viene mai persistito, solo restituito una volta all'agency al momento della creazione.
+  apiSecret String    @map("api_secret")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  appUsers AppUser[]
+
+  @@index([agencyId])
+  @@map("apps")
+}
+
+// Un AppUser è il cliente finale di una App di terze parti (es. il cliente "malacrida_123"
+// di SinistroPro), identificato dalla software house tramite un proprio ID esterno.
+model AppUser {
+  id                 String        @id @default(uuid())
+  appId              String        @map("app_id")
+  externalCustomerId String        @map("external_customer_id")
+  status             AppUserStatus @default(INACTIVE)
+  createdAt          DateTime      @default(now()) @map("created_at")
+
+  app                App                 @relation(fields: [appId], references: [id], onDelete: Cascade)
+  whatsappConnection WhatsappConnection?
+
+  @@unique([appId, externalCustomerId])
+  @@map("app_users")
 }
 
 // Un Tenant rappresenta il workspace di UN cliente finale dell'agenzia
@@ -85,9 +130,14 @@ model User {
   @@map("users")
 }
 
+// Una connessione appartiene ESATTAMENTE a un tenant (dashboard multi-workspace, Step 5)
+// oppure a un appUser (SDK per software house, Step 9), mai a entrambi né a nessuno dei due:
+// vincolo imposto sia dal check applicativo nei due flussi di creazione, sia da un CHECK SQL
+// aggiunto a mano nella migrazione (vedi prisma/migrations).
 model WhatsappConnection {
   id                 String                   @id @default(uuid())
-  tenantId           String                   @map("tenant_id")
+  tenantId           String?                  @map("tenant_id")
+  appUserId          String?                  @unique @map("app_user_id")
   wabaId             String                   @map("waba_id")
   phoneNumberId      String                   @unique @map("phone_number_id")
   displayPhoneNumber String                   @map("display_phone_number")
@@ -98,7 +148,8 @@ model WhatsappConnection {
   lastHeartbeatAt    DateTime?                @map("last_heartbeat_at")
   createdAt          DateTime                 @default(now()) @map("created_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant  Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  appUser AppUser? @relation(fields: [appUserId], references: [id], onDelete: Cascade)
 
   @@index([tenantId])
   @@map("whatsapp_connections")

@@ -69,6 +69,18 @@ export default async function ImpostazioniPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>{t("applications.title")}</CardTitle>
+          <CardDescription>{t("applications.subtitle")}</CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button nativeButton={false} render={<Link href="/impostazioni/applicazioni" />}>
+            {t("applications.manageLink")}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>{t("appearance.title")}</CardTitle>
           <CardDescription>{t("appearance.description")}</CardDescription>
         </CardHeader>

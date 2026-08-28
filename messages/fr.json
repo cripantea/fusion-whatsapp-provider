@@ -202,6 +202,39 @@
         "CANCELED": "Annulé",
         "UNPAID": "Impayé"
       }
+    },
+    "applications": {
+      "title": "Applications",
+      "subtitle": "Gérez les clés API des applications tierces connectées à votre compte.",
+      "manageLink": "Gérer les Applications",
+      "createTitle": "Nouvelle application",
+      "createDescription": "Générez une clé API à intégrer dans le logiciel d'une société tierce (ex. \"SinistroPro\") via le SDK FusionWA.",
+      "nameLabel": "Nom de l'application",
+      "namePlaceholder": "Ex. SinistroPro",
+      "createButton": "Générer la clé API",
+      "creating": "Génération…",
+      "nameRequired": "Le nom de l'application est obligatoire",
+      "errorGeneric": "Une erreur est survenue. Veuillez réessayer.",
+      "secretRevealTitle": "Clé API générée pour « {name} »",
+      "secretRevealDescription": "Copiez la clé secrète maintenant : elle ne sera plus jamais affichée par la suite.",
+      "apiKeyLabel": "Clé API",
+      "apiSecretLabel": "Clé secrète API",
+      "copyButton": "Copier",
+      "copied": "Copié",
+      "doneButton": "C'est copié, fermer",
+      "tableName": "Nom",
+      "tableApiKey": "Clé API",
+      "tableCustomers": "Clients",
+      "tableConnections": "Connexions actives",
+      "tableStatus": "Statut",
+      "tableActions": "Actions",
+      "statusActive": "Active",
+      "statusRevoked": "Révoquée",
+      "revokeButton": "Révoquer",
+      "revokeConfirm": "Confirmer la révocation",
+      "revoking": "Révocation…",
+      "cancel": "Annuler",
+      "empty": "Aucune application créée pour l'instant."
     }
   }
 }

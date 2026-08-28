@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StripeActionButton } from "@/components/billing/stripe-action-button";
+import { countAgencyConnections } from "@/lib/agency-connections";
 import { PAID_PLAN_TYPES, PLAN_MAX_CONNECTIONS } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
 
@@ -27,9 +28,7 @@ export default async function BillingPage() {
     redirect("/dashboard");
   }
 
-  const currentConnections = await prisma.whatsappConnection.count({
-    where: { tenant: { agencyId: agency.id } },
-  });
+  const currentConnections = await countAgencyConnections(agency.id);
 
   return (
     <div className="flex flex-col gap-6">

@@ -63,6 +63,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  // Le connessioni create via SDK (Step 9) appartengono a un AppUser, non a un Tenant:
+  // non sono gestibili da questo endpoint, pensato solo per il flusso dashboard.
+  if (!connection.tenantId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   // Verifica che il tenant della connessione appartenga all'agency dell'utente loggato.
   const ownedTenant = await assertTenantOwnedByAgency(
     connection.tenantId,

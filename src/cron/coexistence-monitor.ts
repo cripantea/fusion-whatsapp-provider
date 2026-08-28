@@ -21,6 +21,13 @@ async function main() {
       tenant: {
         select: { id: true, name: true, agencyId: true },
       },
+      appUser: {
+        select: {
+          id: true,
+          externalCustomerId: true,
+          app: { select: { id: true, name: true, agencyId: true } },
+        },
+      },
     },
   });
 
@@ -37,11 +44,26 @@ async function main() {
       ? Math.floor((Date.now() - connection.lastHeartbeatAt.getTime()) / (24 * 60 * 60 * 1000))
       : null;
 
+    // La connessione appartiene esattamente a un tenant (dashboard) o a un appUser (SDK, Step 9),
+    // mai a entrambi: vedi il CHECK SQL su whatsapp_connections.
+    const owner = connection.tenant
+      ? {
+          ownerType: "tenant" as const,
+          tenantId: connection.tenant.id,
+          tenantName: connection.tenant.name,
+          agencyId: connection.tenant.agencyId,
+        }
+      : {
+          ownerType: "appUser" as const,
+          appUserId: connection.appUser?.id,
+          externalCustomerId: connection.appUser?.externalCustomerId,
+          appName: connection.appUser?.app.name,
+          agencyId: connection.appUser?.app.agencyId,
+        };
+
     console.warn(WARNING_CODE, {
       connectionId: connection.id,
-      tenantId: connection.tenant.id,
-      tenantName: connection.tenant.name,
-      agencyId: connection.tenant.agencyId,
+      ...owner,
       wabaId: connection.wabaId,
       phoneNumberId: connection.phoneNumberId,
       displayPhoneNumber: connection.displayPhoneNumber,

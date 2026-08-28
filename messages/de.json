@@ -202,6 +202,39 @@
         "CANCELED": "Gekündigt",
         "UNPAID": "Unbezahlt"
       }
+    },
+    "applications": {
+      "title": "Anwendungen",
+      "subtitle": "Verwalte die API-Keys der mit deinem Konto verbundenen Drittanwendungen.",
+      "manageLink": "Anwendungen verwalten",
+      "createTitle": "Neue Anwendung",
+      "createDescription": "Generiere einen API-Key zur Integration in die Software eines Drittanbieters (z. B. \"SinistroPro\") über das FusionWA-SDK.",
+      "nameLabel": "Name der Anwendung",
+      "namePlaceholder": "z. B. SinistroPro",
+      "createButton": "API-Key generieren",
+      "creating": "Wird generiert…",
+      "nameRequired": "Der Name der Anwendung ist erforderlich",
+      "errorGeneric": "Es ist ein Fehler aufgetreten. Bitte versuche es erneut.",
+      "secretRevealTitle": "API-Key generiert für „{name}“",
+      "secretRevealDescription": "Kopiere den Secret Key jetzt: Er wird danach nicht mehr angezeigt.",
+      "apiKeyLabel": "API-Key",
+      "apiSecretLabel": "API-Secret",
+      "copyButton": "Kopieren",
+      "copied": "Kopiert",
+      "doneButton": "Kopiert, schließen",
+      "tableName": "Name",
+      "tableApiKey": "API-Key",
+      "tableCustomers": "Kunden",
+      "tableConnections": "Aktive Verbindungen",
+      "tableStatus": "Status",
+      "tableActions": "Aktionen",
+      "statusActive": "Aktiv",
+      "statusRevoked": "Widerrufen",
+      "revokeButton": "Widerrufen",
+      "revokeConfirm": "Widerruf bestätigen",
+      "revoking": "Wird widerrufen…",
+      "cancel": "Abbrechen",
+      "empty": "Noch keine Anwendung erstellt."
     }
   }
 }
