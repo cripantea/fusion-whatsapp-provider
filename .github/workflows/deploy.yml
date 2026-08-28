@@ -61,7 +61,9 @@ jobs:
           script: |
             set -euo pipefail
 
-            APP_DIR="${DEPLOY_PATH:-/opt/fusion-whatsapp-provider}"
+            # Default coerente con l'attuale server di produzione (utente non-sudo,
+            # repo clonato nella home). Override possibile con la repo variable DEPLOY_PATH.
+            APP_DIR="${DEPLOY_PATH:-/home/cristi/fusion-whatsapp-provider}"
             cd "$APP_DIR"
 
             echo "==> Pull ultimo codice da main"
