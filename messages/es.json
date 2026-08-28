@@ -1,0 +1,207 @@
+{
+  "app": {
+    "name": "Fusion WhatsApp"
+  },
+  "landing": {
+    "nav": {
+      "login": "Iniciar sesión",
+      "register": "Empieza Gratis"
+    },
+    "hero": {
+      "title": "Infraestructura de WhatsApp y Coexistence para Desarrolladores",
+      "subtitle": "Conecta, gestiona y monitoriza la API de WhatsApp Business Cloud para tus clientes. Multi-tenant, segura y lista para producción.",
+      "ctaPrimary": "Empieza Gratis",
+      "ctaSecondary": "Iniciar sesión"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para gestionar WhatsApp Business a gran escala",
+      "coexistence": {
+        "title": "Coexistence sin perder la app móvil",
+        "description": "Monitorización automática del heartbeat: tus clientes siguen usando la app de WhatsApp Business y la Cloud API juntas, sin interrupciones."
+      },
+      "webhook": {
+        "title": "Webhook Override ultrarrápido",
+        "description": "Un único endpoint hacia Meta, encaminado automáticamente al endpoint correcto del cliente mediante una cola Redis con reintentos automáticos."
+      },
+      "multitenant": {
+        "title": "Multi-tenant para agencias",
+        "description": "Cada cliente tiene su propio workspace aislado: conexiones, tokens y webhooks separados bajo una misma agencia."
+      },
+      "noStorage": {
+        "title": "Cero almacenamiento de mensajes",
+        "description": "No almacenamos el contenido de los mensajes de tus clientes: los payloads solo se reenvían, nunca se guardan."
+      }
+    },
+    "pricing": {
+      "title": "Un plan para cada etapa de crecimiento",
+      "subtitle": "Cambia de plan cuando quieras desde el panel.",
+      "upToConnections": "Hasta {count, plural, one {# conexión} other {# conexiones}}",
+      "cta": "Elegir plan",
+      "ctaFree": "Empieza Gratis",
+      "mostPopular": "Más elegido"
+    },
+    "footer": {
+      "tagline": "Infraestructura de WhatsApp Cloud API para software houses y agencias.",
+      "linksTitle": "Enlaces útiles",
+      "login": "Iniciar sesión",
+      "register": "Regístrate",
+      "billing": "Planes y precios",
+      "compliance": "Fusion WhatsApp Provider es una integración independiente como Meta Tech Provider. No está afiliada, patrocinada ni respaldada por Meta. WhatsApp y el logotipo de WhatsApp son marcas de Meta Platforms, Inc.",
+      "rights": "Todos los derechos reservados."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Accede a tu workspace de Fusion WhatsApp.",
+      "emailLabel": "Email",
+      "passwordLabel": "Contraseña",
+      "submit": "Iniciar sesión",
+      "error": "Email o contraseña no válidos."
+    },
+    "register": {
+      "title": "Crea tu cuenta",
+      "subtitle": "Empieza gratis, mejora tu plan cuando quieras.",
+      "agencyNameLabel": "Nombre de la agencia",
+      "agencyNamePlaceholder": "Ej. Acme Software House",
+      "emailLabel": "Email",
+      "passwordLabel": "Contraseña",
+      "passwordHint": "Al menos 8 caracteres",
+      "selectedPlan": "Plan seleccionado: {plan}",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta…",
+      "errorGeneric": "Se ha producido un error. Inténtalo de nuevo.",
+      "loginPrompt": "¿Ya tienes una cuenta?",
+      "loginLink": "Iniciar sesión"
+    }
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "connections": "Conexiones",
+    "settings": "Configuración"
+  },
+  "workspace": {
+    "switcherLabel": "Tus workspaces",
+    "newWorkspace": "Nuevo workspace de cliente",
+    "newWorkspaceDescription": "Crea un nuevo workspace para un cliente: podrás asignarle sus conexiones de WhatsApp por separado de las demás.",
+    "nameLabel": "Nombre del cliente",
+    "namePlaceholder": "Ej. Acme S.L.",
+    "create": "Crear workspace"
+  },
+  "header": {
+    "openMenu": "Abrir el menú",
+    "toggleTheme": "Cambiar tema",
+    "account": "Mi cuenta",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Resumen general de tus conexiones de WhatsApp.",
+    "stats": {
+      "activeConnections": "Conexiones activas",
+      "messagesSent": "Mensajes enviados (30 días)",
+      "contacts": "Contactos",
+      "conversations": "Conversaciones"
+    },
+    "recentConnections": {
+      "title": "Conexiones recientes",
+      "name": "Nombre",
+      "status": "Estado",
+      "notConfigured": "No configurado",
+      "primaryNumber": "Número principal",
+      "supportNumber": "Número de soporte"
+    }
+  },
+  "connections": {
+    "title": "Conexiones",
+    "subtitle": "Gestiona los números de WhatsApp vinculados a tu cuenta.",
+    "linkedNumbers": {
+      "title": "Números vinculados",
+      "description": "La lista de números de WhatsApp configurados para este workspace.",
+      "waba": "WABA ID",
+      "phoneNumber": "Número",
+      "webhook": "Target Webhook URL",
+      "status": "Estado",
+      "empty": "Todavía no hay ninguna conexión configurada."
+    },
+    "webhookEditor": {
+      "placeholder": "https://tu-endpoint.ejemplo.com/webhook",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "error": "URL no válida o error al guardar"
+    },
+    "statusLabels": {
+      "PENDING": "Pendiente",
+      "CONNECTED": "Conectado",
+      "DISCONNECTED": "Desconectado",
+      "ERROR": "Error"
+    },
+    "embeddedSignup": {
+      "title": "Vincular un nuevo número",
+      "description": "Inicia el flujo de Embedded Signup de Meta para vincular un número de WhatsApp Business a tu workspace.",
+      "destinationLabel": "Asignar al workspace del cliente",
+      "connectButton": "Conectar cuenta de WhatsApp",
+      "connecting": "Conectando…",
+      "sdkLoading": "Cargando el SDK de Facebook…",
+      "sdkError": "No se ha podido cargar el SDK de Facebook. Inténtalo de nuevo más tarde.",
+      "configMissing": "Falta la configuración de Embedded Signup. Contacta con el administrador.",
+      "cancelled": "Conexión cancelada.",
+      "success": "Número de WhatsApp vinculado correctamente.",
+      "error": "Se ha producido un error al conectar. Inténtalo de nuevo.",
+      "limitReached": "Has alcanzado el número máximo de conexiones de tu plan. Mejora tu plan para conectar más."
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Gestiona la información del workspace y las preferencias de la cuenta.",
+    "workspace": {
+      "title": "Workspace",
+      "description": "Información general sobre tu espacio de trabajo.",
+      "nameLabel": "Nombre del workspace",
+      "namePlaceholder": "Mi empresa",
+      "emailLabel": "Email de contacto",
+      "emailPlaceholder": "equipo@empresa.es",
+      "save": "Guardar cambios"
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Elige el tema de la interfaz.",
+      "themeLabel": "Tema claro / oscuro"
+    },
+    "billing": {
+      "title": "Facturación",
+      "subtitle": "Gestiona el plan de tu agencia y las conexiones de WhatsApp disponibles.",
+      "manageLink": "Ir a Facturación",
+      "currentPlan": {
+        "title": "Plan actual",
+        "description": "El plan y el estado de la suscripción de tu agencia."
+      },
+      "connectionsUsage": "{used} / {max} conexiones de WhatsApp utilizadas",
+      "managePlan": "Gestionar suscripción",
+      "redirecting": "Redirigiendo…",
+      "plans": {
+        "title": "Planes disponibles",
+        "description": "Mejora tu plan para vincular más números de WhatsApp."
+      },
+      "maxConnections": "Hasta {max} conexiones",
+      "upgradeTo": "Cambiar a {plan}",
+      "currentPlanLabel": "Plan actual",
+      "planLabels": {
+        "DEVELOPER": "Developer",
+        "TEAM": "Team",
+        "AGENCY": "Agency",
+        "ENTERPRISE": "Enterprise"
+      },
+      "statusLabels": {
+        "INACTIVE": "Inactivo",
+        "TRIALING": "Prueba gratuita",
+        "ACTIVE": "Activo",
+        "PAST_DUE": "Pago atrasado",
+        "CANCELED": "Cancelado",
+        "UNPAID": "Impagado"
+      }
+    }
+  }
+}
