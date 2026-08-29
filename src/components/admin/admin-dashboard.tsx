@@ -246,9 +246,16 @@ function PaymentLinkGenerator({ agencyId }: { agencyId: string }) {
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
       {url && (
-        <div className="flex items-center gap-2">
-          <code className="flex-1 truncate rounded bg-muted px-2 py-1 text-xs">{url}</code>
-          <Button type="button" variant="outline" onClick={handleCopy}>
+        <div className="flex w-full items-stretch gap-2 md:w-[65%]">
+          <code className="min-w-0 flex-[7] rounded border bg-muted px-3 py-2 text-xs leading-relaxed break-all whitespace-pre-wrap">
+            {url}
+          </code>
+          <Button
+            type="button"
+            variant="outline"
+            className="flex-[3] shrink-0"
+            onClick={handleCopy}
+          >
             {copied ? "Copiato" : "Copia"}
           </Button>
         </div>
