@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { createAppAction, revokeAppAction } from "@/actions/apps";
@@ -35,6 +35,19 @@ type AppRow = {
 
 type RevealedSecret = { name: string; apiKey: string; rawApiSecret: string };
 
+function buildIntegrationSnippet(apiKey: string) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `<script src="${origin}/sdk/v1.js"></script>
+<script>
+  FusionWA.init({
+    apiKey: "${apiKey}",
+    customerId: "CUSTOMER_ID", // il tuo ID interno per questo cliente
+    containerId: "fusionwa-widget"
+  });
+</script>
+<div id="fusionwa-widget"></div>`;
+}
+
 export function ApplicationsManager({
   apps: initialApps,
   maxConnections,
@@ -49,9 +62,13 @@ export function ApplicationsManager({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<RevealedSecret | null>(null);
-  const [copiedField, setCopiedField] = useState<"apiKey" | "apiSecret" | null>(null);
+  const [copiedField, setCopiedField] = useState<"apiKey" | "apiSecret" | "snippet" | null>(
+    null
+  );
   const [confirmingRevokeId, setConfirmingRevokeId] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [openSnippetId, setOpenSnippetId] = useState<string | null>(null);
+  const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
 
   async function handleCreate() {
     const trimmedName = name.trim();
@@ -100,7 +117,7 @@ export function ApplicationsManager({
     }
   }
 
-  async function copyToClipboard(value: string, field: "apiKey" | "apiSecret") {
+  async function copyToClipboard(value: string, field: "apiKey" | "apiSecret" | "snippet") {
     try {
       await navigator.clipboard.writeText(value);
       setCopiedField(field);
@@ -181,6 +198,24 @@ export function ApplicationsManager({
               </Button>
             </div>
           )}
+
+          {revealed && (
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">{t("integrationTitle")}</span>
+              <p className="text-sm text-muted-foreground">{t("integrationDescription")}</p>
+              <pre className="overflow-x-auto rounded-lg border bg-muted p-3 text-xs">
+                <code>{buildIntegrationSnippet(revealed.apiKey)}</code>
+              </pre>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-fit"
+                onClick={() => copyToClipboard(buildIntegrationSnippet(revealed.apiKey), "snippet")}
+              >
+                {copiedField === "snippet" ? t("copied") : t("copySnippet")}
+              </Button>
+            </div>
+          )}
         </CardContent>
         <CardFooter>
           <Button onClick={handleCreate} disabled={creating}>
@@ -215,50 +250,95 @@ export function ApplicationsManager({
                 </TableRow>
               ) : (
                 apps.map((app) => (
-                  <TableRow key={app.id}>
-                    <TableCell className="font-medium">{app.name}</TableCell>
-                    <TableCell>
-                      <code className="text-xs text-muted-foreground">{app.apiKey}</code>
-                    </TableCell>
-                    <TableCell>{app.customersCount}</TableCell>
-                    <TableCell>
-                      {app.connectedCount} / {maxConnections}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={app.revoked ? "destructive" : "default"}>
-                        {app.revoked ? t("statusRevoked") : t("statusActive")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {app.revoked ? null : confirmingRevokeId === app.id ? (
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            disabled={revokingId === app.id}
-                            onClick={() => handleRevoke(app.id)}
-                          >
-                            {revokingId === app.id ? t("revoking") : t("revokeConfirm")}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setConfirmingRevokeId(null)}
-                          >
-                            {t("cancel")}
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setConfirmingRevokeId(app.id)}
-                        >
-                          {t("revokeButton")}
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                  <Fragment key={app.id}>
+                    <TableRow>
+                      <TableCell className="font-medium">{app.name}</TableCell>
+                      <TableCell>
+                        <code className="text-xs text-muted-foreground">{app.apiKey}</code>
+                      </TableCell>
+                      <TableCell>{app.customersCount}</TableCell>
+                      <TableCell>
+                        {app.connectedCount} / {maxConnections}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={app.revoked ? "destructive" : "default"}>
+                          {app.revoked ? t("statusRevoked") : t("statusActive")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {app.revoked ? null : confirmingRevokeId === app.id ? (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              disabled={revokingId === app.id}
+                              onClick={() => handleRevoke(app.id)}
+                            >
+                              {revokingId === app.id ? t("revoking") : t("revokeConfirm")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setConfirmingRevokeId(null)}
+                            >
+                              {t("cancel")}
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() =>
+                                setOpenSnippetId((current) => (current === app.id ? null : app.id))
+                              }
+                            >
+                              {openSnippetId === app.id ? t("hideSnippetButton") : t("snippetButton")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setConfirmingRevokeId(app.id)}
+                            >
+                              {t("revokeButton")}
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                    {openSnippetId === app.id && (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <div className="flex flex-col gap-2">
+                            <p className="text-sm text-muted-foreground">
+                              {t("integrationDescription")}
+                            </p>
+                            <pre className="overflow-x-auto rounded-lg border bg-muted p-3 text-xs">
+                              <code>{buildIntegrationSnippet(app.apiKey)}</code>
+                            </pre>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-fit"
+                              onClick={async () => {
+                                await copyToClipboard(buildIntegrationSnippet(app.apiKey), "snippet");
+                                setCopiedSnippetId(app.id);
+                                setTimeout(
+                                  () =>
+                                    setCopiedSnippetId((current) =>
+                                      current === app.id ? null : current
+                                    ),
+                                  2000
+                                );
+                              }}
+                            >
+                              {copiedSnippetId === app.id ? t("copied") : t("copySnippet")}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 ))
               )}
             </TableBody>
