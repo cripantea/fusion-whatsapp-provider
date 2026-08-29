@@ -77,17 +77,19 @@ export async function POST(request: NextRequest) {
   const graphData = await graphResponse.json().catch(() => null);
   const errorCode = graphData?.error?.code ? String(graphData.error.code) : null;
 
+  // Forma della risposta identica a quella di Graph API (error.code/error.message)
+  // così un chiamante che già parla con Graph direttamente (es. sinistripro) non
+  // deve cambiare la propria logica di lettura, solo l'URL a cui fa la richiesta.
   if (errorCode === REJECTED_ERROR_CODE) {
     return NextResponse.json({
       status: "rejected",
-      errorCode,
-      errorMessage: graphData?.error?.message ?? null,
+      error: { code: errorCode, message: graphData?.error?.message ?? null },
     });
   }
 
   if (!graphResponse.ok) {
     return NextResponse.json(
-      { error: "Richiesta di sync fallita", details: graphData?.error ?? null },
+      { error: { code: errorCode, message: graphData?.error?.message ?? "Richiesta di sync fallita" } },
       { status: 502 }
     );
   }
