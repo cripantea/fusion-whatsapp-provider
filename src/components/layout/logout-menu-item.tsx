@@ -6,7 +6,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export function LogoutMenuItem({ label }: { label: string }) {
   return (
-    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
+    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
       {label}
     </DropdownMenuItem>
   );
