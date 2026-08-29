@@ -55,12 +55,14 @@ CMD ["node", "server.js"]
 # (tsx) e i comandi `prisma generate`/`migrate deploy` in fase di deploy.
 FROM base AS worker
 ENV NODE_ENV=production
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npx prisma generate
-# L'immagine gira come utente "node" (non root): senza questo chown, un secondo
-# `prisma generate`/`migrate deploy` lanciato a runtime (es. dal workflow di deploy)
-# fallirebbe con EACCES perché i file generati in fase di build appartengono a root.
-RUN chown -R node:node /app
+# --chown in fase di COPY (invece di un "RUN chown -R /app" a parte) evita di dover
+# attraversare l'intero node_modules una seconda volta: con l'overlay filesystem di
+# BuildKit un chown -R ricorsivo forza il copy-up di ogni singolo file, arrivando a
+# durare oltre 20 minuti su questa immagine. USER node va impostato PRIMA di
+# `prisma generate` così i file che genera nascono già del proprietario giusto,
+# invece di appartenere a root (motivo per cui serviva il chown a valle).
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
+COPY --chown=node:node . .
 USER node
+RUN npx prisma generate
 CMD ["npm", "run", "worker"]
