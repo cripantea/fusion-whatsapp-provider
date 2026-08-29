@@ -66,7 +66,8 @@ function delay(ms: number) {
 
 export async function deliverWebhook(
   targetUrl: string,
-  rawBody: string
+  rawBody: string,
+  signature?: string | null
 ): Promise<DeliveryResult> {
   let lastStatus: number | undefined;
   let lastError: string | undefined;
@@ -81,6 +82,10 @@ export async function deliverWebhook(
         headers: {
           "Content-Type": "application/json",
           "User-Agent": "FusionWhatsAppProvider-WebhookForwarder/1.0",
+          // Inoltrata invariata: il destinatario che verifica l'HMAC di Meta
+          // (stesso App Secret, essendo la stessa App Meta) deve poterla validare
+          // esattamente come se avesse ricevuto la richiesta direttamente da Meta.
+          ...(signature ? { "x-hub-signature-256": signature } : {}),
         },
         body: rawBody,
         signal: controller.signal,
@@ -110,7 +115,16 @@ export async function deliverWebhook(
   return { success: false, attempts: MAX_ATTEMPTS, lastStatus, lastError };
 }
 
-export async function processWebhookEvent(rawBody: string): Promise<void> {
+export async function processWebhookEvent(queueItem: string): Promise<void> {
+  let signature: string | null | undefined;
+  let rawBody: string;
+  try {
+    ({ signature, body: rawBody } = JSON.parse(queueItem));
+  } catch {
+    console.error("[webhook-forwarder] elemento in coda non valido, JSON non parsabile");
+    return;
+  }
+
   let payload: MetaWebhookPayload;
   try {
     payload = JSON.parse(rawBody);
@@ -141,7 +155,7 @@ export async function processWebhookEvent(rawBody: string): Promise<void> {
       continue;
     }
 
-    const result = await deliverWebhook(connection.targetWebhookUrl, rawBody);
+    const result = await deliverWebhook(connection.targetWebhookUrl, rawBody, signature);
 
     if (result.success) {
       console.log(

@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await redis.lpush(WEBHOOK_QUEUE_KEY, rawBody);
+  // Il forwarder deve poter inoltrare la stessa firma originale al webhook di
+  // destinazione (es. un altro gestionale che verifica anch'esso l'HMAC di
+  // Meta): la incapsuliamo insieme al body invece di accodare solo il body.
+  await redis.lpush(WEBHOOK_QUEUE_KEY, JSON.stringify({ signature: signatureHeader, body: rawBody }));
 
   return NextResponse.json({ status: "success" }, { status: 200 });
 }
