@@ -12,6 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PLAN_MAX_CONNECTIONS } from "@/lib/plans";
+import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 
 const PLANS = [
   { key: "DEVELOPER" as const, price: "$0", highlighted: false },
@@ -59,9 +60,15 @@ export async function PricingTable() {
                 className="w-full"
                 variant={plan.highlighted ? "default" : "outline"}
                 nativeButton={false}
-                render={<Link href={`/register?plan=${plan.key}`} />}
+                render={
+                  <Link href={PUBLIC_SIGNUP_ENABLED ? `/register?plan=${plan.key}` : "/login"} />
+                }
               >
-                {plan.key === "DEVELOPER" ? t("ctaFree") : t("cta")}
+                {PUBLIC_SIGNUP_ENABLED
+                  ? plan.key === "DEVELOPER"
+                    ? t("ctaFree")
+                    : t("cta")
+                  : t("ctaLogin")}
               </Button>
             </CardFooter>
           </Card>

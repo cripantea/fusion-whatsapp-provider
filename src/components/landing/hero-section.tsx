@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
+import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 
 export async function HeroSection() {
   const t = await getTranslations("landing.hero");
@@ -15,17 +16,25 @@ export async function HeroSection() {
         {t("subtitle")}
       </p>
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button size="lg" nativeButton={false} render={<Link href="/register" />}>
-          {t("ctaPrimary")}
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          nativeButton={false}
-          render={<Link href="/login" />}
-        >
-          {t("ctaSecondary")}
-        </Button>
+        {PUBLIC_SIGNUP_ENABLED ? (
+          <>
+            <Button size="lg" nativeButton={false} render={<Link href="/register" />}>
+              {t("ctaPrimary")}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              nativeButton={false}
+              render={<Link href="/login" />}
+            >
+              {t("ctaSecondary")}
+            </Button>
+          </>
+        ) : (
+          <Button size="lg" nativeButton={false} render={<Link href="/login" />}>
+            {t("ctaPlatform")}
+          </Button>
+        )}
       </div>
     </section>
   );

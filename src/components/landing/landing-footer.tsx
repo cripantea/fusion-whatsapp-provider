@@ -2,6 +2,8 @@ import Link from "next/link";
 import { MessageSquareText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
+
 export async function LandingFooter() {
   const t = await getTranslations("landing.footer");
   const tApp = await getTranslations("app");
@@ -27,12 +29,14 @@ export async function LandingFooter() {
           >
             {t("login")}
           </Link>
-          <Link
-            href="/register"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            {t("register")}
-          </Link>
+          {PUBLIC_SIGNUP_ENABLED && (
+            <Link
+              href="/register"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              {t("register")}
+            </Link>
+          )}
           <Link
             href="/#pricing"
             className="text-sm text-muted-foreground hover:text-foreground"

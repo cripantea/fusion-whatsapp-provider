@@ -11,7 +11,8 @@
       "title": "WhatsApp-Infrastruktur & Coexistence für Entwickler",
       "subtitle": "Verbinde, verwalte und überwache die WhatsApp Business Cloud API für deine Kunden. Multi-Tenant, sicher, produktionsbereit.",
       "ctaPrimary": "Kostenlos starten",
-      "ctaSecondary": "Anmelden"
+      "ctaSecondary": "Anmelden",
+      "ctaPlatform": "Zur Plattform"
     },
     "features": {
       "title": "Alles, was du brauchst, um WhatsApp Business im großen Maßstab zu betreiben",
@@ -38,6 +39,7 @@
       "upToConnections": "Bis zu {count, plural, one {# Verbindung} other {# Verbindungen}}",
       "cta": "Plan wählen",
       "ctaFree": "Kostenlos starten",
+      "ctaLogin": "Anmelden",
       "mostPopular": "Beliebteste Wahl"
     },
     "footer": {
@@ -57,7 +59,8 @@
       "emailLabel": "E-Mail",
       "passwordLabel": "Passwort",
       "submit": "Anmelden",
-      "error": "Ungültige E-Mail oder ungültiges Passwort."
+      "error": "Ungültige E-Mail oder ungültiges Passwort.",
+      "accessRestricted": "Eingeschränkter Zugang: Registrierungen sind derzeit nicht öffentlich möglich."
     },
     "register": {
       "title": "Erstelle dein Konto",

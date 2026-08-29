@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 
 export async function LandingHeader() {
   const t = await getTranslations("landing.nav");
@@ -20,12 +21,18 @@ export async function LandingHeader() {
       <div className="flex-1" />
 
       <ThemeToggle label={tHeader("toggleTheme")} />
-      <Button variant="ghost" nativeButton={false} render={<Link href="/login" />}>
+      <Button
+        variant={PUBLIC_SIGNUP_ENABLED ? "ghost" : "default"}
+        nativeButton={false}
+        render={<Link href="/login" />}
+      >
         {t("login")}
       </Button>
-      <Button nativeButton={false} render={<Link href="/register" />}>
-        {t("register")}
-      </Button>
+      {PUBLIC_SIGNUP_ENABLED && (
+        <Button nativeButton={false} render={<Link href="/register" />}>
+          {t("register")}
+        </Button>
+      )}
     </header>
   );
 }

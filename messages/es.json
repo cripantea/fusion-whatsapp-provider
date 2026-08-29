@@ -11,7 +11,8 @@
       "title": "Infraestructura de WhatsApp y Coexistence para Desarrolladores",
       "subtitle": "Conecta, gestiona y monitoriza la API de WhatsApp Business Cloud para tus clientes. Multi-tenant, segura y lista para producción.",
       "ctaPrimary": "Empieza Gratis",
-      "ctaSecondary": "Iniciar sesión"
+      "ctaSecondary": "Iniciar sesión",
+      "ctaPlatform": "Accede a la Plataforma"
     },
     "features": {
       "title": "Todo lo que necesitas para gestionar WhatsApp Business a gran escala",
@@ -38,6 +39,7 @@
       "upToConnections": "Hasta {count, plural, one {# conexión} other {# conexiones}}",
       "cta": "Elegir plan",
       "ctaFree": "Empieza Gratis",
+      "ctaLogin": "Iniciar sesión",
       "mostPopular": "Más elegido"
     },
     "footer": {
@@ -57,7 +59,8 @@
       "emailLabel": "Email",
       "passwordLabel": "Contraseña",
       "submit": "Iniciar sesión",
-      "error": "Email o contraseña no válidos."
+      "error": "Email o contraseña no válidos.",
+      "accessRestricted": "Acceso restringido: los registros no están abiertos al público en este momento."
     },
     "register": {
       "title": "Crea tu cuenta",

@@ -131,6 +131,7 @@ function NewSubscriberForm() {
 function PlanManager({ agency }: { agency: AgencyRow }) {
   const [planType, setPlanType] = useState(agency.planType);
   const [subscriptionStatus, setSubscriptionStatus] = useState(agency.subscriptionStatus);
+  const [maxConnections, setMaxConnections] = useState(String(agency.maxConnections));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -140,7 +141,13 @@ function PlanManager({ agency }: { agency: AgencyRow }) {
     setSaved(false);
     setSaving(true);
     try {
-      await updateAgencyPlanAction({ agencyId: agency.id, planType, subscriptionStatus });
+      const parsed = Number(maxConnections);
+      await updateAgencyPlanAction({
+        agencyId: agency.id,
+        planType,
+        subscriptionStatus,
+        maxConnectionsOverride: Number.isFinite(parsed) ? parsed : undefined,
+      });
       setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore generico");
@@ -180,6 +187,16 @@ function PlanManager({ agency }: { agency: AgencyRow }) {
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-muted-foreground">Quota connessioni</label>
+        <Input
+          type="number"
+          min={0}
+          className="w-28"
+          value={maxConnections}
+          onChange={(e) => setMaxConnections(e.target.value)}
+        />
       </div>
       <Button type="button" variant="outline" disabled={saving} onClick={handleSave}>
         {saving ? "Salvataggio…" : "Salva piano"}

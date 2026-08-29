@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
+import { auth } from "@/auth";
 import { isPlanType, PLAN_MAX_CONNECTIONS } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
+import { isSuperAdminEmail } from "@/lib/superadmin";
 
 export const runtime = "nodejs";
 
@@ -19,6 +21,13 @@ type RegisterBody = {
 };
 
 export async function POST(request: NextRequest) {
+  // Modalità Private Engine (B2B): registrazione riservata al superadmin, non
+  // pubblica. Riattivare il self-service B2C significa solo rimuovere questo guard.
+  const session = await auth();
+  if (!session || !isSuperAdminEmail(session.user.email)) {
+    return NextResponse.json({ error: "Accesso riservato" }, { status: 403 });
+  }
+
   let body: RegisterBody;
   try {
     body = await request.json();

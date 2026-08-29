@@ -7,6 +7,7 @@ import { countAgencyConnections } from "@/lib/agency-connections";
 import { corsPreflight, withCors } from "@/lib/cors";
 import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+import { agencyHasSuperAdminUser } from "@/lib/superadmin";
 
 export const runtime = "nodejs";
 
@@ -154,8 +155,9 @@ async function handleTenantContext(params: {
   }
 
   // Limite piano: una nuova connessione (non una riautorizzazione di una già esistente)
-  // non può superare il numero massimo consentito dal piano dell'agency.
-  if (!existingConnection) {
+  // non può superare il numero massimo consentito dal piano dell'agency, a meno che
+  // l'agency non sia quella di un superadmin (licenze illimitate).
+  if (!existingConnection && !(await agencyHasSuperAdminUser(session.user.agencyId))) {
     const agency = await prisma.agency.findUnique({
       where: { id: session.user.agencyId },
       select: { maxConnections: true },
@@ -242,7 +244,7 @@ async function handleAppUserContext(
     return NextResponse.json({ error: "Connessione già registrata da un altro account" }, { status: 403 });
   }
 
-  if (!existingConnection) {
+  if (!existingConnection && !(await agencyHasSuperAdminUser(app.agencyId))) {
     const agency = await prisma.agency.findUnique({
       where: { id: app.agencyId },
       select: { maxConnections: true },

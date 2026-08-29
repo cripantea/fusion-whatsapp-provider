@@ -96,10 +96,14 @@ export async function createSubscriberAction(input: {
 
 // Cambia piano/stato abbonamento senza passare da Stripe: per pagamenti concordati
 // fuori flusso (bonifico, accordo commerciale custom) durante l'avvio a voce delle vendite.
+// maxConnectionsOverride è opzionale: se assente, la quota segue il default del piano
+// scelto; se presente, sovrascrive quel default con un valore ad-hoc per questa agenzia
+// (es. un accordo commerciale custom, indipendente dai piani standard).
 export async function updateAgencyPlanAction(input: {
   agencyId: string;
   planType: string;
   subscriptionStatus: string;
+  maxConnectionsOverride?: number;
 }) {
   await requireSuperAdmin();
 
@@ -110,13 +114,19 @@ export async function updateAgencyPlanAction(input: {
   if (!validStatuses.includes(input.subscriptionStatus)) {
     throw new Error("Stato abbonamento non valido");
   }
+  if (
+    input.maxConnectionsOverride !== undefined &&
+    (!Number.isInteger(input.maxConnectionsOverride) || input.maxConnectionsOverride < 0)
+  ) {
+    throw new Error("Il limite connessioni deve essere un numero intero >= 0");
+  }
 
   await prisma.agency.update({
     where: { id: input.agencyId },
     data: {
       planType: input.planType,
       subscriptionStatus: input.subscriptionStatus as never,
-      maxConnections: PLAN_MAX_CONNECTIONS[input.planType],
+      maxConnections: input.maxConnectionsOverride ?? PLAN_MAX_CONNECTIONS[input.planType],
     },
   });
 

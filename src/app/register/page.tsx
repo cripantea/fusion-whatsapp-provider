@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { isPlanType } from "@/lib/plans";
+import { isSuperAdminEmail } from "@/lib/superadmin";
 import {
   Card,
   CardContent,
@@ -20,8 +21,14 @@ export default async function RegisterPage({
 }: {
   searchParams: Promise<{ plan?: string }>;
 }) {
+  // Modalità Private Engine (B2B): la registrazione pubblica è congelata, non
+  // rimossa — riattivarla per il self-service B2C significa solo togliere questo
+  // guard, il resto del flusso (form, API, auto-login) resta intatto.
   const session = await auth();
-  if (session) {
+  if (!session) {
+    redirect("/login?reason=private_engine");
+  }
+  if (!isSuperAdminEmail(session.user.email)) {
     redirect("/dashboard");
   }
 

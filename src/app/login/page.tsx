@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; reason?: string }>;
 }) {
   const session = await auth();
   if (session) {
@@ -27,7 +27,7 @@ export default async function LoginPage({
 
   const t = await getTranslations("auth.login");
   const tApp = await getTranslations("app");
-  const { error } = await searchParams;
+  const { error, reason } = await searchParams;
 
   async function loginAction(formData: FormData) {
     "use server";
@@ -59,6 +59,11 @@ export default async function LoginPage({
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
+          {reason === "private_engine" && (
+            <p className="mb-4 rounded-md border border-amber-500/50 bg-amber-500/5 p-3 text-sm">
+              {t("accessRestricted")}
+            </p>
+          )}
           <form action={loginAction} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-sm font-medium">
