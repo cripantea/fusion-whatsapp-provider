@@ -25,6 +25,7 @@ import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
 import { WorkspaceSwitcherRow } from "@/components/layout/workspace-switcher-row";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { auth } from "@/auth";
+import { isSuperAdminEmail } from "@/lib/superadmin";
 
 type Tenant = { id: string; name: string };
 
@@ -42,6 +43,7 @@ export async function Header({
   const t = await getTranslations();
   const session = await auth();
   const accountLabel = session?.user?.name ?? session?.user?.email ?? "";
+  const isSuperAdmin = isSuperAdminEmail(session?.user?.email);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -90,6 +92,9 @@ export async function Header({
             <DropdownMenuItem render={<Link href="/impostazioni" />}>
               {t("header.settings")}
             </DropdownMenuItem>
+            {isSuperAdmin && (
+              <DropdownMenuItem render={<Link href="/admin" />}>Admin</DropdownMenuItem>
+            )}
             <LogoutMenuItem label={t("header.logout")} />
           </DropdownMenuGroup>
         </DropdownMenuContent>
