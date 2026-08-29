@@ -9,10 +9,20 @@ export const runtime = "nodejs";
 const GRAPH_API_VERSION = "v21.0";
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
 
+type TemplatePayload = {
+  name?: string;
+  language?: string;
+  bodyParams?: unknown;
+};
+
 type SendMessageBody = {
   externalCustomerId?: string;
   toPhoneNumber?: string;
   message?: string;
+  // Un template pre-approvato è l'unico modo per iniziare una conversazione con
+  // un numero senza una finestra di 24h già aperta (regola della piattaforma
+  // WhatsApp, non un limite nostro): se presente, ha priorità su `message`.
+  template?: TemplatePayload;
 };
 
 export async function POST(request: NextRequest) {
@@ -28,12 +38,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { externalCustomerId, toPhoneNumber, message } = body;
-  if (!externalCustomerId || !toPhoneNumber || !message) {
+  const { externalCustomerId, toPhoneNumber, message, template } = body;
+  if (!externalCustomerId || !toPhoneNumber) {
     return NextResponse.json(
-      { error: "Missing required fields: externalCustomerId, toPhoneNumber, message" },
+      { error: "Missing required fields: externalCustomerId, toPhoneNumber" },
       { status: 400 }
     );
+  }
+  if (!message && !template) {
+    return NextResponse.json(
+      { error: "Serve uno tra: message (testo libero) o template (per contattare un numero nuovo)" },
+      { status: 400 }
+    );
+  }
+  if (template && (!template.name || !template.language || typeof template.name !== "string" || typeof template.language !== "string")) {
+    return NextResponse.json(
+      { error: "template richiede almeno { name, language }" },
+      { status: 400 }
+    );
+  }
+  if (template?.bodyParams !== undefined && !Array.isArray(template.bodyParams)) {
+    return NextResponse.json({ error: "template.bodyParams deve essere un array" }, { status: 400 });
   }
 
   const appUser = await prisma.appUser.findUnique({
@@ -56,18 +81,43 @@ export async function POST(request: NextRequest) {
   const accessToken = decrypt(connection.accessToken);
 
   const messagesUrl = `${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/${connection.phoneNumberId}/messages`;
+  const graphPayload = template
+    ? {
+        messaging_product: "whatsapp",
+        to: toPhoneNumber,
+        type: "template",
+        template: {
+          name: template.name,
+          language: { code: template.language },
+          ...(Array.isArray(template.bodyParams) && template.bodyParams.length > 0
+            ? {
+                components: [
+                  {
+                    type: "body",
+                    parameters: template.bodyParams.map((param) => ({
+                      type: "text",
+                      text: String(param),
+                    })),
+                  },
+                ],
+              }
+            : {}),
+        },
+      }
+    : {
+        messaging_product: "whatsapp",
+        to: toPhoneNumber,
+        type: "text",
+        text: { preview_url: false, body: message },
+      };
+
   const graphResponse = await fetch(messagesUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({
-      messaging_product: "whatsapp",
-      to: toPhoneNumber,
-      type: "text",
-      text: { preview_url: false, body: message },
-    }),
+    body: JSON.stringify(graphPayload),
   });
 
   const graphData = await graphResponse.json().catch(() => null);
