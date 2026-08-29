@@ -82,7 +82,13 @@ export function FacebookEmbeddedSignup({
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  const handleSdkLoad = useCallback(() => {
+  // window.fbAsyncInit deve esistere PRIMA che lo script esterno dell'SDK Facebook
+  // finisca di eseguirsi: l'SDK lo controlla in modo sincrono durante il proprio
+  // bootstrap e, se non lo trova in quel momento, non lo richiama mai più. Per
+  // questo va impostato qui (side effect al mount, quindi prima che il fetch di
+  // rete dello <Script> asincrono possa completarsi) e non nel callback onLoad
+  // dello <Script>, che scatta invece DOPO l'esecuzione dell'SDK.
+  useEffect(() => {
     if (!appId) return;
 
     window.fbAsyncInit = () => {
@@ -150,7 +156,6 @@ export function FacebookEmbeddedSignup({
       <Script
         src="https://connect.facebook.net/en_US/sdk.js"
         strategy="afterInteractive"
-        onLoad={handleSdkLoad}
         onError={() => setSdkFailed(true)}
       />
 
