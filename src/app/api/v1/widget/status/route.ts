@@ -46,6 +46,11 @@ export async function GET(request: NextRequest) {
     NextResponse.json({
       status: "CONNECTED",
       phoneNumber: appUser.whatsappConnection.displayPhoneNumber,
+      // Non sono segreti (a differenza del token, mai esposto): un'app come
+      // sinistripro ne ha bisogno per popolare la propria tabella locale e
+      // riconoscere a chi appartiene ogni evento nel proprio webhook.
+      wabaId: appUser.whatsappConnection.wabaId,
+      phoneNumberId: appUser.whatsappConnection.phoneNumberId,
     })
   );
 }
