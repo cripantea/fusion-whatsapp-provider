@@ -44,7 +44,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
     ports:
-      - "${APP_PORT:-3000}:3000"
+      # Bind solo su localhost: Apache la raggiunge già via 127.0.0.1, non deve
+      # essere raggiungibile direttamente da internet (Docker bypassa ufw se
+      # pubblicata su 0.0.0.0).
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     depends_on:
       db:
         condition: service_healthy
