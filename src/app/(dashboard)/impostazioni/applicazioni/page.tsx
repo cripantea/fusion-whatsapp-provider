@@ -30,6 +30,7 @@ export default async function ApplicazioniPage() {
       name: app.name,
       apiKey: app.apiKey,
       revoked: app.revokedAt !== null,
+      webhookUrl: app.webhookUrl,
       customersCount: app._count.appUsers,
       connectedCount: await prisma.whatsappConnection.count({
         where: { appUser: { appId: app.id }, status: "CONNECTED" },

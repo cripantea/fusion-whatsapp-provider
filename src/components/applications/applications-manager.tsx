@@ -3,7 +3,7 @@
 import { Fragment, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { createAppAction, revokeAppAction } from "@/actions/apps";
+import { createAppAction, revokeAppAction, updateAppWebhookAction } from "@/actions/apps";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +29,7 @@ type AppRow = {
   name: string;
   apiKey: string;
   revoked: boolean;
+  webhookUrl: string | null;
   customersCount: number;
   connectedCount: number;
 };
@@ -70,6 +71,12 @@ export function ApplicationsManager({
   const [openSnippetId, setOpenSnippetId] = useState<string | null>(null);
   const [copiedSnippetId, setCopiedSnippetId] = useState<string | null>(null);
 
+  const [openWebhookId, setOpenWebhookId] = useState<string | null>(null);
+  const [webhookDrafts, setWebhookDrafts] = useState<Record<string, string>>({});
+  const [savingWebhookId, setSavingWebhookId] = useState<string | null>(null);
+  const [webhookError, setWebhookError] = useState<string | null>(null);
+  const [savedWebhookId, setSavedWebhookId] = useState<string | null>(null);
+
   async function handleCreate() {
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -88,6 +95,7 @@ export function ApplicationsManager({
           name: result.name,
           apiKey: result.apiKey,
           revoked: false,
+          webhookUrl: null,
           customersCount: 0,
           connectedCount: 0,
         },
@@ -114,6 +122,31 @@ export function ApplicationsManager({
     } finally {
       setRevokingId(null);
       setConfirmingRevokeId(null);
+    }
+  }
+
+  function openWebhookEditor(app: AppRow) {
+    setWebhookError(null);
+    setOpenWebhookId((current) => (current === app.id ? null : app.id));
+    setWebhookDrafts((current) =>
+      current[app.id] !== undefined ? current : { ...current, [app.id]: app.webhookUrl ?? "" }
+    );
+  }
+
+  async function handleSaveWebhook(appId: string) {
+    setSavingWebhookId(appId);
+    setWebhookError(null);
+    try {
+      const result = await updateAppWebhookAction(appId, webhookDrafts[appId] ?? "");
+      setApps((current) =>
+        current.map((app) => (app.id === appId ? { ...app, webhookUrl: result.webhookUrl } : app))
+      );
+      setSavedWebhookId(appId);
+      setTimeout(() => setSavedWebhookId((current) => (current === appId ? null : current)), 2000);
+    } catch (err) {
+      setWebhookError(err instanceof Error ? err.message : t("errorGeneric"));
+    } finally {
+      setSavingWebhookId(null);
     }
   }
 
@@ -295,6 +328,9 @@ export function ApplicationsManager({
                             >
                               {openSnippetId === app.id ? t("hideSnippetButton") : t("snippetButton")}
                             </Button>
+                            <Button type="button" variant="outline" onClick={() => openWebhookEditor(app)}>
+                              {openWebhookId === app.id ? t("hideWebhookButton") : t("webhookButton")}
+                            </Button>
                             <Button
                               type="button"
                               variant="outline"
@@ -333,6 +369,41 @@ export function ApplicationsManager({
                               }}
                             >
                               {copiedSnippetId === app.id ? t("copied") : t("copySnippet")}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {openWebhookId === app.id && (
+                      <TableRow>
+                        <TableCell colSpan={6}>
+                          <div className="flex flex-col gap-2 sm:max-w-lg">
+                            <p className="text-sm text-muted-foreground">{t("webhookDescription")}</p>
+                            <Input
+                              placeholder={t("webhookPlaceholder")}
+                              value={webhookDrafts[app.id] ?? ""}
+                              onChange={(event) =>
+                                setWebhookDrafts((current) => ({
+                                  ...current,
+                                  [app.id]: event.target.value,
+                                }))
+                              }
+                            />
+                            {webhookError && (
+                              <p className="text-sm text-destructive">{webhookError}</p>
+                            )}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-fit"
+                              disabled={savingWebhookId === app.id}
+                              onClick={() => handleSaveWebhook(app.id)}
+                            >
+                              {savingWebhookId === app.id
+                                ? t("webhookSaving")
+                                : savedWebhookId === app.id
+                                  ? t("webhookSaved")
+                                  : t("webhookSaveButton")}
                             </Button>
                           </div>
                         </TableCell>

@@ -331,6 +331,10 @@ async function handleAppUserContext(
       status: "CONNECTED",
       appUserId: appUser.id,
       tenantId: null,
+      // Le connessioni AppUser non hanno un endpoint proprio per impostare
+      // target_webhook_url (a differenza del flusso Tenant): ereditano sempre
+      // il default configurato sull'App, così restano allineate se cambia.
+      targetWebhookUrl: app.webhookUrl,
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
       lastHeartbeatAt: new Date(),
@@ -341,6 +345,7 @@ async function handleAppUserContext(
       phoneNumberId,
       displayPhoneNumber,
       status: "CONNECTED",
+      targetWebhookUrl: app.webhookUrl,
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
       lastHeartbeatAt: new Date(),

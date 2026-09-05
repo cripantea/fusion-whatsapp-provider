@@ -3,34 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { assertTenantOwnedByAgency } from "@/lib/active-tenant";
 import { prisma } from "@/lib/prisma";
+import { normalizeWebhookUrl } from "@/lib/webhook-url";
 
 export const runtime = "nodejs";
 
 type PatchBody = {
   targetWebhookUrl?: unknown;
 };
-
-type NormalizedUrl = { ok: true; url: string | null } | { ok: false };
-
-function normalizeWebhookUrl(value: unknown): NormalizedUrl {
-  if (value === null || value === undefined || value === "") {
-    return { ok: true, url: null };
-  }
-
-  if (typeof value !== "string") {
-    return { ok: false };
-  }
-
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-      return { ok: false };
-    }
-    return { ok: true, url: parsed.toString() };
-  } catch {
-    return { ok: false };
-  }
-}
 
 export async function PATCH(
   request: NextRequest,

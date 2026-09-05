@@ -74,6 +74,11 @@ model App {
   // non viene mai persistito, solo restituito una volta all'agency al momento della creazione.
   apiSecret String    @map("api_secret")
   revokedAt DateTime? @map("revoked_at")
+  // URL a cui inoltrare i webhook Meta per tutte le connessioni degli AppUser di
+  // quest'App (Step 9, SDK): a differenza del flusso dashboard (Step 5, Tenant),
+  // qui non esiste un endpoint per impostare target_webhook_url per singola
+  // connessione, quindi vale come default unico per l'intera integrazione.
+  webhookUrl String?   @map("webhook_url")
   createdAt DateTime  @default(now()) @map("created_at")
 
   agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
