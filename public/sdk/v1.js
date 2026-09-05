@@ -228,7 +228,16 @@
       } catch (e) {
         return;
       }
-      if (payload && payload.type === "WA_EMBEDDED_SIGNUP" && payload.event === "FINISH") {
+      // "FINISH" è l'evento della registrazione standard (porta anche
+      // phone_number_id). Per la Coexistence (numero già attivo
+      // sull'app WhatsApp Business) Meta manda invece
+      // "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING", con solo waba_id: il
+      // phone_number_id in quel caso va risolto lato server (vedi
+      // /api/auth/facebook/callback), che lo recupera da
+      // GET /{waba_id}/phone_numbers quando il client non lo manda.
+      var isFinish = payload && payload.type === "WA_EMBEDDED_SIGNUP" &&
+        (payload.event === "FINISH" || payload.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING");
+      if (isFinish) {
         signupData.wabaId = payload.data && payload.data.waba_id;
         signupData.phoneNumberId = payload.data && payload.data.phone_number_id;
       }
@@ -281,7 +290,12 @@
           response_type: "code",
           override_default_response_type: true,
           scope: FACEBOOK_SCOPE,
-          extras: { sessionInfoVersion: "3" },
+          // featureType abilita la Coexistence: senza questo campo Meta apre
+          // il popup in modalità di registrazione standard, che richiede il
+          // numero libero — rifiuta con "già registrato in un account
+          // WhatsApp" qualunque numero già collegato all'app WhatsApp
+          // Business sul telefono (proprio il caso d'uso della Coexistence).
+          extras: { setup: {}, featureType: "whatsapp_business_app_onboarding", sessionInfoVersion: "3" },
         }
       );
     });

@@ -18,6 +18,9 @@ const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.face
 type CallbackBody = {
   code?: string;
   wabaId?: string;
+  // Presente per la registrazione standard (evento FINISH). Assente per la
+  // Coexistence (evento FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING, che porta
+  // solo waba_id) — in quel caso va risolto qui, vedi resolvePhoneNumberId.
   phoneNumberId?: string;
   // Contesto dashboard (Step 5): collega la connessione a un Tenant, richiede sessione utente.
   tenantId?: string;
@@ -86,6 +89,44 @@ async function fetchDisplayPhoneNumber(phoneNumberId: string, accessToken: strin
   return phoneNumberId;
 }
 
+async function fetchPhoneNumbersForWaba(
+  wabaId: string,
+  accessToken: string
+): Promise<Array<{ id: string; isOnBizApp: boolean }>> {
+  const url = new URL(`${GRAPH_API_BASE_URL}/${GRAPH_API_VERSION}/${wabaId}/phone_numbers`);
+  url.searchParams.set("fields", "is_on_biz_app");
+  url.searchParams.set("access_token", accessToken);
+
+  const response = await fetch(url);
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !Array.isArray(data?.data)) {
+    return [];
+  }
+
+  return (data.data as Array<{ id?: string; is_on_biz_app?: boolean }>)
+    .filter((entry): entry is { id: string; is_on_biz_app?: boolean } => typeof entry.id === "string")
+    .map((entry) => ({ id: entry.id, isOnBizApp: entry.is_on_biz_app === true }));
+}
+
+/**
+ * La registrazione standard (evento FINISH) porta già phone_number_id dal
+ * client. La Coexistence (evento FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING)
+ * porta solo waba_id: il numero va risolto qui elencando i numeri della WABA
+ * e prendendo quello effettivamente collegato all'app WhatsApp Business
+ * (is_on_biz_app), o il primo disponibile se nessuno lo è ancora.
+ */
+async function resolvePhoneNumberId(
+  wabaId: string,
+  accessToken: string,
+  providedPhoneNumberId: string | undefined
+): Promise<string | null> {
+  if (providedPhoneNumberId) return providedPhoneNumberId;
+
+  const phoneNumbers = await fetchPhoneNumbersForWaba(wabaId, accessToken);
+  const onBizApp = phoneNumbers.find((entry) => entry.isOnBizApp);
+  return onBizApp?.id ?? phoneNumbers[0]?.id ?? null;
+}
+
 export async function OPTIONS() {
   return corsPreflight();
 }
@@ -100,12 +141,9 @@ export async function POST(request: NextRequest) {
 
   const { code, wabaId, phoneNumberId, tenantId, externalCustomerId } = body;
 
-  if (!code || !wabaId || !phoneNumberId) {
+  if (!code || !wabaId) {
     return withCors(
-      NextResponse.json(
-        { error: "Missing required fields: code, wabaId, phoneNumberId" },
-        { status: 400 }
-      )
+      NextResponse.json({ error: "Missing required fields: code, wabaId" }, { status: 400 })
     );
   }
 
@@ -130,10 +168,10 @@ export async function POST(request: NextRequest) {
 async function handleTenantContext(params: {
   code: string;
   wabaId: string;
-  phoneNumberId: string;
+  phoneNumberId?: string;
   tenantId: string;
 }): Promise<NextResponse> {
-  const { code, wabaId, phoneNumberId, tenantId } = params;
+  const { code, wabaId, phoneNumberId: providedPhoneNumberId, tenantId } = params;
 
   const session = await auth();
   if (!session) {
@@ -145,6 +183,19 @@ async function handleTenantContext(params: {
   const targetTenant = await assertTenantOwnedByAgency(tenantId, session.user.agencyId);
   if (!targetTenant) {
     return NextResponse.json({ error: "Workspace di destinazione non valido" }, { status: 403 });
+  }
+
+  const oauthResult = await exchangeCodeForToken(code);
+  if (!oauthResult) {
+    return NextResponse.json({ error: "Failed to exchange code for access token" }, { status: 502 });
+  }
+
+  const phoneNumberId = await resolvePhoneNumberId(wabaId, oauthResult.accessToken, providedPhoneNumberId);
+  if (!phoneNumberId) {
+    return NextResponse.json(
+      { error: "Impossibile determinare il numero di telefono collegato a questa WABA" },
+      { status: 502 }
+    );
   }
 
   // Ownership check: se questo numero è già collegato a un altro tenant/appUser, blocca
@@ -167,11 +218,6 @@ async function handleTenantContext(params: {
     if (agency && currentConnections >= agency.maxConnections) {
       return NextResponse.json({ error: "Limit reached", maxConnections: agency.maxConnections }, { status: 403 });
     }
-  }
-
-  const oauthResult = await exchangeCodeForToken(code);
-  if (!oauthResult) {
-    return NextResponse.json({ error: "Failed to exchange code for access token" }, { status: 502 });
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
@@ -220,9 +266,9 @@ async function handleTenantContext(params: {
 
 async function handleAppUserContext(
   request: NextRequest,
-  params: { code: string; wabaId: string; phoneNumberId: string; externalCustomerId: string }
+  params: { code: string; wabaId: string; phoneNumberId?: string; externalCustomerId: string }
 ): Promise<NextResponse> {
-  const { code, wabaId, phoneNumberId, externalCustomerId } = params;
+  const { code, wabaId, phoneNumberId: providedPhoneNumberId, externalCustomerId } = params;
 
   const app = await authenticateApp(request);
   if (!app) {
@@ -237,6 +283,19 @@ async function handleAppUserContext(
   });
   if (!appUser || appUser.status !== "ACTIVE") {
     return NextResponse.json({ error: "AppUser non attivo: chiamare prima /api/v1/widget/activate" }, { status: 403 });
+  }
+
+  const oauthResult = await exchangeCodeForToken(code);
+  if (!oauthResult) {
+    return NextResponse.json({ error: "Failed to exchange code for access token" }, { status: 502 });
+  }
+
+  const phoneNumberId = await resolvePhoneNumberId(wabaId, oauthResult.accessToken, providedPhoneNumberId);
+  if (!phoneNumberId) {
+    return NextResponse.json(
+      { error: "Impossibile determinare il numero di telefono collegato a questa WABA" },
+      { status: 502 }
+    );
   }
 
   const existingConnection = await prisma.whatsappConnection.findUnique({ where: { phoneNumberId } });
@@ -254,11 +313,6 @@ async function handleAppUserContext(
     if (agency && currentConnections >= agency.maxConnections) {
       return NextResponse.json({ error: "Limit reached", maxConnections: agency.maxConnections }, { status: 403 });
     }
-  }
-
-  const oauthResult = await exchangeCodeForToken(code);
-  if (!oauthResult) {
-    return NextResponse.json({ error: "Failed to exchange code for access token" }, { status: 502 });
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
