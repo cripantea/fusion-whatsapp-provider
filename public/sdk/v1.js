@@ -8,7 +8,7 @@
   "use strict";
 
   var API_KEY_HEADER = "X-FusionWA-API-Key";
-  var GRAPH_SDK_VERSION = "v21.0";
+  var GRAPH_SDK_VERSION = "v26.0";
   var FACEBOOK_SCOPE = "whatsapp_business_management,whatsapp_business_messaging";
   var FACEBOOK_MESSAGE_ORIGIN = "https://www.facebook.com";
 

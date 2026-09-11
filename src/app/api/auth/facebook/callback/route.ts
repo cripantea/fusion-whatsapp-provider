@@ -11,7 +11,7 @@ import { agencyHasSuperAdminUser } from "@/lib/superadmin";
 
 export const runtime = "nodejs";
 
-const GRAPH_API_VERSION = "v21.0";
+const GRAPH_API_VERSION = "v26.0";
 // Configurabile per test/endpoint regionali; di default punta alla Graph API pubblica di Meta.
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
 

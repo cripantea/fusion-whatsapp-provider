@@ -27,7 +27,7 @@ type EmbeddedSignupMessage = {
 
 type Tenant = { id: string; name: string };
 
-const GRAPH_SDK_VERSION = "v21.0";
+const GRAPH_SDK_VERSION = "v26.0";
 const FACEBOOK_SCOPE = "whatsapp_business_management,whatsapp_business_messaging";
 const FACEBOOK_MESSAGE_ORIGIN = "https://www.facebook.com";
 
