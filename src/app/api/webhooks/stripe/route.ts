@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   handleCheckoutSessionCompleted,
+  handleInvoicePaid,
+  handleInvoicePaymentFailed,
   handleSubscriptionDeleted,
   handleSubscriptionUpdated,
 } from "@/lib/stripe-events";
@@ -31,15 +33,27 @@ export async function POST(request: NextRequest) {
   }
 
   switch (event.type) {
+    // Legacy subscription + nuovo setup (disambiguato in handleCheckoutSessionCompleted via session.mode)
     case "checkout.session.completed":
       await handleCheckoutSessionCompleted(event.data.object);
       break;
+
+    // Legacy subscription management
     case "customer.subscription.updated":
       await handleSubscriptionUpdated(event.data.object);
       break;
     case "customer.subscription.deleted":
       await handleSubscriptionDeleted(event.data.object);
       break;
+
+    // Nuovo modello — pagamento attivazione connessione (autorità finale)
+    case "invoice.paid":
+      await handleInvoicePaid(event.data.object);
+      break;
+    case "invoice.payment_failed":
+      await handleInvoicePaymentFailed(event.data.object);
+      break;
+
     default:
       break;
   }

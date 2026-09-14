@@ -25,7 +25,7 @@ export async function createAppAction(name: string) {
     data: { name: trimmedName, agencyId: session.user.agencyId, apiKey, apiSecret },
   });
 
-  revalidatePath("/impostazioni/applicazioni");
+  revalidatePath("/applicazioni");
 
   // rawApiSecret esiste solo qui: dopo questa risposta non è più recuperabile,
   // né in chiaro né dal DB (è salvato solo il suo hash bcrypt).
@@ -50,7 +50,7 @@ export async function revokeAppAction(appId: string) {
     data: { revokedAt: new Date() },
   });
 
-  revalidatePath("/impostazioni/applicazioni");
+  revalidatePath("/applicazioni");
 }
 
 export async function updateAppWebhookAction(appId: string, webhookUrl: string) {
@@ -82,7 +82,7 @@ export async function updateAppWebhookAction(appId: string, webhookUrl: string) 
     }),
   ]);
 
-  revalidatePath("/impostazioni/applicazioni");
+  revalidatePath("/applicazioni");
 
   return { webhookUrl: normalized.url };
 }

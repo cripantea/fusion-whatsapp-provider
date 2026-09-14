@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Fusion WhatsApp"
+    "name": "FusionWA"
   },
   "landing": {
     "nav": {
@@ -81,6 +81,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "connections": "Connections",
+    "applications": "Applications",
     "settings": "Settings"
   },
   "workspace": {
@@ -100,20 +101,19 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "General overview of your WhatsApp connections.",
+    "subtitle": "Overview of your Fusion WhatsApp account.",
     "stats": {
-      "activeConnections": "Active connections",
-      "messagesSent": "Messages sent (30d)",
-      "contacts": "Contacts",
-      "conversations": "Conversations"
+      "directConnections": "Direct connections",
+      "sdkConnections": "SDK connections",
+      "apps": "Applications",
+      "sdkUsers": "SDK users"
     },
     "recentConnections": {
-      "title": "Recent connections",
-      "name": "Name",
+      "title": "Latest direct connections",
+      "phoneNumber": "Number",
+      "wabaId": "WABA ID",
       "status": "Status",
-      "notConfigured": "Not configured",
-      "primaryNumber": "Primary number",
-      "supportNumber": "Support number"
+      "empty": "No connection configured yet."
     }
   },
   "connections": {
@@ -121,7 +121,7 @@
     "subtitle": "Manage the WhatsApp numbers linked to your account.",
     "linkedNumbers": {
       "title": "Linked numbers",
-      "description": "The list of WhatsApp numbers configured for this workspace.",
+      "description": "The list of WhatsApp numbers linked to your account.",
       "waba": "WABA ID",
       "phoneNumber": "Number",
       "webhook": "Target Webhook URL",
@@ -143,8 +143,7 @@
     },
     "embeddedSignup": {
       "title": "Link a new number",
-      "description": "Start Meta's Embedded Signup flow to link a WhatsApp Business number to your workspace.",
-      "destinationLabel": "Assign to client workspace",
+      "description": "Start Meta's Embedded Signup flow to link a new WhatsApp Business number to your account.",
       "connectButton": "Connect WhatsApp Account",
       "connecting": "Connecting…",
       "sdkLoading": "Loading the Facebook SDK…",

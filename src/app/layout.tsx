@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fusion WhatsApp Provider",
-  description: "Dashboard SaaS per la gestione delle connessioni WhatsApp",
+  title: "FusionWA",
+  description: "WhatsApp Business Cloud API per software house e agenzie.",
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
 

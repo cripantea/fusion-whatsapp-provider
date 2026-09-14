@@ -148,6 +148,15 @@ export async function processWebhookEvent(queueItem: string): Promise<void> {
   }
 
   for (const connection of connections) {
+    // Connessioni con pagamento fallito non devono ricevere eventi:
+    // non sono operative finché il billing non viene risolto.
+    if (connection.billingStatus === "PAYMENT_FAILED") {
+      console.warn(
+        `[webhook-forwarder] connessione ${connection.id} con billingStatus=PAYMENT_FAILED, skip`
+      );
+      continue;
+    }
+
     if (!connection.targetWebhookUrl) {
       console.warn(
         `[webhook-forwarder] connessione ${connection.id} senza target_webhook_url, skip`

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-const GRAPH_API_VERSION = "v21.0";
+const GRAPH_API_VERSION = "v26.0";
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
 
 type TemplatePayload = {
@@ -75,6 +75,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "Nessun numero WhatsApp collegato per questo cliente" },
       { status: 409 }
+    );
+  }
+
+  if (connection.billingStatus === "PAYMENT_FAILED") {
+    return NextResponse.json(
+      { error: "Connessione non operativa: pagamento fallito — risolvere il billing dalla dashboard" },
+      { status: 402 }
     );
   }
 

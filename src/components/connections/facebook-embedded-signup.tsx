@@ -6,13 +6,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type SignupStatus = "idle" | "connecting" | "success" | "error" | "cancelled" | "limit_reached";
 
@@ -25,22 +18,18 @@ type EmbeddedSignupMessage = {
   };
 };
 
-type Tenant = { id: string; name: string };
-
 const GRAPH_SDK_VERSION = "v26.0";
-const FACEBOOK_SCOPE = "whatsapp_business_management,whatsapp_business_messaging";
+const FACEBOOK_SCOPE = "business_management,whatsapp_business_management,whatsapp_business_messaging";
 const FACEBOOK_MESSAGE_ORIGIN = "https://www.facebook.com";
 
 export function FacebookEmbeddedSignup({
   appId,
   configId,
-  tenants,
-  activeTenantId,
+  tenantId,
 }: {
   appId: string | null;
   configId: string | null;
-  tenants: Tenant[];
-  activeTenantId: string;
+  tenantId: string;
 }) {
   const t = useTranslations("connections.embeddedSignup");
   const router = useRouter();
@@ -48,16 +37,11 @@ export function FacebookEmbeddedSignup({
   const [sdkReady, setSdkReady] = useState(false);
   const [sdkFailed, setSdkFailed] = useState(false);
   const [status, setStatus] = useState<SignupStatus>("idle");
-  const [destinationTenantId, setDestinationTenantId] = useState(activeTenantId);
 
   // Meta invia waba_id/phone_number_id via postMessage durante il flusso Embedded Signup,
   // separatamente dal `code` OAuth restituito dal callback di FB.login().
   const signupDataRef = useRef<{ wabaId?: string; phoneNumberId?: string }>({});
-  const destinationTenantIdRef = useRef(destinationTenantId);
-
-  useEffect(() => {
-    destinationTenantIdRef.current = destinationTenantId;
-  }, [destinationTenantId]);
+  const tenantIdRef = useRef(tenantId);
 
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
@@ -128,7 +112,7 @@ export function FacebookEmbeddedSignup({
         }
 
         const { wabaId, phoneNumberId } = signupDataRef.current;
-        const tenantId = destinationTenantIdRef.current;
+        const tenantId = tenantIdRef.current;
 
         fetch("/api/auth/facebook/callback", {
           method: "POST",
@@ -173,33 +157,6 @@ export function FacebookEmbeddedSignup({
         strategy="afterInteractive"
         onError={() => setSdkFailed(true)}
       />
-
-      {tenants.length > 1 && (
-        <div className="flex flex-col gap-1.5 sm:max-w-xs">
-          <label className="text-sm font-medium">{t("destinationLabel")}</label>
-          <Select
-            value={destinationTenantId}
-            onValueChange={(value) => {
-              if (value) setDestinationTenantId(value);
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue>
-                {(value: string) =>
-                  tenants.find((tenant) => tenant.id === value)?.name ?? value
-                }
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {tenants.map((tenant) => (
-                <SelectItem key={tenant.id} value={tenant.id}>
-                  {tenant.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
       <Button
         onClick={handleConnect}

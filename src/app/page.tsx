@@ -1,6 +1,6 @@
 import { LandingHeader } from "@/components/landing/landing-header";
 import { HeroSection } from "@/components/landing/hero-section";
-import { FeatureCards } from "@/components/landing/feature-cards";
+import { FeaturesSection } from "@/components/landing/features-section";
 import { PricingTable } from "@/components/landing/pricing-table";
 import { LandingFooter } from "@/components/landing/landing-footer";
 
@@ -10,7 +10,7 @@ export default function Home() {
       <LandingHeader />
       <main className="flex-1">
         <HeroSection />
-        <FeatureCards />
+        <FeaturesSection />
         <PricingTable />
       </main>
       <LandingFooter />

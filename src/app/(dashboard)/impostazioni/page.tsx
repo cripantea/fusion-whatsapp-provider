@@ -4,12 +4,11 @@ import { getTranslations } from "next-intl/server";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -26,55 +25,12 @@ export default async function ImpostazioniPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("workspace.title")}</CardTitle>
-          <CardDescription>{t("workspace.description")}</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4 sm:max-w-md">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="workspace-name" className="text-sm font-medium">
-              {t("workspace.nameLabel")}
-            </label>
-            <Input
-              id="workspace-name"
-              placeholder={t("workspace.namePlaceholder")}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="workspace-email" className="text-sm font-medium">
-              {t("workspace.emailLabel")}
-            </label>
-            <Input
-              id="workspace-email"
-              type="email"
-              placeholder={t("workspace.emailPlaceholder")}
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button>{t("workspace.save")}</Button>
-        </CardFooter>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>{t("billing.title")}</CardTitle>
           <CardDescription>{t("billing.subtitle")}</CardDescription>
         </CardHeader>
         <CardFooter>
           <Button nativeButton={false} render={<Link href="/impostazioni/billing" />}>
             {t("billing.manageLink")}
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("applications.title")}</CardTitle>
-          <CardDescription>{t("applications.subtitle")}</CardDescription>
-        </CardHeader>
-        <CardFooter>
-          <Button nativeButton={false} render={<Link href="/impostazioni/applicazioni" />}>
-            {t("applications.manageLink")}
           </Button>
         </CardFooter>
       </Card>

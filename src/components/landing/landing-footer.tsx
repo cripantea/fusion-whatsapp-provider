@@ -1,56 +1,63 @@
 import Link from "next/link";
-import { MessageSquareText } from "lucide-react";
-import { getTranslations } from "next-intl/server";
 
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 
-export async function LandingFooter() {
-  const t = await getTranslations("landing.footer");
-  const tApp = await getTranslations("app");
-
+export function LandingFooter() {
   const year = new Date().getFullYear();
 
   return (
     <footer className="border-t">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:flex-row sm:justify-between">
-        <div className="flex max-w-sm flex-col gap-2">
-          <div className="flex items-center gap-2 font-semibold">
-            <MessageSquareText className="size-5 text-primary" />
-            <span>{tApp("name")}</span>
-          </div>
-          <p className="text-sm text-muted-foreground">{t("tagline")}</p>
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-3">
+          <span className="text-sm font-semibold">FusionWA</span>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            Infrastruttura WhatsApp Business Cloud API per software house e agenzie.
+            Nessuna affiliazione con Meta.
+          </p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{t("linksTitle")}</span>
-          <Link
-            href="/login"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            {t("login")}
-          </Link>
-          {PUBLIC_SIGNUP_ENABLED && (
-            <Link
-              href="/register"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              {t("register")}
+        <div className="flex gap-12">
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Prodotto
+            </span>
+            <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Documentazione
             </Link>
-          )}
-          <Link
-            href="/#pricing"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            {t("billing")}
-          </Link>
+            <Link href="/#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Prezzi
+            </Link>
+            {PUBLIC_SIGNUP_ENABLED && (
+              <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Inizia gratis
+              </Link>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Account
+            </span>
+            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Accedi
+            </Link>
+            <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Guida SDK
+            </Link>
+            <Link href="/llms.txt" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              llms.txt
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="border-t px-4 py-6">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 text-xs text-muted-foreground">
-          <p>{t("compliance")}</p>
-          <p>
-            © {year} {tApp("name")}. {t("rights")}
+      <div className="border-t px-6 py-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <p className="text-xs text-muted-foreground">
+            © {year} FusionWA. Tutti i diritti riservati.
+          </p>
+          <p className="max-w-lg text-right text-xs text-muted-foreground">
+            FusionWA è un&apos;integrazione indipendente. Non è affiliata, sponsorizzata o approvata da Meta.
           </p>
         </div>
       </div>

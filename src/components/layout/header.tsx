@@ -22,24 +22,15 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
-import { WorkspaceSwitcherRow } from "@/components/layout/workspace-switcher-row";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { auth } from "@/auth";
 import { isSuperAdminEmail } from "@/lib/superadmin";
-
-type Tenant = { id: string; name: string };
 
 function getInitials(label: string): string {
   return label.slice(0, 2).toUpperCase();
 }
 
-export async function Header({
-  tenants,
-  activeTenantId,
-}: {
-  tenants: Tenant[];
-  activeTenantId: string;
-}) {
+export async function Header() {
   const t = await getTranslations();
   const session = await auth();
   const accountLabel = session?.user?.name ?? session?.user?.email ?? "";
@@ -68,7 +59,6 @@ export async function Header({
               <span>{t("app.name")}</span>
             </SheetTitle>
           </SheetHeader>
-          <WorkspaceSwitcherRow tenants={tenants} activeTenantId={activeTenantId} />
           <div className="py-4">
             <SidebarNav />
           </div>

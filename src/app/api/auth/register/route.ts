@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
-import { isPlanType, PLAN_MAX_CONNECTIONS } from "@/lib/plans";
+import { PLAN_MAX_CONNECTIONS } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
 import { isSuperAdminEmail } from "@/lib/superadmin";
 
@@ -18,7 +18,8 @@ type RegisterBody = {
   agencyName?: string;
   email?: string;
   password?: string;
-  plan?: string;
+  // plan è ignorato: tutti i nuovi account sono identici; nessuna logica
+  // di business deve dipendere dal piano scelto al momento della registrazione.
 };
 
 export async function POST(request: NextRequest) {
@@ -41,7 +42,6 @@ export async function POST(request: NextRequest) {
   const agencyName = body.agencyName?.trim();
   const email = body.email?.trim().toLowerCase();
   const password = body.password;
-  const requestedPlan = body.plan;
 
   if (!agencyName) {
     return NextResponse.json({ error: "Nome agenzia obbligatorio" }, { status: 400 });
@@ -56,7 +56,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const planType = requestedPlan && isPlanType(requestedPlan) ? requestedPlan : "DEVELOPER";
+  // Tutti i nuovi account partono con il piano DEVELOPER (legacy field); non
+  // accettiamo il piano dalla richiesta — è irrilevante nel nuovo modello.
+  const planType = "DEVELOPER" as const;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {

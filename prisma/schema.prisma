@@ -17,6 +17,27 @@ enum WhatsappConnectionStatus {
   ERROR
 }
 
+// ── NEW BILLING MODEL ──────────────────────────────────────────────────────────
+// Replaces the legacy PlanType-based access control for connection creation.
+
+enum AgencyBillingStatus {
+  NOT_CONFIGURED   // No payment method set up yet
+  READY            // Payment method on file, charges can be made
+  REQUIRES_ACTION  // 3DS / SCA or other customer action required
+  PAST_DUE         // Failed payment, needs resolution
+  SUSPENDED        // Account suspended by FusionWA ops
+}
+
+// Tracks payment lifecycle for each individual WhatsApp connection.
+enum ConnectionBillingStatus {
+  NOT_REQUIRED    // First free connection — no charge needed
+  PENDING         // Payment authorised but not yet charged (Step 3 will process it)
+  PAID            // Charge successful
+  PAYMENT_FAILED  // Charge failed — connection may be blocked in Step 3
+  CANCELED        // Connection removed / refunded
+}
+
+// ── LEGACY ENUMS (kept for backward-compatibility; no new logic should use them) ──
 enum PlanType {
   DEVELOPER
   TEAM
@@ -46,17 +67,46 @@ model Agency {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  stripeCustomerId     String?            @unique @map("stripe_customer_id")
-  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
-  planType             PlanType           @default(DEVELOPER) @map("plan_type")
-  subscriptionStatus   SubscriptionStatus @default(INACTIVE) @map("subscription_status")
-  // Default coerente con il piano DEVELOPER; aggiornato esplicitamente dal codice
-  // applicativo (checkout/webhook Stripe) ogni volta che il piano cambia.
-  maxConnections       Int                @default(1) @map("max_connections")
+  // ── Stripe (usato anche nel nuovo modello per customer/payment method) ──────
+  stripeCustomerId     String?  @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?  @unique @map("stripe_subscription_id")
 
-  users   User[]
-  tenants Tenant[]
-  apps    App[]
+  // ── NUOVO MODELLO BILLING ────────────────────────────────────────────────────
+  // Stato del billing account dell'agenzia; governa se possono essere create
+  // connessioni paganti (autoBillingEnabled deve essere true E billingStatus READY).
+  billingStatus             AgencyBillingStatus @default(NOT_CONFIGURED) @map("billing_status")
+  // L'agenzia autorizza esplicitamente FusionWA ad addebitare automaticamente
+  // nuove connessioni paganti.  La prima connessione gratuita non richiede questo flag.
+  autoBillingEnabled        Boolean             @default(false)           @map("auto_billing_enabled")
+  autoBillingAcceptedAt     DateTime?                                     @map("auto_billing_accepted_at")
+  // Cap scelto dall'agenzia: numero massimo di connessioni complessive che
+  // FusionWA può creare automaticamente per conto di questa agenzia.
+  // null = nessun limite aggiuntivo da parte dell'agenzia (vige solo il platform cap).
+  globalConnectionLimit     Int?                                          @map("global_connection_limit")
+  // Limite di default per singola App. Ereditato dalle App che non hanno un
+  // connectionLimit proprio. null = nessun limite per-App di default.
+  defaultAppConnectionLimit Int?                                          @map("default_app_connection_limit")
+  // SuperAdmin-only: override del platform safety cap (PLATFORM_DEFAULT_CONNECTION_CAP = 300).
+  // null = usa il valore di default della costante.
+  platformLimitOverride     Int?                                          @map("platform_limit_override")
+  // Prep per Step 3: metodo di pagamento default da caricare automaticamente.
+  defaultPaymentMethodId    String?                                       @map("default_payment_method_id")
+  billingSetupCompletedAt   DateTime?                                     @map("billing_setup_completed_at")
+
+  // ── LEGACY FIELDS ────────────────────────────────────────────────────────────
+  // Mantenuti per compatibilità dati e webhook Stripe esistenti.
+  // Nessuna nuova business logic deve dipendere da questi campi.
+  // planType: non governa più la creazione di connessioni.
+  planType             PlanType           @default(DEVELOPER) @map("plan_type")
+  // subscriptionStatus: sostituito da billingStatus per la nuova logica.
+  subscriptionStatus   SubscriptionStatus @default(INACTIVE)  @map("subscription_status")
+  // maxConnections: non è più il gate per le connessioni; usare globalConnectionLimit.
+  maxConnections       Int                @default(1)         @map("max_connections")
+
+  users              User[]
+  tenants            Tenant[]
+  apps               App[]
+  connectionBillings ConnectionBilling[]
 
   @@map("agencies")
 }
@@ -79,6 +129,9 @@ model App {
   // qui non esiste un endpoint per impostare target_webhook_url per singola
   // connessione, quindi vale come default unico per l'intera integrazione.
   webhookUrl String?   @map("webhook_url")
+  // Limite di connessioni per questa specifica App; sovrascrive defaultAppConnectionLimit dell'agenzia.
+  // null = eredita defaultAppConnectionLimit dell'Agency (che può essere anch'esso null = nessun limite).
+  connectionLimit Int? @map("connection_limit")
   createdAt DateTime  @default(now()) @map("created_at")
 
   agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -147,15 +200,47 @@ model WhatsappConnection {
   phoneNumberId      String                   @unique @map("phone_number_id")
   displayPhoneNumber String                   @map("display_phone_number")
   status             WhatsappConnectionStatus @default(PENDING)
+  // Traccia il ciclo di vita del pagamento per questa connessione.
+  // NOT_REQUIRED = prima connessione gratuita; PENDING = da pagare in Step 3.
+  billingStatus      ConnectionBillingStatus  @default(NOT_REQUIRED) @map("billing_status")
   targetWebhookUrl   String?                  @map("target_webhook_url")
   accessToken        String?                  @map("access_token")
   tokenExpiresAt     DateTime?                @map("token_expires_at")
   lastHeartbeatAt    DateTime?                @map("last_heartbeat_at")
   createdAt          DateTime                 @default(now()) @map("created_at")
 
-  tenant  Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  appUser AppUser? @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+  tenant             Tenant?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  appUser            AppUser?             @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+  connectionBillings ConnectionBilling[]
 
   @@index([tenantId])
   @@map("whatsapp_connections")
+}
+
+// Registro di audit di ogni operazione di billing su una connessione.
+// Separato da WhatsappConnection per supportare Step 4 (rinnovi multipli).
+model ConnectionBilling {
+  id                    String    @id @default(uuid())
+  connectionId          String    @map("connection_id")
+  agencyId              String    @map("agency_id")
+  // Tipo operazione: "CONNECTION_ACTIVATION" (Step 3), "RENEWAL" (Step 4)
+  operationType         String    @map("operation_type")
+  stripeInvoiceId       String?   @unique @map("stripe_invoice_id")
+  stripePaymentIntentId String?   @map("stripe_payment_intent_id")
+  amount                Int       @map("amount")        // in centesimi (es. 500 = €5.00)
+  currency              String    @default("eur")        @map("currency")
+  // PENDING | PAID | PAYMENT_FAILED | CANCELED
+  status                String    @map("status")
+  activationChargedAt   DateTime? @map("activation_charged_at")
+  // Step 4: data fino a cui la connessione è coperta dal pagamento corrente
+  paidThrough           DateTime? @map("paid_through")
+  createdAt             DateTime  @default(now())        @map("created_at")
+
+  connection WhatsappConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  agency     Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  // Una sola attivazione per connessione — garantisce idempotenza a livello DB
+  @@unique([connectionId, operationType])
+  @@index([agencyId])
+  @@map("connection_billings")
 }

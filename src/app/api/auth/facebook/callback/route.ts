@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { API_KEY_HEADER, authenticateApp } from "@/lib/api-key-auth";
 import { assertTenantOwnedByAgency } from "@/lib/active-tenant";
-import { countAgencyConnections } from "@/lib/agency-connections";
+import { chargeConnectionActivation } from "@/lib/connection-billing";
+import { authorizeNewConnection } from "@/lib/connection-authorization";
 import { corsPreflight, withCors } from "@/lib/cors";
 import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
-import { agencyHasSuperAdminUser } from "@/lib/superadmin";
 
 export const runtime = "nodejs";
 
@@ -205,19 +205,19 @@ async function handleTenantContext(params: {
     return NextResponse.json({ error: "Connessione già registrata da un altro account" }, { status: 403 });
   }
 
-  // Limite piano: una nuova connessione (non una riautorizzazione di una già esistente)
-  // non può superare il numero massimo consentito dal piano dell'agency, a meno che
-  // l'agency non sia quella di un superadmin (licenze illimitate).
-  if (!existingConnection && !(await agencyHasSuperAdminUser(session.user.agencyId))) {
-    const agency = await prisma.agency.findUnique({
-      where: { id: session.user.agencyId },
-      select: { maxConnections: true },
-    });
-    const currentConnections = await countAgencyConnections(session.user.agencyId);
+  // Blocca il re-onboarding di una connessione con pagamento fallito:
+  // il billing va risolto dalla dashboard, non ri-eseguendo il flusso Meta.
+  if (existingConnection?.billingStatus === "PAYMENT_FAILED") {
+    return NextResponse.json({ error: "Payment required", reason: "PAYMENT_FAILED" }, { status: 402 });
+  }
 
-    if (agency && currentConnections >= agency.maxConnections) {
-      return NextResponse.json({ error: "Limit reached", maxConnections: agency.maxConnections }, { status: 403 });
+  let connectionBillingStatus: 'NOT_REQUIRED' | 'PENDING' = 'NOT_REQUIRED';
+  if (!existingConnection) {
+    const authResult = await authorizeNewConnection({ agencyId: session.user.agencyId, context: 'dashboard' });
+    if (!authResult.allowed) {
+      return NextResponse.json({ error: 'Limit reached', reason: authResult.reason }, { status: 403 });
     }
+    connectionBillingStatus = authResult.isFree ? 'NOT_REQUIRED' : 'PENDING';
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
@@ -228,11 +228,16 @@ async function handleTenantContext(params: {
   const displayPhoneNumber = await fetchDisplayPhoneNumber(phoneNumberId, oauthResult.accessToken);
   const encryptedAccessToken = encrypt(oauthResult.accessToken);
 
+  // Connessioni paganti iniziano in PENDING e vengono portate a CONNECTED solo dopo
+  // il pagamento riuscito. Le connessioni gratuite (prima) diventano CONNECTED subito.
+  const initialStatus = connectionBillingStatus === 'PENDING' ? 'PENDING' : 'CONNECTED';
+
   const connection = await prisma.whatsappConnection.upsert({
     where: { phoneNumberId },
     update: {
       wabaId,
       displayPhoneNumber,
+      // Re-autorizzazione di connessione esistente: ripristina CONNECTED (token refresh)
       status: "CONNECTED",
       tenantId: targetTenant.id,
       appUserId: null,
@@ -245,12 +250,53 @@ async function handleTenantContext(params: {
       wabaId,
       phoneNumberId,
       displayPhoneNumber,
-      status: "CONNECTED",
+      status: initialStatus,
+      billingStatus: connectionBillingStatus,
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
       lastHeartbeatAt: new Date(),
     },
   });
+
+  // Addebito immediato per connessioni paganti
+  if (!existingConnection && connectionBillingStatus === 'PENDING') {
+    const chargeResult = await chargeConnectionActivation({
+      connectionId: connection.id,
+      agencyId: session.user.agencyId,
+    });
+
+    if (!chargeResult.success && chargeResult.requiresAction) {
+      return NextResponse.json({
+        status: "payment_pending",
+        requiresAction: true,
+        reason: "REQUIRES_ACTION",
+        connection: { id: connection.id, status: "PENDING", billingStatus: "PENDING" },
+      }, { status: 202 });
+    }
+
+    if (!chargeResult.success) {
+      return NextResponse.json({
+        status: "payment_failed",
+        error: "Pagamento non riuscito",
+        reason: "PAYMENT_FAILED",
+        connection: { id: connection.id, status: "PENDING", billingStatus: "PAYMENT_FAILED" },
+      }, { status: 402 });
+    }
+
+    // Payment succeeded — reload final state from DB (set by chargeConnectionActivation)
+    const paid = await prisma.whatsappConnection.findUniqueOrThrow({ where: { id: connection.id } });
+    return NextResponse.json({
+      status: "success",
+      connection: {
+        id: paid.id,
+        wabaId: paid.wabaId,
+        phoneNumberId: paid.phoneNumberId,
+        displayPhoneNumber: paid.displayPhoneNumber,
+        status: paid.status,
+        billingStatus: paid.billingStatus,
+      },
+    });
+  }
 
   return NextResponse.json({
     status: "success",
@@ -260,6 +306,7 @@ async function handleTenantContext(params: {
       phoneNumberId: connection.phoneNumberId,
       displayPhoneNumber: connection.displayPhoneNumber,
       status: connection.status,
+      billingStatus: connection.billingStatus,
     },
   });
 }
@@ -303,16 +350,17 @@ async function handleAppUserContext(
     return NextResponse.json({ error: "Connessione già registrata da un altro account" }, { status: 403 });
   }
 
-  if (!existingConnection && !(await agencyHasSuperAdminUser(app.agencyId))) {
-    const agency = await prisma.agency.findUnique({
-      where: { id: app.agencyId },
-      select: { maxConnections: true },
-    });
-    const currentConnections = await countAgencyConnections(app.agencyId);
+  if (existingConnection?.billingStatus === "PAYMENT_FAILED") {
+    return NextResponse.json({ error: "Payment required", reason: "PAYMENT_FAILED" }, { status: 402 });
+  }
 
-    if (agency && currentConnections >= agency.maxConnections) {
-      return NextResponse.json({ error: "Limit reached", maxConnections: agency.maxConnections }, { status: 403 });
+  let connectionBillingStatus: 'NOT_REQUIRED' | 'PENDING' = 'NOT_REQUIRED';
+  if (!existingConnection) {
+    const authResult = await authorizeNewConnection({ agencyId: app.agencyId, appId: app.id, context: 'sdk' });
+    if (!authResult.allowed) {
+      return NextResponse.json({ error: 'Limit reached', reason: authResult.reason }, { status: 403 });
     }
+    connectionBillingStatus = authResult.isFree ? 'NOT_REQUIRED' : 'PENDING';
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
@@ -322,6 +370,8 @@ async function handleAppUserContext(
 
   const displayPhoneNumber = await fetchDisplayPhoneNumber(phoneNumberId, oauthResult.accessToken);
   const encryptedAccessToken = encrypt(oauthResult.accessToken);
+
+  const initialStatus = connectionBillingStatus === 'PENDING' ? 'PENDING' : 'CONNECTED';
 
   const connection = await prisma.whatsappConnection.upsert({
     where: { phoneNumberId },
@@ -344,13 +394,52 @@ async function handleAppUserContext(
       wabaId,
       phoneNumberId,
       displayPhoneNumber,
-      status: "CONNECTED",
+      status: initialStatus,
+      billingStatus: connectionBillingStatus,
       targetWebhookUrl: app.webhookUrl,
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
       lastHeartbeatAt: new Date(),
     },
   });
+
+  if (!existingConnection && connectionBillingStatus === 'PENDING') {
+    const chargeResult = await chargeConnectionActivation({
+      connectionId: connection.id,
+      agencyId: app.agencyId,
+    });
+
+    if (!chargeResult.success && chargeResult.requiresAction) {
+      return NextResponse.json({
+        status: "payment_pending",
+        requiresAction: true,
+        reason: "REQUIRES_ACTION",
+        connection: { id: connection.id, status: "PENDING", billingStatus: "PENDING" },
+      }, { status: 202 });
+    }
+
+    if (!chargeResult.success) {
+      return NextResponse.json({
+        status: "payment_failed",
+        error: "Pagamento non riuscito",
+        reason: "PAYMENT_FAILED",
+        connection: { id: connection.id, status: "PENDING", billingStatus: "PAYMENT_FAILED" },
+      }, { status: 402 });
+    }
+
+    const paid = await prisma.whatsappConnection.findUniqueOrThrow({ where: { id: connection.id } });
+    return NextResponse.json({
+      status: "success",
+      connection: {
+        id: paid.id,
+        wabaId: paid.wabaId,
+        phoneNumberId: paid.phoneNumberId,
+        displayPhoneNumber: paid.displayPhoneNumber,
+        status: paid.status,
+        billingStatus: paid.billingStatus,
+      },
+    });
+  }
 
   return NextResponse.json({
     status: "success",
@@ -360,6 +449,7 @@ async function handleAppUserContext(
       phoneNumberId: connection.phoneNumberId,
       displayPhoneNumber: connection.displayPhoneNumber,
       status: connection.status,
+      billingStatus: connection.billingStatus,
     },
   });
 }

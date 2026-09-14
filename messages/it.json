@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Fusion WhatsApp"
+    "name": "FusionWA"
   },
   "landing": {
     "nav": {
@@ -81,6 +81,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "connections": "Connessioni",
+    "applications": "Applicazioni",
     "settings": "Impostazioni"
   },
   "workspace": {
@@ -100,20 +101,19 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Panoramica generale delle tue connessioni WhatsApp.",
+    "subtitle": "Panoramica del tuo account Fusion WhatsApp.",
     "stats": {
-      "activeConnections": "Connessioni attive",
-      "messagesSent": "Messaggi inviati (30gg)",
-      "contacts": "Contatti",
-      "conversations": "Conversazioni"
+      "directConnections": "Connessioni dirette",
+      "sdkConnections": "Connessioni SDK",
+      "apps": "Applicazioni",
+      "sdkUsers": "Clienti SDK"
     },
     "recentConnections": {
-      "title": "Connessioni recenti",
-      "name": "Nome",
+      "title": "Ultime connessioni dirette",
+      "phoneNumber": "Numero",
+      "wabaId": "WABA ID",
       "status": "Stato",
-      "notConfigured": "Non configurato",
-      "primaryNumber": "Numero principale",
-      "supportNumber": "Numero supporto"
+      "empty": "Nessuna connessione configurata."
     }
   },
   "connections": {
@@ -121,7 +121,7 @@
     "subtitle": "Gestisci i numeri WhatsApp collegati al tuo account.",
     "linkedNumbers": {
       "title": "Numeri collegati",
-      "description": "L'elenco dei numeri WhatsApp configurati per questo workspace.",
+      "description": "L'elenco dei numeri WhatsApp collegati al tuo account.",
       "waba": "WABA ID",
       "phoneNumber": "Numero",
       "webhook": "Target Webhook URL",
@@ -143,8 +143,7 @@
     },
     "embeddedSignup": {
       "title": "Collega un nuovo numero",
-      "description": "Avvia il flusso di Embedded Signup di Meta per collegare un numero WhatsApp Business al tuo workspace.",
-      "destinationLabel": "Assegna al workspace cliente",
+      "description": "Avvia il flusso di Embedded Signup di Meta per collegare un nuovo numero WhatsApp Business al tuo account.",
       "connectButton": "Connetti Account WhatsApp",
       "connecting": "Connessione in corso…",
       "sdkLoading": "Caricamento dell'SDK di Facebook…",

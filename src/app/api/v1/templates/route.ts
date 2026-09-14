@@ -7,7 +7,7 @@ import type { AppModel as App } from "@/generated/prisma/models";
 
 export const runtime = "nodejs";
 
-const GRAPH_API_VERSION = "v21.0";
+const GRAPH_API_VERSION = "v26.0";
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
 const TEMPLATE_NAME_PATTERN = /^[a-z0-9_]+$/;
 const MAX_QUICK_REPLY_BUTTONS = 3;
@@ -72,6 +72,16 @@ async function resolveAppUserConnection(app: App, externalCustomerId: string): P
       response: NextResponse.json(
         { error: "Nessun numero WhatsApp collegato per questo cliente" },
         { status: 409 }
+      ),
+    };
+  }
+
+  if (connection.billingStatus === "PAYMENT_FAILED") {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "Connessione non operativa: pagamento fallito — risolvere il billing dalla dashboard" },
+        { status: 402 }
       ),
     };
   }

@@ -3,17 +3,8 @@ import { MessageSquareText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
-import { WorkspaceSwitcherRow } from "@/components/layout/workspace-switcher-row";
 
-type Tenant = { id: string; name: string };
-
-export async function Sidebar({
-  tenants,
-  activeTenantId,
-}: {
-  tenants: Tenant[];
-  activeTenantId: string;
-}) {
+export async function Sidebar() {
   const t = await getTranslations("app");
 
   return (
@@ -24,7 +15,6 @@ export async function Sidebar({
           <span>{t("name")}</span>
         </Link>
       </div>
-      <WorkspaceSwitcherRow tenants={tenants} activeTenantId={activeTenantId} />
       <div className="flex-1 overflow-y-auto py-4">
         <SidebarNav />
       </div>

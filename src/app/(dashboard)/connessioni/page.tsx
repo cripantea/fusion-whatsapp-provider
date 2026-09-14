@@ -37,10 +37,14 @@ export default async function ConnessioniPage() {
   }
 
   const t = await getTranslations("connections");
-  const { tenants, activeTenant } = await getWorkspaceContext(session.user.agencyId);
+  const agencyId = session.user.agencyId;
 
+  // activeTenant is needed only to assign new connections via EmbeddedSignup.
+  const { activeTenant } = await getWorkspaceContext(agencyId);
+
+  // Show all direct connections across all tenants of this agency.
   const connections = await prisma.whatsappConnection.findMany({
-    where: { tenantId: activeTenant.id },
+    where: { tenant: { agencyId } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -61,11 +65,9 @@ export default async function ConnessioniPage() {
         </CardHeader>
         <CardContent>
           <FacebookEmbeddedSignup
-            key={activeTenant.id}
             appId={appId}
             configId={configId}
-            tenants={tenants}
-            activeTenantId={activeTenant.id}
+            tenantId={activeTenant.id}
           />
         </CardContent>
       </Card>

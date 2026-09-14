@@ -1,38 +1,55 @@
 import Link from "next/link";
-import { MessageSquareText } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 
 export async function LandingHeader() {
   const t = await getTranslations("landing.nav");
-  const tApp = await getTranslations("app");
-  const tHeader = await getTranslations("header");
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-6">
-      <Link href="/" className="flex items-center gap-2 font-semibold">
-        <MessageSquareText className="size-5 text-primary" />
-        <span>{tApp("name")}</span>
-      </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-background/80 backdrop-blur-md transition-colors">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-6">
+        <Link href="/" className="text-sm font-semibold tracking-tight">
+          FusionWA
+        </Link>
 
-      <div className="flex-1" />
+        <nav className="flex flex-1 items-center gap-1">
+          <Link
+            href="/docs"
+            className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
+          </Link>
+          <Link
+            href="/#pricing"
+            className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Prezzi
+          </Link>
+        </nav>
 
-      <ThemeToggle label={tHeader("toggleTheme")} />
-      <Button
-        variant={PUBLIC_SIGNUP_ENABLED ? "ghost" : "default"}
-        nativeButton={false}
-        render={<Link href="/login" />}
-      >
-        {t("login")}
-      </Button>
-      {PUBLIC_SIGNUP_ENABLED && (
-        <Button nativeButton={false} render={<Link href="/register" />}>
-          {t("register")}
-        </Button>
-      )}
+        <div className="flex items-center gap-2">
+          {PUBLIC_SIGNUP_ENABLED && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-sm text-muted-foreground hover:text-foreground"
+              nativeButton={false}
+              render={<Link href="/register" />}
+            >
+              {t("register")}
+            </Button>
+          )}
+          <Button
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/login" />}
+          >
+            {t("login")}
+          </Button>
+        </div>
+      </div>
     </header>
   );
 }

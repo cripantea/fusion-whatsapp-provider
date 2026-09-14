@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Fusion WhatsApp"
+    "name": "FusionWA"
   },
   "landing": {
     "nav": {
@@ -81,6 +81,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "connections": "Verbindungen",
+    "applications": "Anwendungen",
     "settings": "Einstellungen"
   },
   "workspace": {
@@ -100,20 +101,19 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Allgemeine Übersicht deiner WhatsApp-Verbindungen.",
+    "subtitle": "Übersicht deines Fusion WhatsApp-Kontos.",
     "stats": {
-      "activeConnections": "Aktive Verbindungen",
-      "messagesSent": "Gesendete Nachrichten (30 Tage)",
-      "contacts": "Kontakte",
-      "conversations": "Unterhaltungen"
+      "directConnections": "Direkte Verbindungen",
+      "sdkConnections": "SDK-Verbindungen",
+      "apps": "Anwendungen",
+      "sdkUsers": "SDK-Kunden"
     },
     "recentConnections": {
-      "title": "Letzte Verbindungen",
-      "name": "Name",
+      "title": "Letzte direkte Verbindungen",
+      "phoneNumber": "Nummer",
+      "wabaId": "WABA ID",
       "status": "Status",
-      "notConfigured": "Nicht konfiguriert",
-      "primaryNumber": "Hauptnummer",
-      "supportNumber": "Support-Nummer"
+      "empty": "Noch keine Verbindung konfiguriert."
     }
   },
   "connections": {
@@ -121,7 +121,7 @@
     "subtitle": "Verwalte die mit deinem Konto verknüpften WhatsApp-Nummern.",
     "linkedNumbers": {
       "title": "Verknüpfte Nummern",
-      "description": "Die Liste der für diesen Workspace konfigurierten WhatsApp-Nummern.",
+      "description": "Die Liste der mit deinem Konto verknüpften WhatsApp-Nummern.",
       "waba": "WABA ID",
       "phoneNumber": "Nummer",
       "webhook": "Target Webhook URL",
@@ -143,8 +143,7 @@
     },
     "embeddedSignup": {
       "title": "Neue Nummer verknüpfen",
-      "description": "Starte den Embedded-Signup-Ablauf von Meta, um eine WhatsApp Business-Nummer mit deinem Workspace zu verknüpfen.",
-      "destinationLabel": "Kunden-Workspace zuweisen",
+      "description": "Starte den Embedded-Signup-Ablauf von Meta, um eine neue WhatsApp Business-Nummer mit deinem Konto zu verknüpfen.",
       "connectButton": "WhatsApp-Konto verbinden",
       "connecting": "Verbindung wird hergestellt…",
       "sdkLoading": "Facebook SDK wird geladen…",

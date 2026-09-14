@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard, Plug, Settings } from "lucide-react";
+import { LayoutDashboard, Plug, AppWindow, Settings } from "lucide-react";
 
 export type NavItem = {
-  titleKey: "dashboard" | "connections" | "settings";
+  titleKey: "dashboard" | "connections" | "applications" | "settings";
   href: string;
   icon: LucideIcon;
 };
@@ -17,6 +17,11 @@ export const navItems: NavItem[] = [
     titleKey: "connections",
     href: "/connessioni",
     icon: Plug,
+  },
+  {
+    titleKey: "applications",
+    href: "/applicazioni",
+    icon: AppWindow,
   },
   {
     titleKey: "settings",

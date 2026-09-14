@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
-import { isPlanType } from "@/lib/plans";
 import { isSuperAdminEmail } from "@/lib/superadmin";
 import {
   Card,
@@ -24,24 +23,15 @@ export default async function RegisterPage({
 }) {
   const session = await auth();
   if (PUBLIC_SIGNUP_ENABLED) {
-    // Self-service pubblico attivo: chiunque non loggato può registrarsi.
-    if (session) {
-      redirect("/dashboard");
-    }
+    if (session) redirect("/dashboard");
   } else {
-    // Modalità Private Engine (B2B): registrazione riservata al superadmin.
-    if (!session) {
-      redirect("/login?reason=private_engine");
-    }
-    if (!isSuperAdminEmail(session.user.email)) {
-      redirect("/dashboard");
-    }
+    if (!session) redirect("/login?reason=private_engine");
+    if (!isSuperAdminEmail(session.user.email)) redirect("/dashboard");
   }
 
+  const { plan = null } = await searchParams;
   const t = await getTranslations("auth.register");
   const tApp = await getTranslations("app");
-  const { plan } = await searchParams;
-  const selectedPlan = plan && isPlanType(plan) ? plan : null;
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -55,7 +45,7 @@ export default async function RegisterPage({
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <RegisterForm plan={selectedPlan} />
+          <RegisterForm plan={plan} />
         </CardContent>
         <CardFooter>
           <p className="text-sm text-muted-foreground">

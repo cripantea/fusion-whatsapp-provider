@@ -26,10 +26,11 @@ async function requireSuperAdmin() {
   }
 }
 
-// Libera una licenza (slot di maxConnections) rimuovendo una connessione che
-// il cliente ha disconnesso o che è finita in errore: countAgencyConnections
-// conta ogni riga WhatsappConnection a prescindere dallo stato, quindi finché
-// la riga esiste lo slot resta occupato per sempre, anche a numero disconnesso.
+/**
+ * @deprecated LEGACY — libera uno slot nel vecchio sistema maxConnections.
+ * Nel nuovo modello le connessioni DISCONNECTED/ERROR sono già escluse dal conteggio effettivo;
+ * questa action resta per pulizia dati manuale da parte del superadmin.
+ */
 export async function unlockConnectionAction(connectionId: string) {
   await requireSuperAdmin();
 
@@ -94,11 +95,10 @@ export async function createSubscriberAction(input: {
   revalidatePath("/admin");
 }
 
-// Cambia piano/stato abbonamento senza passare da Stripe: per pagamenti concordati
-// fuori flusso (bonifico, accordo commerciale custom) durante l'avvio a voce delle vendite.
-// maxConnectionsOverride è opzionale: se assente, la quota segue il default del piano
-// scelto; se presente, sovrascrive quel default con un valore ad-hoc per questa agenzia
-// (es. un accordo commerciale custom, indipendente dai piani standard).
+/**
+ * @deprecated LEGACY — cambia piano/stato con il vecchio sistema a piani fissi.
+ * Per operazioni manuali superadmin usare updateAgencyBillingStatusAction e setAgencyPlatformLimitOverrideAction.
+ */
 export async function updateAgencyPlanAction(input: {
   agencyId: string;
   planType: string;
@@ -133,9 +133,7 @@ export async function updateAgencyPlanAction(input: {
   revalidatePath("/admin");
 }
 
-// Genera un vero link Stripe Checkout per conto di un'agenzia già creata: da girare
-// al titolare della carta (mai da compilare da parte del superadmin), tipicamente
-// durante una vendita a voce. Stesso identico webhook/metadata del checkout self-service.
+/** @deprecated LEGACY — genera un checkout Stripe per i vecchi piani fissi. */
 export async function generateCheckoutLinkAction(input: { agencyId: string; planType: string }) {
   await requireSuperAdmin();
 
@@ -182,4 +180,50 @@ export async function generateCheckoutLinkAction(input: { agencyId: string; plan
   }
 
   return { url: checkoutSession.url };
+}
+
+// ── NUOVO MODELLO BILLING ──────────────────────────────────────────────────────
+
+/** Imposta manualmente il billingStatus di un'agenzia (es. dopo aver verificato
+ *  un pagamento fuori-banda o risolto una sospensione). */
+export async function updateAgencyBillingStatusAction(input: {
+  agencyId: string;
+  billingStatus: string;
+}) {
+  await requireSuperAdmin();
+
+  const validStatuses = ["NOT_CONFIGURED", "READY", "REQUIRES_ACTION", "PAST_DUE", "SUSPENDED"];
+  if (!validStatuses.includes(input.billingStatus)) {
+    throw new Error("Billing status non valido");
+  }
+
+  await prisma.agency.update({
+    where: { id: input.agencyId },
+    data: { billingStatus: input.billingStatus as never },
+  });
+
+  revalidatePath("/admin");
+}
+
+/** Imposta il platform safety cap per un'agenzia specifica (superadmin-only).
+ *  null rimuove l'override e ripristina PLATFORM_DEFAULT_CONNECTION_CAP (300). */
+export async function setAgencyPlatformLimitOverrideAction(input: {
+  agencyId: string;
+  platformLimitOverride: number | null;
+}) {
+  await requireSuperAdmin();
+
+  if (
+    input.platformLimitOverride !== null &&
+    (!Number.isInteger(input.platformLimitOverride) || input.platformLimitOverride < 1)
+  ) {
+    throw new Error("Il platform limit override deve essere un intero >= 1 oppure null");
+  }
+
+  await prisma.agency.update({
+    where: { id: input.agencyId },
+    data: { platformLimitOverride: input.platformLimitOverride },
+  });
+
+  revalidatePath("/admin");
 }

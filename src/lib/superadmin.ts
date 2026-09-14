@@ -14,8 +14,11 @@ export function isSuperAdminEmail(email: string | null | undefined): boolean {
   return getSuperAdminEmails().includes(email.toLowerCase());
 }
 
-// Un'agenzia il cui staff include un'email superadmin ha licenze illimitate:
-// bypassa completamente il controllo di countAgencyConnections vs maxConnections.
+/**
+ * @deprecated LEGACY — bypassa il gate maxConnections per le agenzie con staff superadmin.
+ * Il nuovo modello usa Agency.platformLimitOverride (superadmin-only via setAgencyPlatformLimitOverrideAction).
+ * Mantenuto perché alcune UI admin ancora lo referenziano; non usare in nuova business logic.
+ */
 export async function agencyHasSuperAdminUser(agencyId: string): Promise<boolean> {
   const emails = getSuperAdminEmails();
   if (emails.length === 0) {
