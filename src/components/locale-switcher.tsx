@@ -3,6 +3,11 @@
 import { useTransition } from "react";
 import { localeCookieName } from "@/i18n/config";
 
+const FLAGS: Record<string, string> = {
+  it: "🇮🇹",
+  en: "🇬🇧",
+};
+
 export function LocaleSwitcher({ locale }: { locale: string }) {
   const [isPending, startTransition] = useTransition();
 
@@ -18,9 +23,10 @@ export function LocaleSwitcher({ locale }: { locale: string }) {
     <button
       onClick={switchLocale}
       disabled={isPending}
-      className="rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
+      title={locale === "it" ? "Switch to English" : "Passa all'italiano"}
+      className="flex size-8 items-center justify-center rounded-full text-base transition-opacity hover:opacity-70 disabled:opacity-30"
     >
-      {locale === "it" ? "EN" : "IT"}
+      {FLAGS[locale]}
     </button>
   );
 }
