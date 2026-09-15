@@ -309,69 +309,92 @@ export default function DocsPage() {
           <Section id="rest-api">
             <H2>REST API</H2>
             <P>
-              All calls require the header{" "}
-              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                X-FusionWA-API-Key: fwa_live_...
-              </code>
-              .
+              Full machine-readable spec:{" "}
+              <a
+                href="/openapi.yaml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline underline-offset-4"
+              >
+                /openapi.yaml
+              </a>{" "}
+              (OpenAPI 3.1 — import into Postman or Insomnia).
             </P>
             <P>
-              Base URL:{" "}
+              Widget endpoints (called from the browser) require only{" "}
               <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                https://fusionwa.io/api/v1
+                x-fusionwa-api-key
               </code>
+              . Server-to-server endpoints also require{" "}
+              <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                x-fusionwa-api-secret
+              </code>
+              .
             </P>
 
             <H3>Send a template message</H3>
             <CodeBlock
               lang="bash"
               code={`POST /api/v1/messages/send
+x-fusionwa-api-key: fwa_live_...
+x-fusionwa-api-secret: <your-secret>
 
 {
-  "to": "+39 02 1234567",
-  "templateName": "hello_world",
-  "languageCode": "it",
-  "components": []
+  "externalCustomerId": "user_123",
+  "toPhoneNumber": "+393331234567",
+  "template": {
+    "name": "booking_confirmation",
+    "language": "it",
+    "bodyParams": ["Mario Rossi", "15 set 10:00"]
+  }
 }
 
 # Response
-{ "messageId": "wamid.abc123..." }`}
+{ "status": "success", "messageId": "wamid.abc123..." }`}
+            />
+
+            <H3>Send a free-form text message</H3>
+            <CodeBlock
+              lang="bash"
+              code={`POST /api/v1/messages/send
+x-fusionwa-api-key: fwa_live_...
+x-fusionwa-api-secret: <your-secret>
+
+{
+  "externalCustomerId": "user_123",
+  "toPhoneNumber": "+393331234567",
+  "message": "La tua prenotazione è confermata."
+}
+
+# Only valid within a 24-hour customer-initiated window`}
             />
 
             <H3>Check connection status</H3>
             <CodeBlock
               lang="bash"
               code={`GET /api/v1/widget/status?customerId=user_123
+x-fusionwa-api-key: fwa_live_...
 
-# Response
-{
-  "status": "CONNECTED",          // INACTIVE | CONNECTED
-  "phoneNumber": "+39 02 1234567"
-}`}
-            />
-
-            <H3>Activate AppUser (backend flow)</H3>
-            <CodeBlock
-              lang="bash"
-              code={`POST /api/v1/widget/activate
-
-{ "customerId": "user_123" }`}
+# Response — one of:
+{ "status": "NOT_SUBSCRIBED" }
+{ "status": "SUBSCRIBED_UNCONNECTED", "facebookAppId": "...", "facebookConfigId": "..." }
+{ "status": "CONNECTED", "phoneNumber": "+39 333 123 4567", "wabaId": "...", "phoneNumberId": "..." }`}
             />
 
             <H3>List approved templates</H3>
             <CodeBlock
               lang="bash"
-              code={`GET /api/v1/templates?customerId=user_123
+              code={`GET /api/v1/templates?externalCustomerId=user_123
+x-fusionwa-api-key: fwa_live_...
+x-fusionwa-api-secret: <your-secret>
 
 # Response
-[
-  {
-    "name": "hello_world",
-    "status": "APPROVED",
-    "language": "it",
-    "category": "UTILITY"
-  }
-]`}
+{
+  "status": "success",
+  "templates": [
+    { "name": "booking_confirmation", "status": "APPROVED", "language": "it", "category": "UTILITY", "variableCount": 2 }
+  ]
+}`}
             />
           </Section>
 

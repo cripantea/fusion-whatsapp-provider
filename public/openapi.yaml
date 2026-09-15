@@ -1,0 +1,741 @@
+openapi: "3.1.0"
+info:
+  title: FusionWA API
+  version: "1.0"
+  description: |
+    WhatsApp Business Cloud API infrastructure for SaaS and software companies.
+
+    ## Authentication
+
+    FusionWA uses two credential types per App:
+
+    | Header | Value | When to use |
+    |--------|-------|-------------|
+    | `x-fusionwa-api-key` | `fwa_live_…` | Widget SDK endpoints (browser-safe, public) |
+    | `x-fusionwa-api-secret` | raw secret shown once at creation | Server-to-server endpoints only |
+
+    **Never expose `x-fusionwa-api-secret` in client-side code.**
+
+  contact:
+    name: FusionWA Support
+    url: https://fusionwa.com/docs
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://fusionwa.com
+    description: Production
+
+tags:
+  - name: SDK Widget
+    description: Called from the browser by the embedded SDK widget. Requires only `x-fusionwa-api-key`.
+  - name: Messaging
+    description: Server-to-server message sending. Requires both API key and secret.
+  - name: Templates
+    description: WhatsApp message template management. Requires both API key and secret.
+  - name: Connections
+    description: Connection lifecycle management. Requires both API key and secret.
+  - name: Auth
+    description: Meta Embedded Signup OAuth callback. Context-dependent authentication.
+
+paths:
+  /api/v1/widget/activate:
+    post:
+      tags: [SDK Widget]
+      summary: Activate a customer for WhatsApp
+      description: |
+        Creates (or re-activates) an AppUser record for the given `customerId`.
+        This is a prerequisite before the customer can run the Meta Embedded Signup flow.
+
+        Call this when your customer clicks "Connect WhatsApp" in your UI.
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId]
+              properties:
+                customerId:
+                  type: string
+                  maxLength: 255
+                  description: Your internal customer/user identifier.
+                  example: user_9k3mf8
+            examples:
+              basic:
+                value: { customerId: "user_9k3mf8" }
+      responses:
+        "200":
+          description: Customer activated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [SUBSCRIBED_UNCONNECTED]
+                  appUserId:
+                    type: string
+                    format: uuid
+              example:
+                status: SUBSCRIBED_UNCONNECTED
+                appUserId: "550e8400-e29b-41d4-a716-446655440000"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/v1/widget/status:
+    get:
+      tags: [SDK Widget]
+      summary: Get customer connection status
+      description: |
+        Returns the current WhatsApp connection status for a customer.
+        Used by the SDK widget to render the correct UI state.
+      security:
+        - apiKey: []
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+          description: Your internal customer identifier.
+          example: user_9k3mf8
+      responses:
+        "200":
+          description: Connection status
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/StatusNotSubscribed"
+                  - $ref: "#/components/schemas/StatusUnconnected"
+                  - $ref: "#/components/schemas/StatusConnected"
+              examples:
+                not_subscribed:
+                  value: { status: "NOT_SUBSCRIBED" }
+                unconnected:
+                  value:
+                    status: SUBSCRIBED_UNCONNECTED
+                    facebookAppId: "1234567890"
+                    facebookConfigId: "abcdef123456"
+                connected:
+                  value:
+                    status: CONNECTED
+                    phoneNumber: "+39 333 1234567"
+                    wabaId: "1234567890"
+                    phoneNumberId: "0987654321"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/auth/facebook/callback:
+    post:
+      tags: [Auth]
+      summary: Complete Meta Embedded Signup
+      description: |
+        Called after the customer completes the Meta Embedded Signup popup.
+        The SDK widget calls this automatically — you do not need to call it directly.
+
+        ### Dashboard context (tenantId)
+        Requires an authenticated dashboard session (session cookie). Connects the WABA
+        to a dashboard tenant.
+
+        ### SDK context (externalCustomerId)
+        Requires `x-fusionwa-api-key`. Connects the WABA to an AppUser. The AppUser must
+        have been activated first via `/api/v1/widget/activate`.
+
+        Exactly one of `tenantId` or `externalCustomerId` must be present.
+      security:
+        - apiKey: []
+        - {}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, wabaId]
+              properties:
+                code:
+                  type: string
+                  description: OAuth authorization code from Meta Embedded Signup.
+                wabaId:
+                  type: string
+                  description: WhatsApp Business Account ID from the Embedded Signup event.
+                phoneNumberId:
+                  type: string
+                  description: |
+                    Phone number ID from the Embedded Signup event (standard flow).
+                    Omit for Coexistence flow — FusionWA resolves it automatically.
+                tenantId:
+                  type: string
+                  format: uuid
+                  description: Dashboard tenant ID. Use for dashboard connections.
+                externalCustomerId:
+                  type: string
+                  maxLength: 255
+                  description: Your customer ID. Use for SDK/AppUser connections.
+            examples:
+              sdk_context:
+                summary: SDK widget context
+                value:
+                  code: "AQB9..."
+                  wabaId: "1234567890"
+                  phoneNumberId: "0987654321"
+                  externalCustomerId: "user_9k3mf8"
+      responses:
+        "200":
+          description: Connection established
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  connection:
+                    $ref: "#/components/schemas/Connection"
+        "202":
+          description: Payment requires 3DS action
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [payment_pending]
+                  requiresAction:
+                    type: boolean
+                  reason:
+                    type: string
+                    enum: [REQUIRES_ACTION]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          description: Payment failed or required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Meta Graph API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/messages/send:
+    post:
+      tags: [Messaging]
+      summary: Send a WhatsApp message
+      description: |
+        Sends a WhatsApp message to a phone number on behalf of a connected customer.
+
+        Use `message` for free-form text (only valid within a 24-hour customer-initiated window).
+        Use `template` to contact any number at any time with a pre-approved Meta template.
+
+        Exactly one of `message` or `template` must be provided.
+      security:
+        - apiKey: []
+          apiSecret: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [externalCustomerId, toPhoneNumber]
+              properties:
+                externalCustomerId:
+                  type: string
+                  maxLength: 255
+                  description: The customer whose WhatsApp connection is used to send.
+                toPhoneNumber:
+                  type: string
+                  pattern: "^\\+?[1-9]\\d{6,14}$"
+                  description: Recipient phone number in E.164 format.
+                  example: "+393331234567"
+                message:
+                  type: string
+                  maxLength: 4096
+                  description: Free-form text message (24h window must be open).
+                template:
+                  $ref: "#/components/schemas/TemplatePayload"
+            examples:
+              text_message:
+                summary: Free-form text
+                value:
+                  externalCustomerId: user_9k3mf8
+                  toPhoneNumber: "+393331234567"
+                  message: "La tua prenotazione è confermata."
+              template_message:
+                summary: Template (works outside 24h window)
+                value:
+                  externalCustomerId: user_9k3mf8
+                  toPhoneNumber: "+393331234567"
+                  template:
+                    name: booking_confirmation
+                    language: it
+                    bodyParams: ["Mario Rossi", "15 settembre 2026 ore 10:00"]
+      responses:
+        "200":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  messageId:
+                    type: string
+                    nullable: true
+                    description: Meta message ID (wamid).
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          description: Connection billing failed — resolve from dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Customer has no connected WhatsApp number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Meta Graph API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/templates:
+    get:
+      tags: [Templates]
+      summary: List approved templates
+      description: |
+        Returns all WhatsApp message templates for a customer's WABA,
+        fetched directly from Meta. Only APPROVED templates can be used
+        to send messages outside a 24-hour window.
+      security:
+        - apiKey: []
+          apiSecret: []
+      parameters:
+        - name: externalCustomerId
+          in: query
+          required: true
+          schema:
+            type: string
+            maxLength: 255
+          description: The customer whose WABA templates to list.
+      responses:
+        "200":
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  templates:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TemplateSummary"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Customer has no connected WhatsApp number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Meta Graph API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    post:
+      tags: [Templates]
+      summary: Create and submit a template for Meta review
+      description: |
+        Creates a WhatsApp message template and submits it for Meta approval.
+        Templates must be approved by Meta before they can be used to send messages
+        outside a 24-hour conversation window.
+
+        Supported components: text header, body with positional variables `{{1}}` `{{2}}` …,
+        optional text footer, optional quick-reply buttons (max 3).
+      security:
+        - apiKey: []
+          apiSecret: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [externalCustomerId, name, language, category, bodyText]
+              properties:
+                externalCustomerId:
+                  type: string
+                  maxLength: 255
+                name:
+                  type: string
+                  pattern: "^[a-z0-9_]+$"
+                  description: Template name (lowercase, digits, underscores only).
+                  example: booking_confirmation
+                language:
+                  type: string
+                  example: it
+                  description: BCP 47 language code supported by Meta (e.g. "it", "en_US").
+                category:
+                  type: string
+                  enum: [MARKETING, UTILITY]
+                bodyText:
+                  type: string
+                  maxLength: 1024
+                  description: |
+                    Template body. Use `{{1}}`, `{{2}}`, … for variables.
+                    Each variable requires a corresponding entry in `bodyExamples`.
+                  example: "Ciao {{1}}, la tua prenotazione del {{2}} è confermata."
+                bodyExamples:
+                  type: array
+                  items:
+                    type: string
+                  description: |
+                    Example values for each variable in `bodyText`, in order.
+                    Required by Meta for template approval.
+                  example: ["Mario Rossi", "15 settembre 2026 ore 10:00"]
+                headerText:
+                  type: string
+                  maxLength: 60
+                  description: Optional plain-text header.
+                footerText:
+                  type: string
+                  maxLength: 60
+                  description: Optional footer text.
+                buttons:
+                  type: array
+                  maxItems: 3
+                  items:
+                    type: string
+                  description: Optional quick-reply button labels (max 3).
+            examples:
+              utility_template:
+                value:
+                  externalCustomerId: user_9k3mf8
+                  name: booking_confirmation
+                  language: it
+                  category: UTILITY
+                  headerText: "Conferma prenotazione"
+                  bodyText: "Ciao {{1}}, la tua prenotazione del {{2}} è confermata."
+                  bodyExamples: ["Mario Rossi", "15 settembre 2026 ore 10:00"]
+                  footerText: "Rispondi ANNULLA per cancellare"
+                  buttons: ["Conferma", "Annulla"]
+      responses:
+        "200":
+          description: Template created and submitted for review
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  template:
+                    type: object
+                    properties:
+                      externalId:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                      language:
+                        type: string
+                      category:
+                        type: string
+                      status:
+                        type: string
+                        enum: [PENDING, APPROVED, REJECTED]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Customer has no connected WhatsApp number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Meta rejected the template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/v1/connections/request-history-sync:
+    post:
+      tags: [Connections]
+      summary: Request WhatsApp history sync
+      description: |
+        Requests Meta to sync WhatsApp Business App message history to the Cloud API.
+        Only relevant for connections created via the Coexistence path.
+
+        Meta may reject the request (e.g. if the business declined contact sharing) —
+        this is not an error; the connection remains operational for live messages.
+      security:
+        - apiKey: []
+          apiSecret: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [externalCustomerId, syncType]
+              properties:
+                externalCustomerId:
+                  type: string
+                  maxLength: 255
+                syncType:
+                  type: string
+                  enum: [history, smb_app_state_sync]
+                phase:
+                  type: integer
+                  minimum: 0
+                  maximum: 10
+                  description: Sync phase number (optional, Meta-defined).
+      responses:
+        "200":
+          description: Sync requested or rejected by business
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [requested]
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        enum: [rejected]
+                      error:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          message:
+                            type: string
+                            nullable: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Customer has no connected WhatsApp number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+        "502":
+          description: Meta Graph API error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-fusionwa-api-key
+      description: Public App identifier. Safe to include in browser-side code.
+    apiSecret:
+      type: apiKey
+      in: header
+      name: x-fusionwa-api-secret
+      description: Secret credential. **Server-side only. Never expose in client code.**
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    Connection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        wabaId:
+          type: string
+        phoneNumberId:
+          type: string
+        displayPhoneNumber:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, CONNECTED, DISCONNECTED, ERROR]
+        billingStatus:
+          type: string
+          enum: [NOT_REQUIRED, PENDING, PAID, PAYMENT_FAILED, CANCELED]
+
+    TemplateSummary:
+      type: object
+      properties:
+        externalId:
+          type: string
+          nullable: true
+        name:
+          type: string
+        language:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, PAUSED, DISABLED]
+        body:
+          type: string
+        variableCount:
+          type: integer
+
+    TemplatePayload:
+      type: object
+      required: [name, language]
+      properties:
+        name:
+          type: string
+          description: Approved template name.
+        language:
+          type: string
+          description: Template language code (e.g. "it", "en_US").
+        bodyParams:
+          type: array
+          items: {}
+          description: |
+            Values for template body variables `{{1}}`, `{{2}}`, … in order.
+            Each value is converted to string.
+
+    StatusNotSubscribed:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [NOT_SUBSCRIBED]
+
+    StatusUnconnected:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [SUBSCRIBED_UNCONNECTED]
+        facebookAppId:
+          type: string
+          nullable: true
+        facebookConfigId:
+          type: string
+          nullable: true
+
+    StatusConnected:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [CONNECTED]
+        phoneNumber:
+          type: string
+        wabaId:
+          type: string
+        phoneNumberId:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Missing or invalid request parameter
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Missing or invalid API credentials
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Forbidden:
+      description: Credentials valid but access denied (wrong tenant, inactive user, etc.)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    RateLimited:
+      description: Rate limit exceeded — retry after 60 seconds
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Too many requests — retry after a moment"
