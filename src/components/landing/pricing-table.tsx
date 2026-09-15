@@ -19,7 +19,9 @@ export async function PricingTable() {
   return (
     <section id="pricing" className="mx-auto max-w-6xl px-6 py-32">
       <FadeUp className="mb-16 max-w-xl">
-        <p className="mb-4 text-sm font-medium text-muted-foreground">{t("sectionLabel")}</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary/70">
+          {t("sectionLabel")}
+        </p>
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           {t("titleMain")}
           <br />
@@ -32,25 +34,30 @@ export async function PricingTable() {
         {TIERS.map((tier) => (
           <StaggerItem key={tier.key}>
             <div
-              className={`flex h-full flex-col rounded-xl border p-6 ${
+              className={`relative flex h-full flex-col rounded-2xl border p-6 transition-shadow ${
                 tier.highlighted
-                  ? "border-foreground bg-foreground text-background"
-                  : "bg-card"
+                  ? "border-primary/20 bg-foreground text-background shadow-xl shadow-primary/15"
+                  : "bg-card hover:shadow-md"
               }`}
             >
+              {/* Green top accent for highlighted card */}
+              {tier.highlighted && (
+                <div className="absolute inset-x-0 top-0 h-px rounded-t-2xl bg-gradient-to-r from-transparent via-primary to-transparent" />
+              )}
+
               <div className="mb-6">
                 {tier.highlighted && (
-                  <p className="mb-3 text-xs font-medium uppercase tracking-widest opacity-60">
+                  <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
                     {t("mostPopular")}
                   </p>
                 )}
                 <p className="mb-1 font-semibold">{t(`tiers.${tier.key}.name`)}</p>
-                <p className={`mb-3 text-sm ${tier.highlighted ? "opacity-70" : "text-muted-foreground"}`}>
+                <p className={`mb-4 text-sm leading-relaxed ${tier.highlighted ? "opacity-60" : "text-muted-foreground"}`}>
                   {t(`tiers.${tier.key}.description`)}
                 </p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-semibold tracking-tight">{tier.price}</span>
-                  <span className={`text-sm ${tier.highlighted ? "opacity-60" : "text-muted-foreground"}`}>
+                  <span className="text-4xl font-bold tracking-tight">{tier.price}</span>
+                  <span className={`text-sm ${tier.highlighted ? "opacity-50" : "text-muted-foreground"}`}>
                     {tier.pricePerConnection !== null
                       ? t("perConnectionPerMonth")
                       : t("forever")}
@@ -65,9 +72,13 @@ export async function PricingTable() {
                   t("features.apiAndWebhook"),
                   t("features.coexistenceIncluded"),
                 ] as string[]).map((feat) => (
-                  <div key={feat} className="flex items-center gap-2 text-sm">
-                    <Check className={`size-3.5 shrink-0 ${tier.highlighted ? "opacity-80" : "text-foreground"}`} />
-                    <span className={tier.highlighted ? "opacity-80" : "text-muted-foreground"}>
+                  <div key={feat} className="flex items-center gap-2.5 text-sm">
+                    <span className={`flex size-4 shrink-0 items-center justify-center rounded-full ${
+                      tier.highlighted ? "bg-primary/20" : "bg-primary/10"
+                    }`}>
+                      <Check className={`size-2.5 ${tier.highlighted ? "text-primary" : "text-primary"}`} />
+                    </span>
+                    <span className={tier.highlighted ? "opacity-75" : "text-muted-foreground"}>
                       {feat}
                     </span>
                   </div>
@@ -75,8 +86,8 @@ export async function PricingTable() {
               </div>
 
               <Button
-                className="w-full"
-                variant={tier.highlighted ? "secondary" : "outline"}
+                className={`w-full ${tier.highlighted ? "" : ""}`}
+                variant={tier.highlighted ? "default" : "outline"}
                 nativeButton={false}
                 render={<Link href={PUBLIC_SIGNUP_ENABLED ? "/register" : "/login"} />}
               >
