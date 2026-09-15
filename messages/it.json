@@ -276,7 +276,8 @@
       "apps": "Applicazioni",
       "sdkUsers": "Clienti SDK",
       "monthlyBill": "Stima mensile",
-      "free": "Gratis"
+      "free": "Gratis",
+      "exempt": "Esente"
     },
     "recentConnections": {
       "title": "Ultime connessioni SDK",

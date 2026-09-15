@@ -52,12 +52,14 @@ export default async function DashboardPage() {
       }),
       prisma.agency.findUnique({
         where: { id: agencyId },
-        select: { billingStatus: true },
+        select: { billingStatus: true, billingExempt: true },
       }),
     ]);
 
   const tier = getCurrentTier(sdkActive);
   const monthlyBill = getMonthlyBill(sdkActive);
+  const billingReady = agency?.billingStatus === "READY";
+  const billingExempt = agency?.billingExempt ?? false;
 
   const stats = [
     { key: "sdkConnections", value: String(sdkActive), icon: Link2 },
@@ -65,12 +67,10 @@ export default async function DashboardPage() {
     { key: "sdkUsers", value: String(sdkUsersCount), icon: Users },
     {
       key: "monthlyBill",
-      value: monthlyBill === 0 ? t("stats.free") : `€${monthlyBill}`,
+      value: billingExempt ? t("stats.exempt") : (monthlyBill === 0 ? t("stats.free") : `€${monthlyBill}`),
       icon: TrendingUp,
     },
   ] as const;
-
-  const billingReady = agency?.billingStatus === "READY";
 
   return (
     <div className="flex flex-col gap-6">

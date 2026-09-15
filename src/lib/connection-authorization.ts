@@ -35,6 +35,7 @@ export async function authorizeNewConnection({
     where: { id: agencyId },
     select: {
       billingStatus: true,
+      billingExempt: true,
       autoBillingEnabled: true,
       globalConnectionLimit: true,
       defaultAppConnectionLimit: true,
@@ -44,6 +45,9 @@ export async function authorizeNewConnection({
 
   if (!agency) return { allowed: false, reason: 'AGENCY_NOT_FOUND' };
   if (agency.billingStatus === 'SUSPENDED') return { allowed: false, reason: 'ACCOUNT_SUSPENDED' };
+
+  // Account esente: bypass completo di tutti i gate di billing.
+  if (agency.billingExempt) return { allowed: true, reason: 'ALLOWED_FREE', isFree: true };
 
   const effectiveCount = await getAgencyEffectiveConnectionCount(agencyId);
   const platformCap = agency.platformLimitOverride ?? PLATFORM_DEFAULT_CONNECTION_CAP;

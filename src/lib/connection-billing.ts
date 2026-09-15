@@ -43,8 +43,17 @@ export async function chargeConnectionActivation({
 
   const agency = await prisma.agency.findUnique({
     where: { id: agencyId },
-    select: { stripeCustomerId: true, defaultPaymentMethodId: true },
+    select: { stripeCustomerId: true, defaultPaymentMethodId: true, billingExempt: true },
   });
+
+  // Account esente: nessun addebito, connessione attivata direttamente.
+  if (agency?.billingExempt) {
+    await prisma.whatsappConnection.update({
+      where: { id: connectionId },
+      data: { status: 'CONNECTED', billingStatus: 'NOT_REQUIRED' },
+    });
+    return { success: true, invoiceId: 'exempt' };
+  }
 
   if (!agency?.stripeCustomerId || !agency.defaultPaymentMethodId) {
     throw new Error('Agency billing not configured: missing Stripe customer or payment method');

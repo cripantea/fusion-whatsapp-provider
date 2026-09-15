@@ -92,6 +92,8 @@ model Agency {
   // Prep per Step 3: metodo di pagamento default da caricare automaticamente.
   defaultPaymentMethodId    String?                                       @map("default_payment_method_id")
   billingSetupCompletedAt   DateTime?                                     @map("billing_setup_completed_at")
+  // SuperAdmin-only: esonera l'agenzia da qualsiasi addebito (account di test / proprietario).
+  billingExempt             Boolean                                       @default(false) @map("billing_exempt")
 
   // ── LEGACY FIELDS ────────────────────────────────────────────────────────────
   // Mantenuti per compatibilità dati e webhook Stripe esistenti.

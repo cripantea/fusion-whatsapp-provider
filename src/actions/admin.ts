@@ -205,6 +205,21 @@ export async function updateAgencyBillingStatusAction(input: {
   revalidatePath("/admin");
 }
 
+/** Imposta/rimuove l'esenzione dalla fatturazione per un'agenzia (es. account test/proprietario). */
+export async function setAgencyBillingExemptAction(input: {
+  agencyId: string;
+  billingExempt: boolean;
+}) {
+  await requireSuperAdmin();
+
+  await prisma.agency.update({
+    where: { id: input.agencyId },
+    data: { billingExempt: input.billingExempt },
+  });
+
+  revalidatePath("/admin");
+}
+
 /** Imposta il platform safety cap per un'agenzia specifica (superadmin-only).
  *  null rimuove l'override e ripristina PLATFORM_DEFAULT_CONNECTION_CAP (300). */
 export async function setAgencyPlatformLimitOverrideAction(input: {
