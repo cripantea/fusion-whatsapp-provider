@@ -12,11 +12,7 @@ import { prisma } from "@/lib/prisma";
  * Se non è ancora arrivato, torniamo alla pagina onboarding che mostrerà
  * lo stato attuale.
  */
-export default async function BillingSetupSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session_id?: string }>;
-}) {
+export default async function BillingSetupSuccessPage() {
   const session = await auth();
   if (!session) redirect("/login");
 

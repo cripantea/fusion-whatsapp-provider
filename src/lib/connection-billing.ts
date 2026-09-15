@@ -63,7 +63,6 @@ export async function chargeConnectionActivation({
   }
 
   // First attempt — create invoice item + invoice
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await stripe.invoiceItems.create({
     customer: stripeCustomerId,
     price: priceId,
@@ -72,7 +71,7 @@ export async function chargeConnectionActivation({
       connectionId,
       billingOperationType: OPERATION_ACTIVATION,
     },
-  } as any);
+  } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
   const invoice = await stripe.invoices.create({
     customer: stripeCustomerId,
@@ -127,7 +126,7 @@ async function attemptInvoicePayment({
       payment_method: paymentMethodId,
       expand: ['payment_intent'],
     });
-  } catch (err) {
+  } catch {
     // Card declined or other hard payment failure
     await markFailed(connectionId);
     return { success: false, requiresAction: false };
