@@ -18,12 +18,12 @@ type Step = {
 };
 
 export function OnboardingChecklist({ billingReady, hasApps, hasConnections, t }: ChecklistProps) {
-  if (billingReady && hasApps && hasConnections) return null;
+  if (hasApps && hasConnections) return null;
 
   const steps: Step[] = [
-    { key: "billing", href: "/impostazioni/billing", done: billingReady },
     { key: "app", href: "/applicazioni", done: hasApps },
     { key: "connection", href: "/docs", done: hasConnections },
+    { key: "billing", href: "/impostazioni/billing", done: billingReady },
   ];
 
   const doneCount = steps.filter((s) => s.done).length;

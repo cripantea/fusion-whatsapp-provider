@@ -15,19 +15,19 @@ export async function LandingFooter() {
           <p className="max-w-xs text-sm text-muted-foreground">{t("tagline")}</p>
         </div>
 
-        <div className="flex gap-12">
+        <div className="flex flex-wrap gap-10 sm:gap-12">
           <div className="flex flex-col gap-3">
             <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               {t("productTitle")}
             </span>
-            <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/docs" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t("docs")}
             </Link>
-            <Link href="/#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/#pricing" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t("pricing")}
             </Link>
             {PUBLIC_SIGNUP_ENABLED && (
-              <Link href="/register" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/register" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 {t("register")}
               </Link>
             )}
@@ -35,15 +35,27 @@ export async function LandingFooter() {
 
           <div className="flex flex-col gap-3">
             <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              {t("solutionsTitle")}
+            </span>
+            <Link href="/saas" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t("saas")}
+            </Link>
+            <Link href="/software-houses" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {t("softwareHouses")}
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               {t("accountTitle")}
             </span>
-            <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/login" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t("login")}
             </Link>
-            <Link href="/docs" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/docs" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t("sdkGuide")}
             </Link>
-            <Link href="/llms.txt" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/llms.txt" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
               {t("llmsTxt")}
             </Link>
           </div>

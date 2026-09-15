@@ -1,46 +1,62 @@
 # FusionWA
 
-> Infrastruttura WhatsApp Business Cloud API per software house e agenzie.
-> Fornisce SDK widget, API REST e webhook per connettere i clienti a WhatsApp Business.
+> WhatsApp Business Cloud API infrastructure for SaaS companies and software houses.
 
-FusionWA è un SaaS multi-tenant che agisce da Meta Tech Provider intermediario.
-Le aziende (Agency) si registrano, creano una o più App con API Key, e integrano
-il widget o l'API nel loro software per far connettere i clienti finali a WhatsApp.
+FusionWA is a multi-tenant SaaS platform that acts as a Meta Tech Provider intermediary.
+Companies (Agencies) register, create one or more Apps with API credentials, and integrate
+the SDK widget or REST API into their software so end customers can connect their own
+WhatsApp Business accounts.
 
-## Concetti chiave
+## Core Concepts
 
-- **Agency**: l'azienda registrata su FusionWA (software house, agenzia).
-- **App**: un'integrazione creata dall'agency. Ha un'API Key e un webhook URL.
-- **AppUser** (customerId): il cliente finale dell'agency, identificato da un ID esterno.
-- **WhatsappConnection**: il numero WhatsApp Business di un AppUser, connesso via OAuth Meta.
-- **Coexistence**: il numero rimane attivo anche sull'app WhatsApp Business mobile in parallelo.
+- **Agency**: the registered company on FusionWA (software house, SaaS, agency).
+- **App**: an integration created by the Agency. Has an API Key and API Secret.
+- **AppUser** (customerId): the end customer of the Agency's software, identified by an external ID.
+- **WhatsappConnection**: the WhatsApp Business number of an AppUser, connected via Meta Embedded Signup.
+- **Coexistence**: when an eligible WhatsApp Business App number is connected, it remains active
+  on the mobile app in parallel. The customer may scan a QR code during Meta's Coexistence
+  onboarding when requested. After connecting, they continue using WhatsApp Business on their
+  phone while the SaaS gets API + webhooks.
 
-## SDK Widget (metodo consigliato — lato client)
+## Connection Flow
 
-Incolla nel tuo software per far connettere i clienti in autonomia.
+1. SDK widget renders a "Connect WhatsApp" button inside the SaaS UI.
+2. Customer clicks → Meta Embedded Signup popup opens.
+3. Customer authorizes their WhatsApp Business account.
+4. If eligible for Coexistence: Meta guides them through Coexistence setup, which may include
+   scanning a QR code when requested. The existing WhatsApp Business App number is connected
+   without changing the number.
+5. FusionWA receives the authorization, stores the encrypted token.
+6. Connection status becomes CONNECTED.
+7. SaaS can now send messages via REST API and receive events via webhook.
+
+## SDK Widget (recommended — client-side)
+
+Embed in your software so customers can connect on their own.
 
 ```html
 <script src="https://fusionwa.io/sdk/v1.js"></script>
 <div id="fusionwa-widget"></div>
 <script>
   FusionWA.init({
-    apiKey: "fwa_live_abc123",
-    customerId: currentUser.id,   // ID del cliente nel tuo sistema
+    apiKey: "fwa_live_abc123",     // public API key from your FusionWA dashboard
+    customerId: currentUser.id,   // your internal customer ID (any unique string)
     containerId: "fusionwa-widget",
   });
 </script>
 ```
 
-Il widget mostra un pulsante "Connetti WhatsApp". Quando il cliente lo clicca,
-si apre il flusso Embedded Signup di Meta. Dopo la connessione il widget
-mostra "WhatsApp Collegato".
+The widget shows a "Connect WhatsApp" button. On click, Meta Embedded Signup opens.
+After successful connection the widget shows "WhatsApp Connected (+country code...)".
 
-## API REST (lato server)
+AppUsers are created automatically on first `FusionWA.init()` call with a new customerId.
+
+## REST API (server-side)
 
 Base URL: `https://fusionwa.io/api/v1`
-Autenticazione: header `X-FusionWA-API-Key: fwa_live_...`
+Authentication: `X-FusionWA-API-Key: fwa_live_...` header on all requests.
 
-### Invia messaggio template
+### Send a template message
 
 ```
 POST /api/v1/messages/send
@@ -54,20 +70,20 @@ X-FusionWA-API-Key: fwa_live_...
   "components": []
 }
 
-Risposta: { "messageId": "wamid.abc123..." }
+Response: { "messageId": "wamid.abc123..." }
 ```
 
-### Stato connessione cliente
+### Check customer connection status
 
 ```
 GET /api/v1/widget/status?customerId=user_123
 X-FusionWA-API-Key: fwa_live_...
 
-Risposta: { "status": "CONNECTED", "phoneNumber": "+39 02 1234567" }
-Status: "INACTIVE" | "CONNECTED"
+Response: { "status": "CONNECTED", "phoneNumber": "+39 02 1234567" }
+Status values: "INACTIVE" | "CONNECTED"
 ```
 
-### Attiva connessione (flusso backend)
+### Activate AppUser (backend-only flow)
 
 ```
 POST /api/v1/widget/activate
@@ -77,21 +93,21 @@ X-FusionWA-API-Key: fwa_live_...
 { "customerId": "user_123" }
 ```
 
-### Lista template approvati
+### List approved templates
 
 ```
 GET /api/v1/templates?customerId=user_123
 X-FusionWA-API-Key: fwa_live_...
 
-Risposta: [{ "name": "hello_world", "status": "APPROVED", "language": "it", "category": "UTILITY" }]
+Response: [{ "name": "hello_world", "status": "APPROVED", "language": "it", "category": "UTILITY" }]
 ```
 
-## Webhook
+## Webhooks
 
-Configura il webhook URL nella dashboard → Applicazioni → sezione Webhook.
-FusionWA inoltrerà ogni evento WhatsApp al tuo endpoint.
+Configure the webhook URL in the dashboard → Applications → Webhook section.
+FusionWA forwards every WhatsApp event to your endpoint in real time.
 
-### Payload webhook
+### Webhook payload
 
 ```json
 {
@@ -102,71 +118,104 @@ FusionWA inoltrerà ogni evento WhatsApp al tuo endpoint.
   "message": {
     "id": "wamid.abc...",
     "type": "text",
-    "text": { "body": "Ciao!" }
+    "text": { "body": "Hello" }
   }
 }
 ```
 
-Tipi di evento: `message` | `status` | `template_status`
+Event types: `message` | `status` | `template_status`
 
-Rispondere 200 entro 10 secondi. In caso di mancata risposta il webhook viene ritentato.
+Respond with HTTP 200 within 10 seconds. Failed deliveries are retried with exponential backoff.
 
-### Ricevi nel backend
+### Receive in your backend
 
 ```javascript
 app.post("/webhook/whatsapp", express.json(), (req, res) => {
   const { type, from, customerId, message } = req.body;
-  if (type === "message") {
-    // gestisci il messaggio
+  if (type === "message" && message?.type === "text") {
+    console.log(`[${customerId}] ${from}: ${message.text.body}`);
   }
   res.sendStatus(200);
 });
 ```
 
-## Template
+## Templates
 
-I template consentono messaggi proattivi (notifiche, reminder). Devono essere approvati da Meta.
+Templates allow proactive outbound messages (notifications, reminders). Must be approved by Meta.
 
 ```
 POST /api/v1/templates
+Content-Type: application/json
+X-FusionWA-API-Key: fwa_live_...
+
 {
   "customerId": "user_123",
-  "name": "conferma_ordine",
+  "name": "order_confirmed",
   "category": "UTILITY",
   "language": "it",
   "components": [
-    { "type": "BODY", "text": "Ordine {{1}} confermato. Consegna: {{2}}." }
+    { "type": "BODY", "text": "Your order {{1}} has been confirmed. Delivery: {{2}}." }
   ]
 }
 ```
 
-## Note importanti
+Template status becomes APPROVED typically within a few hours. Status changes arrive via webhook.
 
-- **Zero storage**: i messaggi non sono mai salvati su FusionWA, solo inoltrati.
-- **Coexistence**: il numero resta attivo anche sull'app WhatsApp Business mobile.
-- **API Key sicurezza**: l'apiKey lato client è usata solo per lookup, non autentica
-  chiamate server-to-server (che usano un header separato).
-- **customerId**: è l'ID del cliente nel TUO sistema — può essere qualsiasi stringa univoca.
-- Non è necessario creare l'AppUser esplicitamente: viene creato automaticamente
-  al primo `FusionWA.init()` con un nuovo customerId.
+## Authentication Summary
 
-## Errori comuni
+| Header | Where to use | Purpose |
+|--------|-------------|---------|
+| `X-FusionWA-API-Key` | Server-to-server API calls | Identifies your App |
+| `apiKey` in SDK init | Frontend widget only | Public key for SDK lookup |
 
-| Codice | Significato |
-|--------|-------------|
-| 401    | API Key mancante o non valida |
-| 403    | App revocata o customerId non autorizzato |
-| 404    | Cliente non trovato o non connesso |
-| 429    | Limite messaggi raggiunto |
-| 200    | Successo |
+The SDK `apiKey` is intentionally public — it only looks up connection status.
+Keep the API Secret server-side only (used in message sending).
 
-## Guida per AI coding assistant
+## Pricing Model
 
-Se stai implementando FusionWA con Claude Code, Codex o Cursor, usa questo file
-come contesto. Puoi caricarlo con:
+- **1st connection**: free
+- **2nd–9th**: €5 / connection / month
+- **10th–24th**: €4 / connection / month
+- **25th+**: €3 / connection / month
 
+Graduated pricing: each connection is billed at its tier rate. Adding the 10th connection
+does not retroactively raise the price of the first 9.
+
+## Error Reference
+
+| HTTP | Meaning |
+|------|---------|
+| 200 | Success |
+| 401 | Missing or invalid API Key |
+| 403 | App revoked or customerId not authorized |
+| 404 | Customer not found or not connected |
+| 422 | Invalid request body |
+| 429 | Rate limit exceeded |
+
+## Important Notes
+
+- **Zero storage**: message payloads are forwarded only, never stored on FusionWA.
+- **Coexistence**: when a WhatsApp Business App number is connected via Coexistence, the
+  customer's mobile app continues to function normally in parallel with the Cloud API.
+  Not all accounts are eligible for Coexistence — Meta determines eligibility during Embedded Signup.
+- **customerId**: is your internal customer identifier — any unique string per App.
+  AppUsers are created automatically on first SDK init with a new customerId.
+- **Token security**: Meta OAuth tokens are encrypted at rest with AES-256-GCM.
+
+## For AI Coding Assistants
+
+If you are integrating FusionWA using Claude Code, Cursor, Codex, or GitHub Copilot:
+
+1. Read this file as context before generating code.
+2. Do NOT invent API endpoints — use only the endpoints documented above.
+3. Keep API Key and API Secret server-side in environment variables.
+4. The SDK `apiKey` is safe to use client-side; the API Secret is not.
+5. Do NOT store messages — forward them to your own database if needed.
+6. Respond to webhooks with HTTP 200 immediately; process async if needed.
+
+Load this file:
 - Claude Code: `/add https://fusionwa.io/llms.txt`
-- Cursor: trascina il file in chat come contesto
+- Cursor: drag the file into chat as context
 - Codex CLI: `--context https://fusionwa.io/llms.txt`
 
-Documentazione completa: https://fusionwa.io/docs
+Full documentation: https://fusionwa.io/docs

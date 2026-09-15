@@ -102,8 +102,9 @@ export async function PricingTable() {
         ))}
       </StaggerChildren>
 
-      <FadeUp className="mt-12 text-center">
+      <FadeUp className="mt-12 space-y-3 text-center">
         <p className="text-sm text-muted-foreground">{t("noSubscriptionNote")}</p>
+        <p className="text-xs text-muted-foreground/70">{t("graduatedNote")}</p>
       </FadeUp>
     </section>
   );

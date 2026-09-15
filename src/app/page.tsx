@@ -1,7 +1,9 @@
 import { LandingHeader } from "@/components/landing/landing-header";
 import { HeroSection } from "@/components/landing/hero-section";
-import { WhyWhatsappSection } from "@/components/landing/why-whatsapp-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { WhyFusionwaSection } from "@/components/landing/why-fusionwa-section";
+import { BuiltForSaasSection } from "@/components/landing/built-for-saas-section";
+import { WhyWhatsappSection } from "@/components/landing/why-whatsapp-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { PricingTable } from "@/components/landing/pricing-table";
 import { LandingFooter } from "@/components/landing/landing-footer";
@@ -12,8 +14,10 @@ export default function Home() {
       <LandingHeader />
       <main className="flex-1">
         <HeroSection />
-        <WhyWhatsappSection />
         <HowItWorksSection />
+        <WhyFusionwaSection />
+        <BuiltForSaasSection />
+        <WhyWhatsappSection />
         <FeaturesSection />
         <PricingTable />
       </main>

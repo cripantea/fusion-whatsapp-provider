@@ -12,12 +12,12 @@
     "hero": {
       "badge": "WhatsApp Business Cloud API · Pronto all'uso",
       "metaBadge": "Meta Tech Provider Certificato",
-      "title": "WhatsApp nel tuo software in 60 secondi.",
-      "subtitle": "Tre righe di codice. I tuoi clienti si connettono a WhatsApp Business in autonomia — senza toccare Meta, senza burocrazia.",
+      "title": "Aggiungi WhatsApp al tuo SaaS.",
+      "subtitle": "I tuoi clienti si connettono tramite Meta Embedded Signup. Con Coexistence, i numeri già attivi su WhatsApp Business mantengono l'app sul telefono — il tuo software ottiene API e webhook.",
       "ctaPrimary": "Inizia ora",
       "ctaSecondary": "Leggi la documentazione →",
       "ctaPlatform": "Accedi alla piattaforma",
-      "trustLine": "Nessuna carta di credito richiesta · Setup in 60 secondi · Prima connessione a €0"
+      "trustLine": "Prima connessione a €0 · API + webhook · Coexistence inclusa"
     },
     "howItWorks": {
       "sectionLabel": "Come funziona",
@@ -31,15 +31,64 @@
           "detail": "3 righe di codice · nessuna dipendenza"
         },
         "connect": {
-          "title": "Il cliente si connette",
-          "description": "Il cliente clicca \"Connetti WhatsApp\", autorizza il suo numero WhatsApp Business tramite il popup ufficiale Meta, e il numero è online in secondi. Nessun token da gestire.",
-          "detail": "OAuth Meta · Coexistence supportata"
+          "title": "Il cliente si connette tramite Meta",
+          "description": "Il cliente avvia Meta Embedded Signup direttamente dal tuo software. Per i numeri già attivi su WhatsApp Business App, Meta propone Coexistence: il cliente scansiona un QR quando richiesto e mantiene il numero attivo sul telefono.",
+          "detail": "Meta Embedded Signup · Coexistence se idoneo"
         },
         "communicate": {
           "title": "Invia e ricevi",
           "description": "Usa la nostra API REST per inviare messaggi template dal tuo backend. Ricevi messaggi in arrivo e aggiornamenti di stato via webhook al tuo endpoint, in tempo reale.",
           "detail": "REST API · webhook in tempo reale"
         }
+      }
+    },
+    "whyFusionwa": {
+      "sectionLabel": "Perché FusionWA",
+      "titleMain": "Smetti di costruire infrastruttura.",
+      "titleMuted": "Concentrati sul tuo prodotto.",
+      "subtitle": "Implementare WhatsApp Business Cloud API da zero richiede settimane. FusionWA gestisce tutta la complessità infrastrutturale.",
+      "buildCol": {
+        "title": "Costruire da soli",
+        "subtitle": "Cosa devi implementare senza FusionWA:",
+        "items": [
+          "Implementare Meta Embedded Signup",
+          "Gestire token WABA e refresh",
+          "Gestire Coexistence e heartbeat Meta",
+          "Instradare webhook per ogni cliente",
+          "Sincronizzare stati delle connessioni",
+          "Mappare connessioni per tenant",
+          "Mantenerti aggiornato sulle API Meta"
+        ]
+      },
+      "fusionwaCol": {
+        "title": "Con FusionWA",
+        "subtitle": "Cosa ottieni subito:",
+        "items": [
+          "Embedded Signup già implementato",
+          "Coexistence supportata nativamente",
+          "API REST + webhook pronti",
+          "Gestione multi-cliente inclusa",
+          "Prima connessione a €0",
+          "Prezzi per connessione, nessun fisso",
+          "Compatibilità API Meta mantenuta"
+        ]
+      }
+    },
+    "builtForSaas": {
+      "sectionLabel": "Per chi è fatto",
+      "titleMain": "Costruito per software companies.",
+      "titleMuted": "Non per gli utenti finali.",
+      "subtitle": "FusionWA si integra nel tuo prodotto. Sono i tuoi clienti a connettersi a WhatsApp Business — il tuo software ottiene l'API.",
+      "flow": "Il tuo SaaS integra FusionWA una volta → ogni cliente connette il proprio WhatsApp Business",
+      "verticals": {
+        "crm": { "label": "CRM", "description": "Follow-up automatici, gestione lead" },
+        "booking": { "label": "Prenotazioni", "description": "Conferme appuntamento, reminder" },
+        "property": { "label": "Gestione immobili", "description": "Comunicazioni inquilini, visite" },
+        "beauty": { "label": "Beauty & salon", "description": "Reminder, promozioni, fidelizzazione" },
+        "hospitality": { "label": "Hospitality", "description": "Check-in, servizi concierge" },
+        "healthcare": { "label": "Sanità & cliniche", "description": "Reminder visita, risultati esami" },
+        "automotive": { "label": "Automotive", "description": "Aggiornamenti officina, preventivi" },
+        "fitness": { "label": "Fitness & sport", "description": "Reminder lezioni, rinnovi abbonamento" }
       }
     },
     "whyWhatsapp": {
@@ -105,6 +154,7 @@
       "perConnectionPerMonth": "/connessione/mese",
       "forever": "per sempre",
       "noSubscriptionNote": "Nessun abbonamento, nessun costo fisso. Puoi aggiungere e rimuovere connessioni in qualsiasi momento.",
+      "graduatedNote": "Prezzi per scaglioni: ogni connessione viene addebitata in base al suo scaglione. Passare al 10° non cambia retroattivamente il prezzo delle prime 9.",
       "features": {
         "connections": "{range} connessioni WhatsApp",
         "sdkIncluded": "SDK widget incluso",
@@ -134,11 +184,14 @@
       }
     },
     "footer": {
-      "tagline": "Infrastruttura WhatsApp Business Cloud API per software house e agenzie. Nessuna affiliazione con Meta.",
+      "tagline": "Infrastruttura WhatsApp Business Cloud API per SaaS e software house.",
       "productTitle": "Prodotto",
       "accountTitle": "Account",
+      "solutionsTitle": "Soluzioni",
       "docs": "Documentazione",
       "pricing": "Prezzi",
+      "saas": "Per SaaS",
+      "softwareHouses": "Per Software House",
       "register": "Inizia gratis",
       "login": "Accedi",
       "sdkGuide": "Guida SDK",
@@ -202,17 +255,17 @@
       "subtitle": "Completa questi passaggi per avere la prima connessione WhatsApp attiva.",
       "action": "Vai",
       "steps": {
-        "billing": {
-          "title": "Configura il metodo di pagamento",
-          "description": "Necessario per attivare connessioni oltre la prima gratuita."
-        },
         "app": {
           "title": "Crea la tua prima applicazione",
           "description": "Ottieni le credenziali API (API Key + Secret) per il tuo software."
         },
         "connection": {
           "title": "Prima connessione WhatsApp attiva",
-          "description": "Integra l'SDK nel tuo software e fai connettere il primo cliente."
+          "description": "Integra l'SDK nel tuo software e fai connettere il primo cliente. La prima connessione è gratuita."
+        },
+        "billing": {
+          "title": "Configura il metodo di pagamento",
+          "description": "Necessario per attivare connessioni oltre la prima gratuita."
         }
       }
     },

@@ -26,6 +26,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  entries.push(
+    {
+      url: `${baseUrl}/saas`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/software-houses`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.9,
+    }
+  );
+
   if (PUBLIC_SIGNUP_ENABLED) {
     entries.push({
       url: `${baseUrl}/register`,
