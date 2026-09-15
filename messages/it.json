@@ -19,6 +19,29 @@
       "ctaPlatform": "Accedi alla piattaforma",
       "trustLine": "Nessuna carta di credito richiesta · Setup in 60 secondi · Prima connessione a €0"
     },
+    "howItWorks": {
+      "sectionLabel": "Come funziona",
+      "titleMain": "Pronto in tre passaggi.",
+      "titleMuted": "Nessuna burocrazia Meta.",
+      "subtitle": "Dal codice alla prima connessione WhatsApp attiva, in meno di 60 secondi.",
+      "steps": {
+        "embed": {
+          "title": "Incolla il widget",
+          "description": "Aggiungi 3 righe di HTML al tuo software. Il widget FusionWA appare automaticamente nell'interfaccia dei tuoi clienti, pronto per la connessione.",
+          "detail": "3 righe di codice · nessuna dipendenza"
+        },
+        "connect": {
+          "title": "Il cliente si connette",
+          "description": "Il cliente clicca \"Connetti WhatsApp\", autorizza il suo numero WhatsApp Business tramite il popup ufficiale Meta, e il numero è online in secondi. Nessun token da gestire.",
+          "detail": "OAuth Meta · Coexistence supportata"
+        },
+        "communicate": {
+          "title": "Invia e ricevi",
+          "description": "Usa la nostra API REST per inviare messaggi template dal tuo backend. Ricevi messaggi in arrivo e aggiornamenti di stato via webhook al tuo endpoint, in tempo reale.",
+          "detail": "REST API · webhook in tempo reale"
+        }
+      }
+    },
     "whyWhatsapp": {
       "sectionLabel": "Perché WhatsApp nel 2026",
       "titleMain": "I tuoi clienti sono già su WhatsApp.",
@@ -174,6 +197,25 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Panoramica del tuo account Fusion WhatsApp.",
+    "onboarding": {
+      "title": "Inizia con FusionWA",
+      "subtitle": "Completa questi passaggi per avere la prima connessione WhatsApp attiva.",
+      "action": "Vai",
+      "steps": {
+        "billing": {
+          "title": "Configura il metodo di pagamento",
+          "description": "Necessario per attivare connessioni oltre la prima gratuita."
+        },
+        "app": {
+          "title": "Crea la tua prima applicazione",
+          "description": "Ottieni le credenziali API (API Key + Secret) per il tuo software."
+        },
+        "connection": {
+          "title": "Prima connessione WhatsApp attiva",
+          "description": "Integra l'SDK nel tuo software e fai connettere il primo cliente."
+        }
+      }
+    },
     "currentTierLabel": "Tier attuale",
     "perConnectionPerMonth": "connessione/mese",
     "stats": {

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { prisma } from "@/lib/prisma";
 import { getCurrentTier, getMonthlyBill } from "@/lib/connection-tiers";
+import { OnboardingChecklist } from "@/components/dashboard/onboarding-checklist";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
   CONNECTED: "default",
@@ -36,7 +37,7 @@ export default async function DashboardPage() {
   const tConn = await getTranslations("connections");
   const agencyId = session.user.agencyId;
 
-  const [sdkActive, appsCount, sdkUsersCount, recentConnections] =
+  const [sdkActive, appsCount, sdkUsersCount, recentConnections, agency] =
     await Promise.all([
       prisma.whatsappConnection.count({
         where: { status: "CONNECTED", appUser: { app: { agencyId } } },
@@ -48,6 +49,10 @@ export default async function DashboardPage() {
         include: { appUser: { include: { app: true } } },
         orderBy: { createdAt: "desc" },
         take: 5,
+      }),
+      prisma.agency.findUnique({
+        where: { id: agencyId },
+        select: { billingStatus: true },
       }),
     ]);
 
@@ -65,12 +70,21 @@ export default async function DashboardPage() {
     },
   ] as const;
 
+  const billingReady = agency?.billingStatus === "READY";
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
+
+      <OnboardingChecklist
+        billingReady={billingReady}
+        hasApps={appsCount > 0}
+        hasConnections={sdkActive > 0}
+        t={t}
+      />
 
       {/* Tier badge */}
       <div className="flex items-center gap-2">

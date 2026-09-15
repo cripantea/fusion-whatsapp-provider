@@ -19,6 +19,29 @@
       "ctaPlatform": "Access the platform",
       "trustLine": "No credit card required · Live in 60 seconds · First connection at €0"
     },
+    "howItWorks": {
+      "sectionLabel": "How it works",
+      "titleMain": "Ready in three steps.",
+      "titleMuted": "No Meta bureaucracy.",
+      "subtitle": "From code to your first live WhatsApp connection, in under 60 seconds.",
+      "steps": {
+        "embed": {
+          "title": "Embed the widget",
+          "description": "Add 3 lines of HTML to your software. The FusionWA widget automatically appears in your customers' interface, ready to connect.",
+          "detail": "3 lines of code · no dependencies"
+        },
+        "connect": {
+          "title": "Customer connects",
+          "description": "The customer clicks \"Connect WhatsApp\", authorizes their WhatsApp Business number via the official Meta popup, and the number is live in seconds. No tokens to manage.",
+          "detail": "Meta OAuth · Coexistence supported"
+        },
+        "communicate": {
+          "title": "Send and receive",
+          "description": "Use our REST API to send template messages from your backend. Receive incoming messages and status updates via webhooks to your endpoint, in real time.",
+          "detail": "REST API · real-time webhooks"
+        }
+      }
+    },
     "whyWhatsapp": {
       "sectionLabel": "Why WhatsApp in 2026",
       "titleMain": "Your clients are already on WhatsApp.",
@@ -174,6 +197,25 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your Fusion WhatsApp account.",
+    "onboarding": {
+      "title": "Get started with FusionWA",
+      "subtitle": "Complete these steps to get your first live WhatsApp connection.",
+      "action": "Go",
+      "steps": {
+        "billing": {
+          "title": "Set up your payment method",
+          "description": "Required to activate connections beyond your first free one."
+        },
+        "app": {
+          "title": "Create your first application",
+          "description": "Get API credentials (API Key + Secret) for your software."
+        },
+        "connection": {
+          "title": "First active WhatsApp connection",
+          "description": "Integrate the SDK into your software and have your first customer connect."
+        }
+      }
+    },
     "currentTierLabel": "Current tier",
     "perConnectionPerMonth": "connection/month",
     "stats": {

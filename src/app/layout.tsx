@@ -18,9 +18,50 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://fusionwa.com";
+
 export const metadata: Metadata = {
-  title: "FusionWA",
-  description: "WhatsApp Business Cloud API per software house e agenzie.",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "FusionWA — WhatsApp Business API per software house",
+    template: "%s | FusionWA",
+  },
+  description:
+    "Integra WhatsApp Business Cloud API nel tuo software in 60 secondi. SDK widget, API REST, webhook in tempo reale. Prima connessione a €0.",
+  keywords: [
+    "WhatsApp Business API",
+    "WhatsApp SDK",
+    "Meta Business Cloud API",
+    "WhatsApp integration",
+    "software house WhatsApp",
+  ],
+  authors: [{ name: "FusionWA", url: APP_URL }],
+  openGraph: {
+    type: "website",
+    locale: "it_IT",
+    alternateLocale: "en_US",
+    title: "FusionWA — WhatsApp nel tuo software in 60 secondi",
+    description:
+      "Integra WhatsApp Business Cloud API con 3 righe di codice. Prima connessione a €0, nessun abbonamento fisso.",
+    siteName: "FusionWA",
+    url: APP_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FusionWA — WhatsApp nel tuo software in 60 secondi",
+    description:
+      "Integra WhatsApp Business Cloud API con 3 righe di codice. Prima connessione a €0.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
