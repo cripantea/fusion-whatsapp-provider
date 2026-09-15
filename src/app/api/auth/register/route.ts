@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 import { PLAN_MAX_CONNECTIONS } from "@/lib/plans";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limiter";
 import { isSuperAdminEmail } from "@/lib/superadmin";
 
 export const runtime = "nodejs";
@@ -23,6 +24,10 @@ type RegisterBody = {
 };
 
 export async function POST(request: NextRequest) {
+  // 5 registrazioni/min per IP: block credential-stuffing e spam account
+  const rl = await checkRateLimit(getClientIp(request), "register", 5, 60);
+  if (!rl.allowed) return rateLimitResponse();
+
   // Modalità Private Engine (B2B): quando il self-service pubblico è disattivato,
   // la registrazione resta riservata al superadmin.
   if (!PUBLIC_SIGNUP_ENABLED) {

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAppWithSecret } from "@/lib/api-key-auth";
 import { decrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 import type { AppModel as App } from "@/generated/prisma/models";
 
 export const runtime = "nodejs";
@@ -89,11 +90,20 @@ async function resolveAppUserConnection(app: App, externalCustomerId: string): P
   return { ok: true, connection: { wabaId: connection.wabaId, accessToken: decrypt(connection.accessToken) } };
 }
 
+const CUSTOMER_ID_MAX_LENGTH = 255;
+const TEMPLATE_BODY_MAX_LENGTH = 1024;
+const TEMPLATE_HEADER_MAX_LENGTH = 60;
+const TEMPLATE_FOOTER_MAX_LENGTH = 60;
+
 export async function GET(request: NextRequest) {
   const app = await authenticateAppWithSecret(request);
   if (!app) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // 30 letture template/min per chiave API
+  const rl = await checkRateLimit(app.apiKey, "templates-get", 30, 60);
+  if (!rl.allowed) return rateLimitResponse();
 
   const externalCustomerId = request.nextUrl.searchParams.get("externalCustomerId");
   if (!externalCustomerId) {
@@ -154,6 +164,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // 10 creazioni template/min per chiave API: Meta è lenta, questo è più che sufficiente
+  const rl = await checkRateLimit(app.apiKey, "templates-post", 10, 60);
+  if (!rl.allowed) return rateLimitResponse();
+
   let body: CreateTemplateBody;
   try {
     body = await request.json();
@@ -176,6 +190,31 @@ export async function POST(request: NextRequest) {
   if (!externalCustomerId || !name || !language || !category || !bodyText) {
     return NextResponse.json(
       { error: "Missing required fields: externalCustomerId, name, language, category, bodyText" },
+      { status: 400 }
+    );
+  }
+
+  if (typeof externalCustomerId !== "string" || externalCustomerId.length > CUSTOMER_ID_MAX_LENGTH) {
+    return NextResponse.json(
+      { error: `externalCustomerId deve essere una stringa di max ${CUSTOMER_ID_MAX_LENGTH} caratteri` },
+      { status: 400 }
+    );
+  }
+  if (typeof bodyText !== "string" || bodyText.length > TEMPLATE_BODY_MAX_LENGTH) {
+    return NextResponse.json(
+      { error: `bodyText deve essere una stringa di max ${TEMPLATE_BODY_MAX_LENGTH} caratteri` },
+      { status: 400 }
+    );
+  }
+  if (headerText !== undefined && (typeof headerText !== "string" || headerText.length > TEMPLATE_HEADER_MAX_LENGTH)) {
+    return NextResponse.json(
+      { error: `headerText deve essere una stringa di max ${TEMPLATE_HEADER_MAX_LENGTH} caratteri` },
+      { status: 400 }
+    );
+  }
+  if (footerText !== undefined && (typeof footerText !== "string" || footerText.length > TEMPLATE_FOOTER_MAX_LENGTH)) {
+    return NextResponse.json(
+      { error: `footerText deve essere una stringa di max ${TEMPLATE_FOOTER_MAX_LENGTH} caratteri` },
       { status: 400 }
     );
   }

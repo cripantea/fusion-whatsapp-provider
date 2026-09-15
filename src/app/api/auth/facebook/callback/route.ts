@@ -8,6 +8,7 @@ import { authorizeNewConnection } from "@/lib/connection-authorization";
 import { corsPreflight, withCors } from "@/lib/cors";
 import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limiter";
 
 export const runtime = "nodejs";
 
@@ -132,6 +133,10 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: NextRequest) {
+  // 20 callback/min per IP: OAuth code è monouso, ma limita brute-force
+  const rl = await checkRateLimit(getClientIp(request), "fb-callback", 20, 60);
+  if (!rl.allowed) return withCors(rateLimitResponse());
+
   let body: CallbackBody;
   try {
     body = await request.json();

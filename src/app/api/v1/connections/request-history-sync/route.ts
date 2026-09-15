@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAppWithSecret } from "@/lib/api-key-auth";
 import { decrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 export const runtime = "nodejs";
 
@@ -20,11 +21,17 @@ type RequestHistorySyncBody = {
   phase?: number;
 };
 
+const CUSTOMER_ID_MAX_LENGTH = 255;
+
 export async function POST(request: NextRequest) {
   const app = await authenticateAppWithSecret(request);
   if (!app) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // 20 sync request/min per chiave API
+  const rl = await checkRateLimit(app.apiKey, "history-sync", 20, 60);
+  if (!rl.allowed) return rateLimitResponse();
 
   let body: RequestHistorySyncBody;
   try {
@@ -37,6 +44,18 @@ export async function POST(request: NextRequest) {
   if (!externalCustomerId || (syncType !== "history" && syncType !== "smb_app_state_sync")) {
     return NextResponse.json(
       { error: "Missing/invalid fields: externalCustomerId, syncType ('history' | 'smb_app_state_sync')" },
+      { status: 400 }
+    );
+  }
+  if (typeof externalCustomerId !== "string" || externalCustomerId.length > CUSTOMER_ID_MAX_LENGTH) {
+    return NextResponse.json(
+      { error: `externalCustomerId deve essere una stringa di max ${CUSTOMER_ID_MAX_LENGTH} caratteri` },
+      { status: 400 }
+    );
+  }
+  if (phase !== undefined && (!Number.isInteger(phase) || phase < 0 || phase > 10)) {
+    return NextResponse.json(
+      { error: "phase deve essere un intero tra 0 e 10" },
       { status: 400 }
     );
   }

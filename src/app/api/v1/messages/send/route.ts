@@ -3,11 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { authenticateAppWithSecret } from "@/lib/api-key-auth";
 import { decrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limiter";
 
 export const runtime = "nodejs";
 
 const GRAPH_API_VERSION = "v26.0";
 const GRAPH_API_BASE_URL = process.env.GRAPH_API_BASE_URL ?? "https://graph.facebook.com";
+// E.164: opzionale "+" iniziale, poi 7–15 cifre (ITU-T E.164 max 15 digits)
+const PHONE_NUMBER_PATTERN = /^\+?[1-9]\d{6,14}$/;
+const CUSTOMER_ID_MAX_LENGTH = 255;
+const MESSAGE_MAX_LENGTH = 4096;
 
 type TemplatePayload = {
   name?: string;
@@ -31,6 +36,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // 60 messaggi/min per chiave API: 1/sec, sufficiente per use case reali
+  const rl = await checkRateLimit(app.apiKey, "messages-send", 60, 60);
+  if (!rl.allowed) return rateLimitResponse();
+
   let body: SendMessageBody;
   try {
     body = await request.json();
@@ -42,6 +51,24 @@ export async function POST(request: NextRequest) {
   if (!externalCustomerId || !toPhoneNumber) {
     return NextResponse.json(
       { error: "Missing required fields: externalCustomerId, toPhoneNumber" },
+      { status: 400 }
+    );
+  }
+  if (typeof externalCustomerId !== "string" || externalCustomerId.length > CUSTOMER_ID_MAX_LENGTH) {
+    return NextResponse.json(
+      { error: `externalCustomerId deve essere una stringa di max ${CUSTOMER_ID_MAX_LENGTH} caratteri` },
+      { status: 400 }
+    );
+  }
+  if (typeof toPhoneNumber !== "string" || !PHONE_NUMBER_PATTERN.test(toPhoneNumber)) {
+    return NextResponse.json(
+      { error: "toPhoneNumber deve essere un numero in formato E.164 (es. +393331234567)" },
+      { status: 400 }
+    );
+  }
+  if (message && (typeof message !== "string" || message.length > MESSAGE_MAX_LENGTH)) {
+    return NextResponse.json(
+      { error: `message deve essere una stringa di max ${MESSAGE_MAX_LENGTH} caratteri` },
       { status: 400 }
     );
   }
