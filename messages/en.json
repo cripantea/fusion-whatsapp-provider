@@ -35,7 +35,7 @@
         "smsReason1": "35% open rate — vs 98% on WhatsApp. 65% of your messages go ignored.",
         "smsReason2": "Text only. No images, PDFs, audio, video, or interactive buttons.",
         "smsReason3": "Zero read receipts. You never know if the client actually read your message.",
-        "smsReason4": "Rising costs: carriers increase SMS rates every year. WhatsApp is free up to 1,000 conversations/month with Meta.",
+        "smsReason4": "Rising SMS costs every year. WhatsApp: each of your clients gets 1,000 inbound conversations free/month from Meta — in most use cases, the channel costs nothing.",
         "verdict": "Meta deprecated SMS notifications for businesses in 2025. WhatsApp is the new official channel."
       },
       "clientCol": {

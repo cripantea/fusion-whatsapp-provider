@@ -35,7 +35,7 @@
         "smsReason1": "35% di tasso di apertura — contro 98% di WhatsApp. Il 65% dei tuoi messaggi finisce ignorato.",
         "smsReason2": "Solo testo. Niente immagini, PDF, audio, video, bottoni interattivi.",
         "smsReason3": "Zero prove di lettura. Non sai mai se il cliente ha letto o no.",
-        "smsReason4": "Costi crescenti: i carrier aumentano le tariffe SMS ogni anno. WhatsApp è gratis fino a 1.000 conversazioni/mese con Meta.",
+        "smsReason4": "Costi SMS crescenti ogni anno. WhatsApp: ogni tuo cliente ha 1.000 conversazioni in entrata gratis/mese con Meta — nella maggior parte dei casi d'uso, il canale non costa nulla.",
         "verdict": "Meta ha deprecato le notifiche SMS per i business nel 2025. WhatsApp è il nuovo canale ufficiale."
       },
       "clientCol": {
