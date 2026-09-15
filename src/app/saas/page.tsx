@@ -198,8 +198,8 @@ export default function SaasPage() {
               </pre>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
-              The widget renders a "Connect WhatsApp" button. On click, Meta Embedded Signup
-              opens in a popup. Once the customer authorizes, the widget shows "WhatsApp Connected".
+              The widget renders a &quot;Connect WhatsApp&quot; button. On click, Meta Embedded Signup
+              opens in a popup. Once the customer authorizes, the widget shows &quot;WhatsApp Connected&quot;.
             </p>
           </div>
         </section>

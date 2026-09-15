@@ -150,7 +150,7 @@ export default function DocsPage() {
 
             <H3>Step 2 — Embed the connection widget</H3>
             <P>
-              Add the SDK to your frontend. The widget renders a "Connect WhatsApp" button for
+              Add the SDK to your frontend. The widget renders a &quot;Connect WhatsApp&quot; button for
               each of your customers.
             </P>
             <CodeBlock
@@ -168,7 +168,7 @@ export default function DocsPage() {
 
             <H3>Step 3 — Customer connects through Meta Embedded Signup</H3>
             <P>
-              Your customer clicks "Connect WhatsApp". Meta Embedded Signup opens in a popup.
+              Your customer clicks &quot;Connect WhatsApp&quot;. Meta Embedded Signup opens in a popup.
               They authorize their WhatsApp Business account. FusionWA receives and stores the
               connection securely.
             </P>
@@ -266,7 +266,7 @@ export default function DocsPage() {
             <H3>The Coexistence flow</H3>
             <P>When a customer connects via FusionWA and Meta offers Coexistence:</P>
             <ol className="mb-4 ml-4 flex list-decimal flex-col gap-2 text-sm text-muted-foreground">
-              <li>Customer clicks "Connect WhatsApp" in your software.</li>
+              <li>Customer clicks &quot;Connect WhatsApp&quot; in your software.</li>
               <li>Meta Embedded Signup popup opens.</li>
               <li>Customer selects their existing WhatsApp Business account.</li>
               <li>Meta may prompt the customer to scan a QR code on their phone (this is Meta&apos;s process, not FusionWA&apos;s).</li>
