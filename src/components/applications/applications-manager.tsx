@@ -408,7 +408,8 @@ export function ApplicationsManager({
           <CardTitle>{t("title")}</CardTitle>
           <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -446,9 +447,10 @@ export function ApplicationsManager({
                       </TableCell>
                       <TableCell className="text-right">
                         {app.revoked ? null : confirmingRevokeId === app.id ? (
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1.5">
                             <Button
                               type="button"
+                              size="sm"
                               variant="destructive"
                               disabled={revokingId === app.id}
                               onClick={() => handleRevoke(app.id)}
@@ -457,6 +459,7 @@ export function ApplicationsManager({
                             </Button>
                             <Button
                               type="button"
+                              size="sm"
                               variant="outline"
                               onClick={() => setConfirmingRevokeId(null)}
                             >
@@ -464,9 +467,10 @@ export function ApplicationsManager({
                             </Button>
                           </div>
                         ) : (
-                          <div className="flex justify-end gap-2">
+                          <div className="flex justify-end gap-1.5">
                             <Button
                               type="button"
+                              size="sm"
                               variant="outline"
                               onClick={() =>
                                 setOpenSnippetId((current) => (current === app.id ? null : app.id))
@@ -474,11 +478,12 @@ export function ApplicationsManager({
                             >
                               {openSnippetId === app.id ? t("hideSnippetButton") : t("snippetButton")}
                             </Button>
-                            <Button type="button" variant="outline" onClick={() => openWebhookEditor(app)}>
+                            <Button type="button" size="sm" variant="outline" onClick={() => openWebhookEditor(app)}>
                               {openWebhookId === app.id ? t("hideWebhookButton") : t("webhookButton")}
                             </Button>
                             <Button
                               type="button"
+                              size="sm"
                               variant="outline"
                               onClick={() =>
                                 downloadMd(
@@ -491,6 +496,7 @@ export function ApplicationsManager({
                             </Button>
                             <Button
                               type="button"
+                              size="sm"
                               variant="outline"
                               onClick={() => setConfirmingRevokeId(app.id)}
                             >
@@ -572,6 +578,7 @@ export function ApplicationsManager({
               )}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

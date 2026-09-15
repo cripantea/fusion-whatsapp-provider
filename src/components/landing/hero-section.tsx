@@ -63,7 +63,7 @@ export async function HeroSection() {
             <span className="size-2.5 rounded-full bg-green-500/80" />
             <span className="ml-3 text-xs text-zinc-500">index.html</span>
           </div>
-          <pre className="overflow-x-auto p-5 text-sm leading-relaxed text-zinc-300">
+          <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-zinc-300 sm:p-5 sm:text-sm">
             <code>
               {SDK_SNIPPET.split("\n").map((line, i) => {
                 if (line.startsWith("<!--")) {

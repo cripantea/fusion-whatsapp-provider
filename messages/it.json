@@ -40,29 +40,34 @@
     },
     "pricing": {
       "sectionLabel": "Prezzi",
-      "titleMain": "Semplice,",
-      "titleMuted": "prevedibile.",
+      "titleMain": "Nessun abbonamento.",
+      "titleMuted": "Paghi solo le connessioni attive.",
+      "subtitle": "La prima connessione è gratis. Aggiungi quante ne vuoi e paghi solo quelle che usi.",
       "mostPopular": "Più scelto",
-      "perMonth": "/mese",
-      "upToConnections": "Fino a {count} connessioni WhatsApp",
-      "sdkIncluded": "SDK widget incluso",
-      "apiAndWebhook": "API REST + webhook",
-      "coexistenceIncluded": "Coexistence inclusa",
+      "perConnectionPerMonth": "/connessione/mese",
+      "forever": "per sempre",
+      "noSubscriptionNote": "Nessun abbonamento, nessun costo fisso. Puoi aggiungere e rimuovere connessioni in qualsiasi momento.",
+      "features": {
+        "connections": "{range} connessioni WhatsApp",
+        "sdkIncluded": "SDK widget incluso",
+        "apiAndWebhook": "API REST + webhook",
+        "coexistenceIncluded": "Coexistence inclusa"
+      },
       "ctaFree": "Inizia gratis",
-      "ctaPlan": "Scegli piano",
+      "ctaStart": "Inizia ora",
       "ctaLogin": "Accedi",
-      "plans": {
-        "DEVELOPER": {
-          "description": "Per iniziare e testare l'integrazione."
+      "tiers": {
+        "FREE": {
+          "name": "Free",
+          "description": "Per iniziare e testare l'integrazione con i tuoi primi clienti."
         },
-        "TEAM": {
-          "description": "Per team con qualche cliente attivo."
+        "STARTER": {
+          "name": "Starter",
+          "description": "Per software house con clienti attivi. Scala gradualmente."
         },
-        "AGENCY": {
-          "description": "Per software house con clienti multipli."
-        },
-        "ENTERPRISE": {
-          "description": "Volumi elevati, SLA dedicato."
+        "SCALE": {
+          "name": "Scale",
+          "description": "Volumi elevati, prezzo ridotto per ogni connessione."
         }
       }
     },
@@ -130,31 +135,41 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Panoramica del tuo account Fusion WhatsApp.",
+    "currentTierLabel": "Tier attuale",
+    "perConnectionPerMonth": "connessione/mese",
     "stats": {
-      "directConnections": "Connessioni dirette",
-      "sdkConnections": "Connessioni SDK",
+      "sdkConnections": "Connessioni attive",
       "apps": "Applicazioni",
-      "sdkUsers": "Clienti SDK"
+      "sdkUsers": "Clienti SDK",
+      "monthlyBill": "Stima mensile",
+      "free": "Gratis"
     },
     "recentConnections": {
-      "title": "Ultime connessioni dirette",
+      "title": "Ultime connessioni SDK",
+      "app": "Applicazione",
+      "customer": "Cliente",
       "phoneNumber": "Numero",
-      "wabaId": "WABA ID",
       "status": "Stato",
       "empty": "Nessuna connessione configurata."
     }
   },
   "connections": {
     "title": "Connessioni",
-    "subtitle": "Gestisci i numeri WhatsApp collegati al tuo account.",
-    "linkedNumbers": {
-      "title": "Numeri collegati",
-      "description": "L'elenco dei numeri WhatsApp collegati al tuo account.",
-      "waba": "WABA ID",
+    "subtitle": "Panoramica delle connessioni WhatsApp attivate tramite SDK.",
+    "tierCard": {
+      "activeConnections": "Connessioni attive",
+      "currentTier": "Tier attuale",
+      "monthlyEstimate": "Stima mensile",
+      "free": "Gratis"
+    },
+    "sdkConnections": {
+      "title": "Connessioni SDK",
+      "description": "Elenco delle connessioni WhatsApp attivate dai tuoi clienti tramite le tue applicazioni SDK.",
+      "app": "Applicazione",
+      "customer": "Cliente (ID esterno)",
       "phoneNumber": "Numero",
-      "webhook": "Target Webhook URL",
       "status": "Stato",
-      "empty": "Nessuna connessione configurata."
+      "empty": "Nessuna connessione SDK attiva. Integra l'SDK nelle tue applicazioni per iniziare."
     },
     "webhookEditor": {
       "placeholder": "https://tuo-endpoint.esempio.com/webhook",

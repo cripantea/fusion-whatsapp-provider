@@ -40,29 +40,34 @@
     },
     "pricing": {
       "sectionLabel": "Pricing",
-      "titleMain": "Simple,",
-      "titleMuted": "predictable.",
+      "titleMain": "No subscription.",
+      "titleMuted": "Pay only for active connections.",
+      "subtitle": "The first connection is free. Add as many as you need and pay only for what you use.",
       "mostPopular": "Most popular",
-      "perMonth": "/mo",
-      "upToConnections": "Up to {count} WhatsApp connections",
-      "sdkIncluded": "SDK widget included",
-      "apiAndWebhook": "REST API + webhooks",
-      "coexistenceIncluded": "Coexistence included",
+      "perConnectionPerMonth": "/connection/month",
+      "forever": "forever",
+      "noSubscriptionNote": "No subscription, no fixed costs. Add and remove connections at any time.",
+      "features": {
+        "connections": "{range} WhatsApp connections",
+        "sdkIncluded": "SDK widget included",
+        "apiAndWebhook": "REST API + webhooks",
+        "coexistenceIncluded": "Coexistence included"
+      },
       "ctaFree": "Start free",
-      "ctaPlan": "Choose plan",
+      "ctaStart": "Get started",
       "ctaLogin": "Sign in",
-      "plans": {
-        "DEVELOPER": {
-          "description": "To get started and test the integration."
+      "tiers": {
+        "FREE": {
+          "name": "Free",
+          "description": "Get started and test the integration with your first clients."
         },
-        "TEAM": {
-          "description": "For teams with a few active clients."
+        "STARTER": {
+          "name": "Starter",
+          "description": "For software houses with active clients. Scale gradually."
         },
-        "AGENCY": {
-          "description": "For software houses with multiple clients."
-        },
-        "ENTERPRISE": {
-          "description": "High volumes, dedicated SLA."
+        "SCALE": {
+          "name": "Scale",
+          "description": "High volumes, lower price per connection."
         }
       }
     },
@@ -130,31 +135,41 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Overview of your Fusion WhatsApp account.",
+    "currentTierLabel": "Current tier",
+    "perConnectionPerMonth": "connection/month",
     "stats": {
-      "directConnections": "Direct connections",
-      "sdkConnections": "SDK connections",
+      "sdkConnections": "Active connections",
       "apps": "Applications",
-      "sdkUsers": "SDK users"
+      "sdkUsers": "SDK users",
+      "monthlyBill": "Monthly estimate",
+      "free": "Free"
     },
     "recentConnections": {
-      "title": "Latest direct connections",
+      "title": "Latest SDK connections",
+      "app": "Application",
+      "customer": "Customer",
       "phoneNumber": "Number",
-      "wabaId": "WABA ID",
       "status": "Status",
       "empty": "No connection configured yet."
     }
   },
   "connections": {
     "title": "Connections",
-    "subtitle": "Manage the WhatsApp numbers linked to your account.",
-    "linkedNumbers": {
-      "title": "Linked numbers",
-      "description": "The list of WhatsApp numbers linked to your account.",
-      "waba": "WABA ID",
+    "subtitle": "Overview of WhatsApp connections activated via SDK.",
+    "tierCard": {
+      "activeConnections": "Active connections",
+      "currentTier": "Current tier",
+      "monthlyEstimate": "Monthly estimate",
+      "free": "Free"
+    },
+    "sdkConnections": {
+      "title": "SDK Connections",
+      "description": "List of WhatsApp connections activated by your customers through your SDK applications.",
+      "app": "Application",
+      "customer": "Customer (external ID)",
       "phoneNumber": "Number",
-      "webhook": "Target Webhook URL",
       "status": "Status",
-      "empty": "No connection configured yet."
+      "empty": "No active SDK connections. Integrate the SDK into your applications to get started."
     },
     "webhookEditor": {
       "placeholder": "https://your-endpoint.example.com/webhook",

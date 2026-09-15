@@ -18,10 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FacebookEmbeddedSignup } from "@/components/connections/facebook-embedded-signup";
-import { WebhookUrlEditor } from "@/components/connections/webhook-url-editor";
-import { getWorkspaceContext } from "@/lib/active-tenant";
 import { prisma } from "@/lib/prisma";
+import { getCurrentTier, getMonthlyBill } from "@/lib/connection-tiers";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
   CONNECTED: "default",
@@ -32,24 +30,26 @@ const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = 
 
 export default async function ConnessioniPage() {
   const session = await auth();
-  if (!session) {
-    redirect("/login");
-  }
+  if (!session) redirect("/login");
 
   const t = await getTranslations("connections");
   const agencyId = session.user.agencyId;
 
-  // activeTenant is needed only to assign new connections via EmbeddedSignup.
-  const { activeTenant } = await getWorkspaceContext(agencyId);
+  const [connections, totalActive] = await Promise.all([
+    prisma.whatsappConnection.findMany({
+      where: { appUser: { app: { agencyId } } },
+      include: {
+        appUser: { include: { app: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.whatsappConnection.count({
+      where: { status: "CONNECTED", appUser: { app: { agencyId } } },
+    }),
+  ]);
 
-  // Show all direct connections across all tenants of this agency.
-  const connections = await prisma.whatsappConnection.findMany({
-    where: { tenant: { agencyId } },
-    orderBy: { createdAt: "desc" },
-  });
-
-  const appId = process.env.FACEBOOK_APP_ID ?? null;
-  const configId = process.env.FACEBOOK_EMBEDDED_SIGNUP_CONFIG_ID ?? null;
+  const tier = getCurrentTier(totalActive);
+  const monthlyBill = getMonthlyBill(totalActive);
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,63 +58,78 @@ export default async function ConnessioniPage() {
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("embeddedSignup.title")}</CardTitle>
-          <CardDescription>{t("embeddedSignup.description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FacebookEmbeddedSignup
-            appId={appId}
-            configId={configId}
-            tenantId={activeTenant.id}
-          />
-        </CardContent>
-      </Card>
+      {/* Tier summary */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("tierCard.activeConnections")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalActive}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("tierCard.currentTier")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{tier.label}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("tierCard.monthlyEstimate")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {monthlyBill === 0 ? t("tierCard.free") : `€${monthlyBill}`}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("linkedNumbers.title")}</CardTitle>
-          <CardDescription>{t("linkedNumbers.description")}</CardDescription>
+          <CardTitle>{t("sdkConnections.title")}</CardTitle>
+          <CardDescription>{t("sdkConnections.description")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("linkedNumbers.waba")}</TableHead>
-                <TableHead>{t("linkedNumbers.phoneNumber")}</TableHead>
-                <TableHead>{t("linkedNumbers.webhook")}</TableHead>
-                <TableHead className="text-right">
-                  {t("linkedNumbers.status")}
-                </TableHead>
+                <TableHead>{t("sdkConnections.app")}</TableHead>
+                <TableHead>{t("sdkConnections.customer")}</TableHead>
+                <TableHead>{t("sdkConnections.phoneNumber")}</TableHead>
+                <TableHead className="text-right">{t("sdkConnections.status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {connections.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    {t("linkedNumbers.empty")}
+                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                    {t("sdkConnections.empty")}
                   </TableCell>
                 </TableRow>
               ) : (
-                connections.map((connection) => (
-                  <TableRow key={connection.id}>
+                connections.map((conn) => (
+                  <TableRow key={conn.id}>
                     <TableCell className="font-medium">
-                      {connection.wabaId}
+                      {conn.appUser?.app.name ?? "—"}
                     </TableCell>
-                    <TableCell>{connection.displayPhoneNumber}</TableCell>
-                    <TableCell className="min-w-64">
-                      <WebhookUrlEditor
-                        connectionId={connection.id}
-                        initialUrl={connection.targetWebhookUrl}
-                      />
+                    <TableCell className="font-mono text-sm text-muted-foreground">
+                      {conn.appUser?.externalCustomerId ?? "—"}
                     </TableCell>
+                    <TableCell>{conn.displayPhoneNumber}</TableCell>
                     <TableCell className="text-right">
-                      <Badge variant={STATUS_VARIANT[connection.status] ?? "secondary"}>
-                        {t(`statusLabels.${connection.status}`)}
+                      <Badge variant={STATUS_VARIANT[conn.status] ?? "secondary"}>
+                        {t(`statusLabels.${conn.status}`)}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -122,6 +137,7 @@ export default async function ConnessioniPage() {
               )}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

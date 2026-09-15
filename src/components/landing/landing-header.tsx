@@ -18,7 +18,7 @@ export async function LandingHeader() {
           FusionWA
         </Link>
 
-        <nav className="flex flex-1 items-center gap-1">
+        <nav className="hidden flex-1 items-center gap-1 sm:flex">
           <Link
             href="/docs"
             className="rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -33,13 +33,13 @@ export async function LandingHeader() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <LocaleSwitcher locale={locale} />
           {PUBLIC_SIGNUP_ENABLED && (
             <Button
               size="sm"
               variant="ghost"
-              className="text-sm text-muted-foreground hover:text-foreground"
+              className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline-flex"
               nativeButton={false}
               render={<Link href="/register" />}
             >
