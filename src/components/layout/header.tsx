@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Menu, MessageSquareText } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { Menu, Flame } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { auth } from "@/auth";
 import { isSuperAdminEmail } from "@/lib/superadmin";
 
@@ -32,6 +33,7 @@ function getInitials(label: string): string {
 
 export async function Header() {
   const t = await getTranslations();
+  const locale = await getLocale();
   const session = await auth();
   const accountLabel = session?.user?.name ?? session?.user?.email ?? "";
   const isSuperAdmin = isSuperAdminEmail(session?.user?.email);
@@ -55,7 +57,7 @@ export async function Header() {
                 />
               }
             >
-              <MessageSquareText className="size-5 text-primary" />
+              <Flame className="size-5 text-primary" />
               <span>{t("app.name")}</span>
             </SheetTitle>
           </SheetHeader>
@@ -67,6 +69,7 @@ export async function Header() {
 
       <div className="flex-1" />
 
+      <LocaleSwitcher locale={locale} />
       <ThemeToggle label={t("header.toggleTheme")} />
 
       <DropdownMenu>

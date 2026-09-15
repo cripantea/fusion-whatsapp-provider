@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import { StaggerChildren, StaggerItem, FadeUp } from "@/components/landing/motion";
 
 const API_SNIPPET = `curl -X POST https://fusionwa.io/api/v1/messages/send \\
@@ -11,57 +13,25 @@ const API_SNIPPET = `curl -X POST https://fusionwa.io/api/v1/messages/send \\
 
 # → { "messageId": "wamid.abc123..." }`;
 
-const WEBHOOK_SNIPPET = `// Il tuo endpoint riceve ogni evento in tempo reale
-app.post("/webhook/whatsapp", (req, res) => {
+const WEBHOOK_SNIPPET = `app.post("/webhook/whatsapp", (req, res) => {
   const { type, from, text } = req.body;
   // type: "message" | "status" | "template_status"
-  console.log(\`Messaggio da \${from}: \${text}\`);
+  console.log(\`Message from \${from}: \${text}\`);
   res.sendStatus(200);
 });`;
 
-const FEATURES = [
-  {
-    label: "01",
-    title: "SDK Widget",
-    description:
-      "Incolla 3 righe nel tuo software. I tuoi clienti si connettono a WhatsApp Business in autonomia, senza che tu debba gestire OAuth o token Meta.",
-    code: `FusionWA.init({
+const COEXISTENCE_SNIPPET = `// No extra configuration needed.
+// FusionWA automatically manages
+// the Coexistence heartbeat with Meta.
+//
+// The number stays active on both
+// the mobile app and the Cloud API.`;
+
+const SDK_SNIPPET = `FusionWA.init({
   apiKey: "fwa_live_...",
   customerId: user.id,
   containerId: "widget",
-});`,
-    lang: "js",
-  },
-  {
-    label: "02",
-    title: "API REST",
-    description:
-      "Invia messaggi template, ricevi notifiche, gestisci le connessioni. Un'API JSON pulita, autenticata con API Key.",
-    code: API_SNIPPET,
-    lang: "bash",
-  },
-  {
-    label: "03",
-    title: "Webhook in tempo reale",
-    description:
-      "Ogni messaggio e cambio di stato arriva al tuo endpoint in pochi millisecondi. Zero polling, zero storage dei messaggi da parte nostra.",
-    code: WEBHOOK_SNIPPET,
-    lang: "js",
-  },
-  {
-    label: "04",
-    title: "Coexistence",
-    description:
-      "I tuoi clienti mantengono l'app WhatsApp Business sul telefono. Ricezione da mobile, invio da API — in parallelo, senza conflitti.",
-    code: `// Nessuna configurazione aggiuntiva.
-// FusionWA gestisce automaticamente
-// il heartbeat Coexistence con Meta.
-//
-// Il numero rimane attivo sia sull'app
-// mobile che sulla Cloud API.`,
-    lang: "js",
-  },
-] as const;
+});`;
 
 function CodeBlock({ code, lang }: { code: string; lang: string }) {
   return (
@@ -79,15 +49,24 @@ function CodeBlock({ code, lang }: { code: string; lang: string }) {
   );
 }
 
-export function FeaturesSection() {
+export async function FeaturesSection() {
+  const t = await getTranslations("landing.features");
+
+  const FEATURES = [
+    { label: "01", titleKey: "sdk", code: SDK_SNIPPET, lang: "js" },
+    { label: "02", titleKey: "api", code: API_SNIPPET, lang: "bash" },
+    { label: "03", titleKey: "webhook", code: WEBHOOK_SNIPPET, lang: "js" },
+    { label: "04", titleKey: "coexistence", code: COEXISTENCE_SNIPPET, lang: "js" },
+  ] as const;
+
   return (
     <section className="mx-auto max-w-6xl px-6 py-32">
       <FadeUp className="mb-20 max-w-xl">
-        <p className="mb-4 text-sm font-medium text-muted-foreground">Funzionalità</p>
+        <p className="mb-4 text-sm font-medium text-muted-foreground">{t("sectionLabel")}</p>
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Tutto quello che serve.
+          {t("titleMain")}
           <br />
-          <span className="text-muted-foreground">Niente di più.</span>
+          <span className="text-muted-foreground">{t("titleMuted")}</span>
         </h2>
       </FadeUp>
 
@@ -99,9 +78,11 @@ export function FeaturesSection() {
                 {feature.label}
               </span>
               <div>
-                <h3 className="mb-1.5 font-semibold tracking-tight">{feature.title}</h3>
+                <h3 className="mb-1.5 font-semibold tracking-tight">
+                  {t(`${feature.titleKey}.title`)}
+                </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  {feature.description}
+                  {t(`${feature.titleKey}.description`)}
                 </p>
               </div>
             </div>

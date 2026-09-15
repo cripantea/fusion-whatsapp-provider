@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageSquareText } from "lucide-react";
+import { Flame } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { SidebarNav } from "@/components/layout/sidebar-nav";
@@ -11,7 +11,7 @@ export async function Sidebar() {
     <aside className="hidden w-64 shrink-0 border-r bg-background md:flex md:flex-col">
       <div className="flex h-16 items-center gap-2 border-b px-4">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-          <MessageSquareText className="size-5 text-primary" />
+          <Flame className="size-5 text-primary" />
           <span>{t("name")}</span>
         </Link>
       </div>

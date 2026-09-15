@@ -4,52 +4,80 @@
   },
   "landing": {
     "nav": {
+      "docs": "Docs",
+      "pricing": "Pricing",
       "login": "Sign in",
-      "register": "Start Free"
+      "register": "Get started"
     },
     "hero": {
-      "title": "WhatsApp Infrastructure & Coexistence for Developers",
-      "subtitle": "Connect, manage, and monitor the WhatsApp Business Cloud API for your clients. Multi-tenant, secure, production-ready.",
-      "ctaPrimary": "Start Free",
-      "ctaSecondary": "Sign in",
-      "ctaPlatform": "Access the Platform"
+      "badge": "WhatsApp Business Cloud API · Ready to use",
+      "title": "WhatsApp for your software.",
+      "subtitle": "SDK widget, REST API and real-time webhooks. Your clients connect to WhatsApp Business in a day — without touching Meta.",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "Read the docs →",
+      "ctaPlatform": "Access the platform"
     },
     "features": {
-      "title": "Everything you need to run WhatsApp Business at scale",
-      "coexistence": {
-        "title": "Coexistence without losing the mobile app",
-        "description": "Automatic heartbeat monitoring: your clients keep using the WhatsApp Business App and the Cloud API together, without interruptions."
+      "sectionLabel": "Features",
+      "titleMain": "Everything you need.",
+      "titleMuted": "Nothing more.",
+      "sdk": {
+        "title": "SDK Widget",
+        "description": "Paste 3 lines into your software. Your clients connect to WhatsApp Business on their own, without you dealing with OAuth or Meta tokens."
+      },
+      "api": {
+        "title": "REST API",
+        "description": "Send template messages, receive notifications, manage connections. A clean JSON API authenticated with API Keys."
       },
       "webhook": {
-        "title": "Blazing-fast webhook override",
-        "description": "A single endpoint towards Meta, automatically routed to the right client endpoint via a Redis queue with automatic retries."
+        "title": "Real-time Webhooks",
+        "description": "Every message and status change reaches your endpoint in milliseconds. Zero polling, zero message storage on our end."
       },
-      "multitenant": {
-        "title": "Multi-tenant for agencies",
-        "description": "Every client gets their own isolated workspace: separate connections, tokens, and webhooks under one agency."
-      },
-      "noStorage": {
-        "title": "Zero message storage",
-        "description": "We never store your clients' message content: payloads are only forwarded, never saved."
+      "coexistence": {
+        "title": "Coexistence",
+        "description": "Your clients keep the WhatsApp Business app on their phones. Receive on mobile, send via API — in parallel, without conflicts."
       }
     },
     "pricing": {
-      "title": "A plan for every stage of growth",
-      "subtitle": "Change plan anytime from the dashboard.",
-      "upToConnections": "Up to {count, plural, one {# connection} other {# connections}}",
-      "cta": "Choose plan",
-      "ctaFree": "Start Free",
+      "sectionLabel": "Pricing",
+      "titleMain": "Simple,",
+      "titleMuted": "predictable.",
+      "mostPopular": "Most popular",
+      "perMonth": "/mo",
+      "upToConnections": "Up to {count} WhatsApp connections",
+      "sdkIncluded": "SDK widget included",
+      "apiAndWebhook": "REST API + webhooks",
+      "coexistenceIncluded": "Coexistence included",
+      "ctaFree": "Start free",
+      "ctaPlan": "Choose plan",
       "ctaLogin": "Sign in",
-      "mostPopular": "Most popular"
+      "plans": {
+        "DEVELOPER": {
+          "description": "To get started and test the integration."
+        },
+        "TEAM": {
+          "description": "For teams with a few active clients."
+        },
+        "AGENCY": {
+          "description": "For software houses with multiple clients."
+        },
+        "ENTERPRISE": {
+          "description": "High volumes, dedicated SLA."
+        }
+      }
     },
     "footer": {
-      "tagline": "WhatsApp Cloud API infrastructure for software houses and agencies.",
-      "linksTitle": "Useful links",
+      "tagline": "WhatsApp Business Cloud API infrastructure for software houses and agencies. No affiliation with Meta.",
+      "productTitle": "Product",
+      "accountTitle": "Account",
+      "docs": "Documentation",
+      "pricing": "Pricing",
+      "register": "Start free",
       "login": "Sign in",
-      "register": "Sign up",
-      "billing": "Plans & pricing",
-      "compliance": "Fusion WhatsApp Provider is an independent Meta Tech Provider integration. It is not affiliated with, sponsored by, or endorsed by Meta. WhatsApp and the WhatsApp logo are trademarks of Meta Platforms, Inc.",
-      "rights": "All rights reserved."
+      "sdkGuide": "SDK Guide",
+      "llmsTxt": "llms.txt",
+      "rights": "All rights reserved.",
+      "disclaimer": "FusionWA is an independent integration. Not affiliated with, sponsored by, or endorsed by Meta."
     }
   },
   "auth": {

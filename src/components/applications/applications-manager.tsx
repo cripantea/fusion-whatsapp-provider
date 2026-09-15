@@ -49,6 +49,152 @@ function buildIntegrationSnippet(apiKey: string) {
 <div id="fusionwa-widget"></div>`;
 }
 
+function buildMdGuide(appName: string, apiKey: string, webhookUrl: string | null): string {
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://fusionwa.io";
+  return `# Guida Integrazione FusionWA — ${appName}
+
+> Documento generato automaticamente dalla dashboard FusionWA.
+> Incollalo nel tuo progetto per guidare Claude Code, Copilot o Cursor nell'integrazione.
+
+## Credenziali
+
+| Campo     | Valore                    |
+|-----------|---------------------------|
+| API Key   | \`${apiKey}\`              |
+| Base URL  | \`${origin}/api/v1\`       |
+| Webhook   | \`${webhookUrl ?? "non configurato"}\` |
+
+---
+
+## 1. SDK Widget (HTML/JS)
+
+Il modo più rapido per mostrare il widget WhatsApp ai tuoi clienti.
+
+\`\`\`html
+<!-- 1. Carica il widget -->
+<script src="${origin}/sdk/v1.js"></script>
+<div id="fusionwa-widget"></div>
+
+<!-- 2. Inizializza con l'ID del cliente corrente -->
+<script>
+  FusionWA.init({
+    apiKey: "${apiKey}",
+    customerId: currentUser.id, // stringa univoca per ogni cliente
+    containerId: "fusionwa-widget"
+  });
+</script>
+\`\`\`
+
+---
+
+## 2. API REST
+
+### Autenticazione
+
+Aggiungi l'header \`X-FusionWA-API-Key\` ad ogni richiesta:
+
+\`\`\`bash
+-H "X-FusionWA-API-Key: ${apiKey}"
+\`\`\`
+
+### Invia messaggio template
+
+\`\`\`bash
+curl -X POST ${origin}/api/v1/messages/send \\
+  -H "X-FusionWA-API-Key: ${apiKey}" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "to": "+39 02 1234567",
+    "templateName": "hello_world",
+    "languageCode": "it"
+  }'
+\`\`\`
+
+Risposta:
+\`\`\`json
+{ "messageId": "wamid.abc123..." }
+\`\`\`
+
+### Lista template approvati
+
+\`\`\`bash
+curl ${origin}/api/v1/templates \\
+  -H "X-FusionWA-API-Key: ${apiKey}"
+\`\`\`
+
+---
+
+## 3. Webhook
+
+FusionWA inoltra ogni evento WhatsApp al tuo endpoint in tempo reale.
+
+**Endpoint configurato:** \`${webhookUrl ?? "⚠️  nessuno — configuralo dalla dashboard"}\`
+
+### Payload esempio
+
+\`\`\`json
+{
+  "type": "message",
+  "from": "+39 02 1234567",
+  "text": "Ciao, voglio un appuntamento",
+  "timestamp": "2026-01-15T10:30:00Z",
+  "customerId": "customer_abc"
+}
+\`\`\`
+
+### Tipi di evento
+
+| Tipo               | Descrizione                            |
+|--------------------|----------------------------------------|
+| \`message\`          | Messaggio ricevuto dal cliente         |
+| \`status\`           | Cambio stato consegna (sent/delivered/read) |
+| \`template_status\`  | Aggiornamento stato template Meta      |
+
+### Express.js
+
+\`\`\`js
+app.post("/webhook/whatsapp", (req, res) => {
+  const { type, from, text, customerId } = req.body;
+
+  if (type === "message") {
+    console.log(\`Messaggio da \${from} (cliente \${customerId}): \${text}\`);
+    // Gestisci il messaggio...
+  }
+
+  res.sendStatus(200); // Rispondi sempre 200 entro 5 secondi
+});
+\`\`\`
+
+---
+
+## 4. Coexistence
+
+I tuoi clienti possono continuare ad usare l'app WhatsApp Business sul telefono
+mentre tu invii messaggi tramite API. FusionWA gestisce automaticamente il heartbeat
+Coexistence con Meta — nessuna configurazione aggiuntiva richiesta.
+
+---
+
+## Note per Claude Code / Copilot / Cursor
+
+- L'API Key è già inclusa in questo file: usala direttamente negli snippet sopra
+- Il Base URL è \`${origin}/api/v1\`
+- Autenticazione: header \`X-FusionWA-API-Key\`
+- Zero storage dei messaggi: i payload vengono solo inoltrati al tuo webhook
+- Rate limit: consulta la dashboard per i limiti del tuo piano
+`;
+}
+
+function downloadMd(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export function ApplicationsManager({
   apps: initialApps,
   maxConnections,
@@ -330,6 +476,18 @@ export function ApplicationsManager({
                             </Button>
                             <Button type="button" variant="outline" onClick={() => openWebhookEditor(app)}>
                               {openWebhookId === app.id ? t("hideWebhookButton") : t("webhookButton")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() =>
+                                downloadMd(
+                                  `fusionwa-${app.name.toLowerCase().replace(/\s+/g, "-")}.md`,
+                                  buildMdGuide(app.name, app.apiKey, app.webhookUrl)
+                                )
+                              }
+                            >
+                              Guide .md
                             </Button>
                             <Button
                               type="button"
