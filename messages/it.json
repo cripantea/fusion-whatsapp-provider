@@ -12,18 +12,18 @@
     "hero": {
       "badge": "WhatsApp Business Cloud API · Pronto all'uso",
       "metaBadge": "Meta Tech Provider Certificato",
-      "title": "Aggiungi WhatsApp al tuo SaaS.",
-      "subtitle": "I tuoi clienti si connettono tramite Meta Embedded Signup. Con Coexistence, i numeri già attivi su WhatsApp Business mantengono l'app sul telefono — il tuo software ottiene API e webhook.",
+      "title": "Aggiungi WhatsApp al tuo software in 5 minuti.",
+      "subtitle": "I tuoi clienti si connettono tramite Meta Embedded Signup in circa 60 secondi — scansionano un QR, nient'altro. Con Coexistence, chi usa già WhatsApp Business mantiene l'app sul telefono. Il tuo software ottiene API e webhook.",
       "ctaPrimary": "Inizia ora",
       "ctaSecondary": "Leggi la documentazione →",
       "ctaPlatform": "Accedi alla piattaforma",
-      "trustLine": "Prima connessione a €0 · API + webhook · Coexistence inclusa"
+      "trustLine": "Prima connessione a €0 · 60 secondi per il cliente · Coexistence inclusa"
     },
     "howItWorks": {
       "sectionLabel": "Come funziona",
       "titleMain": "Pronto in tre passaggi.",
-      "titleMuted": "Nessuna burocrazia Meta.",
-      "subtitle": "Dal codice alla prima connessione WhatsApp attiva, in meno di 60 secondi.",
+      "titleMuted": "Tre passaggi.",
+      "subtitle": "Dal codice alla prima connessione WhatsApp attiva del tuo cliente, in circa 5 minuti.",
       "steps": {
         "embed": {
           "title": "Incolla il widget",
