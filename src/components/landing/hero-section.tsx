@@ -22,11 +22,11 @@ export async function HeroSection() {
   const t = await getTranslations("landing.hero");
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-14 text-center">
+    <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-20 text-center">
       <HeroEntrance className="flex flex-col items-center gap-6">
 
         {/* Badges row */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
           <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3.5 py-1 text-xs font-medium text-muted-foreground">
             <span className="size-1.5 rounded-full bg-emerald-500" />
             {t("badge")}

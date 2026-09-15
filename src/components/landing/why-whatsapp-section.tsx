@@ -3,8 +3,9 @@ import { getTranslations } from "next-intl/server";
 import { FadeUp, StaggerChildren, StaggerItem } from "@/components/landing/motion";
 
 const STATS = [
-  { key: "users", value: "2B+", sourceKey: "users" },
-  { key: "italy", value: "#1",  sourceKey: "italy" },
+  { key: "openRate", value: "98%", sourceKey: "openRate" },
+  { key: "users",    value: "2B+", sourceKey: "users"    },
+  { key: "italy",    value: "#1",  sourceKey: "italy"    },
 ] as const;
 
 const SMS_REASONS = [
@@ -40,7 +41,7 @@ export async function WhyWhatsappSection() {
         </FadeUp>
 
         {/* Verified stats */}
-        <StaggerChildren className="mb-16 grid grid-cols-1 gap-px overflow-hidden rounded-xl border sm:grid-cols-2">
+        <StaggerChildren className="mb-16 grid grid-cols-1 gap-px overflow-hidden rounded-xl border sm:grid-cols-3">
           {STATS.map((stat) => (
             <StaggerItem key={stat.key} className="flex flex-col gap-1 bg-background p-8">
               <span className="text-4xl font-semibold tracking-tight text-primary">{stat.value}</span>

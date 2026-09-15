@@ -11,7 +11,7 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Ready to use",
-      "metaBadge": "Powered by WhatsApp Business API",
+      "metaBadge": "Meta Tech Provider",
       "title": "WhatsApp in your software in 60 seconds.",
       "subtitle": "Three lines of code. Your clients connect to WhatsApp Business on their own — no Meta bureaucracy, no OAuth headaches.",
       "ctaPrimary": "Get started",
@@ -25,10 +25,12 @@
       "titleMuted": "Your software isn't.",
       "subtitle": "In 2026, WhatsApp isn't optional — it's the channel your clients expect. Those who don't integrate it lose customers. Those who do, keep them.",
       "stats": {
+        "openRate": "Average WhatsApp message open rate",
         "users": "Monthly active WhatsApp users",
         "italy": "Most used messaging app in Italy"
       },
       "statSources": {
+        "openRate": "Source: Insider Intelligence / multiple industry reports, 2024",
         "users": "Source: Meta Earnings Report, 2024",
         "italy": "Source: DataReportal Digital 2024 Italy"
       },

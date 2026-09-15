@@ -11,7 +11,7 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Pronto all'uso",
-      "metaBadge": "Powered by WhatsApp Business API",
+      "metaBadge": "Meta Tech Provider Certificato",
       "title": "WhatsApp nel tuo software in 60 secondi.",
       "subtitle": "Tre righe di codice. I tuoi clienti si connettono a WhatsApp Business in autonomia — senza toccare Meta, senza burocrazia.",
       "ctaPrimary": "Inizia ora",
@@ -25,10 +25,12 @@
       "titleMuted": "Il tuo software no.",
       "subtitle": "Nel 2026 WhatsApp non è un optional — è il canale che i tuoi clienti si aspettano. Chi non lo integra perde clienti. Chi lo integra bene, fidelizza.",
       "stats": {
+        "openRate": "Tasso medio di apertura messaggi WhatsApp",
         "users": "Utenti WhatsApp attivi ogni mese",
         "italy": "App di messaggistica più usata in Italia"
       },
       "statSources": {
+        "openRate": "Fonte: Insider Intelligence / varie ricerche di settore, 2024",
         "users": "Fonte: Meta Earnings Report, 2024",
         "italy": "Fonte: DataReportal Digital 2024 Italy"
       },
