@@ -11,11 +11,43 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Ready to use",
-      "title": "WhatsApp for your software.",
-      "subtitle": "SDK widget, REST API and real-time webhooks. Your clients connect to WhatsApp Business in a day — without touching Meta.",
+      "metaBadge": "Certified Meta Tech Provider",
+      "title": "WhatsApp in your software in 60 seconds, for free.",
+      "subtitle": "Three lines of code. Your clients connect to WhatsApp Business on their own — no Meta bureaucracy, no OAuth headaches.",
       "ctaPrimary": "Start free",
       "ctaSecondary": "Read the docs →",
-      "ctaPlatform": "Access the platform"
+      "ctaPlatform": "Access the platform",
+      "trustLine": "First connection free · No credit card required · Live in 60 seconds"
+    },
+    "whyWhatsapp": {
+      "sectionLabel": "Why WhatsApp in 2026",
+      "titleMain": "Your clients are already on WhatsApp.",
+      "titleMuted": "Your software isn't.",
+      "subtitle": "In 2026, WhatsApp isn't optional — it's the channel your clients expect. Those who don't integrate it lose customers. Those who do, keep them.",
+      "stats": {
+        "openRate": "WhatsApp open rate",
+        "users": "Daily active WhatsApp users",
+        "demand": "More B2B WhatsApp demand vs 2023"
+      },
+      "smsCol": {
+        "title": "SMS is dead in 2026.",
+        "subtitle": "It's not an opinion — it's the data. Companies still communicating via SMS are losing clients to those using WhatsApp.",
+        "smsReason1": "35% open rate — vs 98% on WhatsApp. 65% of your messages go ignored.",
+        "smsReason2": "Text only. No images, PDFs, audio, video, or interactive buttons.",
+        "smsReason3": "Zero read receipts. You never know if the client actually read your message.",
+        "smsReason4": "Rising costs: carriers increase SMS rates every year. WhatsApp is free up to 1,000 conversations/month with Meta.",
+        "verdict": "Meta deprecated SMS notifications for businesses in 2025. WhatsApp is the new official channel."
+      },
+      "clientCol": {
+        "title": "Your clients are already asking for it.",
+        "subtitle": "You don't need to convince them — they're the ones asking. The question is: is your software ready to answer?",
+        "clientReason1": "\"Can I reach you on WhatsApp?\" — the phrase you hear every day from your clients.",
+        "clientReason2": "Your clients' end customers expect support on WhatsApp, not email.",
+        "clientReason3": "SaaS products that integrate WhatsApp see +40% engagement vs traditional channels.",
+        "clientReason4": "In Italy, WhatsApp is used by 89% of the population. It's where your market lives.",
+        "quote": "\"As soon as we added the WhatsApp widget, our clients stopped calling the switchboard. Everything goes through it now.\"",
+        "quoteAuthor": "— FusionWA client, vertical insurance software house"
+      }
     },
     "features": {
       "sectionLabel": "Features",
@@ -42,7 +74,7 @@
       "sectionLabel": "Pricing",
       "titleMain": "No subscription.",
       "titleMuted": "Pay only for active connections.",
-      "subtitle": "The first connection is free. Add as many as you need and pay only for what you use.",
+      "subtitle": "The first connection is always free. From the second onward you pay in brackets — the more clients you have, the less you pay per connection.",
       "mostPopular": "Most popular",
       "perConnectionPerMonth": "/connection/month",
       "forever": "forever",
@@ -59,15 +91,19 @@
       "tiers": {
         "FREE": {
           "name": "Free",
-          "description": "Get started and test the integration with your first clients."
+          "description": "The first connection is always free, forever."
         },
         "STARTER": {
           "name": "Starter",
-          "description": "For software houses with active clients. Scale gradually."
+          "description": "From the 2nd to the 9th connection. Pay only for active ones."
+        },
+        "GROWTH": {
+          "name": "Growth",
+          "description": "From the 10th to the 24th connection. Lower price as you grow."
         },
         "SCALE": {
           "name": "Scale",
-          "description": "High volumes, lower price per connection."
+          "description": "From the 25th connection onward. Best price for high volumes."
         }
       }
     },

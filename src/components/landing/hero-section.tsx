@@ -24,9 +24,19 @@ export async function HeroSection() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-14 text-center">
       <HeroEntrance className="flex flex-col items-center gap-6">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3.5 py-1 text-xs font-medium text-muted-foreground">
-          <span className="size-1.5 rounded-full bg-emerald-500" />
-          {t("badge")}
+
+        {/* Badges row */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3.5 py-1 text-xs font-medium text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-emerald-500" />
+            {t("badge")}
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1 text-xs font-medium text-primary">
+            <svg viewBox="0 0 16 16" className="size-3 fill-current" aria-hidden>
+              <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 5.5-4 4.5-2-2L4 9.5l3.5 3.5 5-5.5L11.5 5.5z"/>
+            </svg>
+            {t("metaBadge")}
+          </div>
         </div>
 
         <h1 className="max-w-3xl text-balance text-5xl font-semibold tracking-tighter sm:text-6xl lg:text-7xl">
@@ -53,6 +63,10 @@ export async function HeroSection() {
             </Button>
           )}
         </div>
+
+        {/* Trust line */}
+        <p className="text-xs text-muted-foreground">{t("trustLine")}</p>
+
       </HeroEntrance>
 
       <FadeIn delay={0.4} className="mt-16 w-full max-w-2xl">

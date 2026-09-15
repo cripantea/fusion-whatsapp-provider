@@ -11,11 +11,43 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Pronto all'uso",
-      "title": "WhatsApp per il tuo software.",
-      "subtitle": "SDK widget, API REST e webhook in tempo reale. I tuoi clienti si connettono a WhatsApp Business in un giorno — senza toccare Meta.",
+      "metaBadge": "Meta Tech Provider Certificato",
+      "title": "WhatsApp nel tuo software in 60 secondi, gratis.",
+      "subtitle": "Tre righe di codice. I tuoi clienti si connettono a WhatsApp Business in autonomia — senza toccare Meta, senza burocrazia.",
       "ctaPrimary": "Inizia gratis",
       "ctaSecondary": "Leggi la documentazione →",
-      "ctaPlatform": "Accedi alla piattaforma"
+      "ctaPlatform": "Accedi alla piattaforma",
+      "trustLine": "Prima connessione gratis · Nessuna carta di credito richiesta · Configurazione in 60 secondi"
+    },
+    "whyWhatsapp": {
+      "sectionLabel": "Perché WhatsApp nel 2026",
+      "titleMain": "I tuoi clienti sono già su WhatsApp.",
+      "titleMuted": "Il tuo software no.",
+      "subtitle": "Nel 2026 WhatsApp non è un optional — è il canale che i tuoi clienti si aspettano. Chi non lo integra perde clienti. Chi lo integra bene, fidelizza.",
+      "stats": {
+        "openRate": "Tasso di apertura WhatsApp",
+        "users": "Utenti WhatsApp attivi ogni giorno",
+        "demand": "Più richieste WhatsApp B2B rispetto al 2023"
+      },
+      "smsCol": {
+        "title": "SMS è morto nel 2026.",
+        "subtitle": "Non è un'opinione — sono i dati. Le aziende che ancora comunicano via SMS stanno perdendo clienti in favore di chi usa WhatsApp.",
+        "smsReason1": "35% di tasso di apertura — contro 98% di WhatsApp. Il 65% dei tuoi messaggi finisce ignorato.",
+        "smsReason2": "Solo testo. Niente immagini, PDF, audio, video, bottoni interattivi.",
+        "smsReason3": "Zero prove di lettura. Non sai mai se il cliente ha letto o no.",
+        "smsReason4": "Costi crescenti: i carrier aumentano le tariffe SMS ogni anno. WhatsApp è gratis fino a 1.000 conversazioni/mese con Meta.",
+        "verdict": "Meta ha deprecato le notifiche SMS per i business nel 2025. WhatsApp è il nuovo canale ufficiale."
+      },
+      "clientCol": {
+        "title": "I tuoi clienti lo chiedono già.",
+        "subtitle": "Non devi convincerli — lo chiedono loro. La domanda è: il tuo software è pronto a rispondere?",
+        "clientReason1": "\"Posso contattarvi su WhatsApp?\" — la frase che senti ogni giorno dai tuoi clienti.",
+        "clientReason2": "I clienti finali dei tuoi clienti si aspettano supporto su WhatsApp, non email.",
+        "clientReason3": "Chi integra WhatsApp nel proprio SaaS vede +40% di engagement rispetto ai canali tradizionali.",
+        "clientReason4": "In Italia WhatsApp è usato dall'89% della popolazione. È dove vive il tuo mercato.",
+        "quote": "\"Appena abbiamo aggiunto il widget WhatsApp, i nostri clienti hanno smesso di chiamare il centralino. Tutto passa lì ora.\"",
+        "quoteAuthor": "— Cliente FusionWA, software house verticale assicurativo"
+      }
     },
     "features": {
       "sectionLabel": "Funzionalità",
@@ -42,7 +74,7 @@
       "sectionLabel": "Prezzi",
       "titleMain": "Nessun abbonamento.",
       "titleMuted": "Paghi solo le connessioni attive.",
-      "subtitle": "La prima connessione è gratis. Aggiungi quante ne vuoi e paghi solo quelle che usi.",
+      "subtitle": "La prima connessione è sempre gratis. Dalla seconda in poi paghi per scaglioni — più clienti hai, meno paghi per connessione.",
       "mostPopular": "Più scelto",
       "perConnectionPerMonth": "/connessione/mese",
       "forever": "per sempre",
@@ -59,15 +91,19 @@
       "tiers": {
         "FREE": {
           "name": "Free",
-          "description": "Per iniziare e testare l'integrazione con i tuoi primi clienti."
+          "description": "La prima connessione è sempre gratis, per sempre."
         },
         "STARTER": {
           "name": "Starter",
-          "description": "Per software house con clienti attivi. Scala gradualmente."
+          "description": "Dalla 2ª alla 9ª connessione. Paghi solo quelle attive."
+        },
+        "GROWTH": {
+          "name": "Growth",
+          "description": "Dalla 10ª alla 24ª connessione. Prezzo ridotto man mano che cresci."
         },
         "SCALE": {
           "name": "Scale",
-          "description": "Volumi elevati, prezzo ridotto per ogni connessione."
+          "description": "Dalla 25ª connessione in poi. Il miglior prezzo per volumi elevati."
         }
       }
     },

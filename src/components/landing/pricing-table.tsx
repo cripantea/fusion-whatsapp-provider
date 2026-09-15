@@ -7,9 +7,10 @@ import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 import { StaggerChildren, StaggerItem, FadeUp } from "@/components/landing/motion";
 
 const TIERS = [
-  { key: "FREE" as const,    connections: "1–10",  price: "€0",  pricePerConnection: null, highlighted: false },
-  { key: "STARTER" as const, connections: "11–25", price: "€5",  pricePerConnection: 5,    highlighted: true  },
-  { key: "SCALE" as const,   connections: "26+",   price: "€3",  pricePerConnection: 3,    highlighted: false },
+  { key: "FREE" as const,    connections: "1",     price: "€0", pricePerConnection: null, highlighted: false },
+  { key: "STARTER" as const, connections: "2–9",   price: "€5", pricePerConnection: 5,    highlighted: false },
+  { key: "GROWTH" as const,  connections: "10–24", price: "€4", pricePerConnection: 4,    highlighted: true  },
+  { key: "SCALE" as const,   connections: "25+",   price: "€3", pricePerConnection: 3,    highlighted: false },
 ] as const;
 
 export async function PricingTable() {
@@ -27,7 +28,7 @@ export async function PricingTable() {
         <p className="mt-4 text-sm text-muted-foreground">{t("subtitle")}</p>
       </FadeUp>
 
-      <StaggerChildren className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <StaggerChildren className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {TIERS.map((tier) => (
           <StaggerItem key={tier.key}>
             <div
