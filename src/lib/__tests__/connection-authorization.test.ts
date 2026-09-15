@@ -79,8 +79,8 @@ describe('Case 4 – platform cap with override', () => {
     mockAgency.mockResolvedValue({ ...baseAgency, platformLimitOverride: 500 });
     mockAgencyCount.mockResolvedValue(300); // would be blocked at default 300, but override is 500
     const result = await authorizeNewConnection({ agencyId: 'a1' });
-    // 300 < 500 so not platform-blocked; but billingStatus NOT_CONFIGURED → BILLING_NOT_READY
-    expect(result).toEqual({ allowed: false, reason: 'AUTOBILLING_DISABLED' });
+    // 300 < 500 so not platform-blocked; billing NOT_CONFIGURED → BILLING_NOT_READY
+    expect(result).toEqual({ allowed: false, reason: 'BILLING_NOT_READY' });
   });
 });
 
@@ -96,8 +96,8 @@ describe('Case 5 – global connection limit reached', () => {
 
 // Case 6: First free connection (effectiveCount = 0 < FREE_CONNECTIONS_INCLUDED = 1)
 describe('Case 6 – first free connection', () => {
-  it('allows without requiring billing setup', async () => {
-    mockAgency.mockResolvedValue(baseAgency);
+  it('allows when billing is READY and count is 0', async () => {
+    mockAgency.mockResolvedValue({ ...baseAgency, billingStatus: 'READY' });
     mockAgencyCount.mockResolvedValue(0);
     const result = await authorizeNewConnection({ agencyId: 'a1' });
     expect(result).toEqual({ allowed: true, reason: 'ALLOWED_FREE', isFree: true });
@@ -106,8 +106,8 @@ describe('Case 6 – first free connection', () => {
 
 // Case 7: Second connection – autoBilling disabled
 describe('Case 7 – autoBilling disabled', () => {
-  it('returns AUTOBILLING_DISABLED when count >= FREE_CONNECTIONS_INCLUDED', async () => {
-    mockAgency.mockResolvedValue({ ...baseAgency, autoBillingEnabled: false });
+  it('returns AUTOBILLING_DISABLED when billing READY but autoBilling off', async () => {
+    mockAgency.mockResolvedValue({ ...baseAgency, billingStatus: 'READY', autoBillingEnabled: false });
     mockAgencyCount.mockResolvedValue(1);
     const result = await authorizeNewConnection({ agencyId: 'a1' });
     expect(result).toEqual({ allowed: false, reason: 'AUTOBILLING_DISABLED' });
