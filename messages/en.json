@@ -11,13 +11,13 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Ready to use",
-      "metaBadge": "Certified Meta Tech Provider",
-      "title": "WhatsApp in your software in 60 seconds, for free.",
+      "metaBadge": "Powered by WhatsApp Business API",
+      "title": "WhatsApp in your software in 60 seconds.",
       "subtitle": "Three lines of code. Your clients connect to WhatsApp Business on their own — no Meta bureaucracy, no OAuth headaches.",
-      "ctaPrimary": "Start free",
+      "ctaPrimary": "Get started",
       "ctaSecondary": "Read the docs →",
       "ctaPlatform": "Access the platform",
-      "trustLine": "First connection free · No credit card required · Live in 60 seconds"
+      "trustLine": "No credit card required · Live in 60 seconds · First connection at €0"
     },
     "whyWhatsapp": {
       "sectionLabel": "Why WhatsApp in 2026",
@@ -25,28 +25,29 @@
       "titleMuted": "Your software isn't.",
       "subtitle": "In 2026, WhatsApp isn't optional — it's the channel your clients expect. Those who don't integrate it lose customers. Those who do, keep them.",
       "stats": {
-        "openRate": "WhatsApp open rate",
-        "users": "Daily active WhatsApp users",
-        "demand": "More B2B WhatsApp demand vs 2023"
+        "users": "Monthly active WhatsApp users",
+        "italy": "Most used messaging app in Italy"
+      },
+      "statSources": {
+        "users": "Source: Meta Earnings Report, 2024",
+        "italy": "Source: DataReportal Digital 2024 Italy"
       },
       "smsCol": {
-        "title": "SMS is dead in 2026.",
-        "subtitle": "It's not an opinion — it's the data. Companies still communicating via SMS are losing clients to those using WhatsApp.",
-        "smsReason1": "35% open rate — vs 98% on WhatsApp. 65% of your messages go ignored.",
-        "smsReason2": "Text only. No images, PDFs, audio, video, or interactive buttons.",
-        "smsReason3": "Zero read receipts. You never know if the client actually read your message.",
-        "smsReason4": "Rising SMS costs every year. WhatsApp: each of your clients gets 1,000 inbound conversations free/month from Meta — in most use cases, the channel costs nothing.",
-        "verdict": "Meta deprecated SMS notifications for businesses in 2025. WhatsApp is the new official channel."
+        "title": "SMS: real limitations.",
+        "subtitle": "SMS works, but has structural limits that WhatsApp solves natively.",
+        "smsReason1": "Low open rates compared to WhatsApp — business SMS messages are often ignored or filtered as spam.",
+        "smsReason2": "Text only. No images, PDFs, audio, video, interactive buttons, or structured templates.",
+        "smsReason3": "Zero read receipts. No way to know if the client actually read the message.",
+        "smsReason4": "Fixed and rising per-message costs. WhatsApp Business API uses a conversation-based pricing model, not per individual message.",
+        "verdict": "WhatsApp is Meta's official channel for business communication — with dedicated infrastructure, templates, and API."
       },
       "clientCol": {
         "title": "Your clients are already asking for it.",
         "subtitle": "You don't need to convince them — they're the ones asking. The question is: is your software ready to answer?",
-        "clientReason1": "\"Can I reach you on WhatsApp?\" — the phrase you hear every day from your clients.",
-        "clientReason2": "Your clients' end customers expect support on WhatsApp, not email.",
-        "clientReason3": "SaaS products that integrate WhatsApp see +40% engagement vs traditional channels.",
-        "clientReason4": "In Italy, WhatsApp is used by 89% of the population. It's where your market lives.",
-        "quote": "\"As soon as we added the WhatsApp widget, our clients stopped calling the switchboard. Everything goes through it now.\"",
-        "quoteAuthor": "— FusionWA client, vertical insurance software house"
+        "clientReason1": "\"Can I reach you on WhatsApp?\" — the question your end clients ask businesses every day.",
+        "clientReason2": "WhatsApp is the dominant messaging app in Italy and Europe. It's where people already communicate.",
+        "clientReason3": "WhatsApp communication is perceived as more direct and personal than email or SMS.",
+        "clientReason4": "Software houses that integrate WhatsApp differentiate their product on something clients see and use every day."
       }
     },
     "features": {
@@ -74,7 +75,7 @@
       "sectionLabel": "Pricing",
       "titleMain": "No subscription.",
       "titleMuted": "Pay only for active connections.",
-      "subtitle": "The first connection is always free. From the second onward you pay in brackets — the more clients you have, the less you pay per connection.",
+      "subtitle": "First connection at €0. From the second onward you pay in brackets — the more clients you have, the less you pay per connection.",
       "mostPopular": "Most popular",
       "perConnectionPerMonth": "/connection/month",
       "forever": "forever",
@@ -91,7 +92,7 @@
       "tiers": {
         "FREE": {
           "name": "Free",
-          "description": "The first connection is always free, forever."
+          "description": "First connection at €0, no expiry."
         },
         "STARTER": {
           "name": "Starter",

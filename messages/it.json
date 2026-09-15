@@ -11,13 +11,13 @@
     },
     "hero": {
       "badge": "WhatsApp Business Cloud API · Pronto all'uso",
-      "metaBadge": "Meta Tech Provider Certificato",
-      "title": "WhatsApp nel tuo software in 60 secondi, gratis.",
+      "metaBadge": "Powered by WhatsApp Business API",
+      "title": "WhatsApp nel tuo software in 60 secondi.",
       "subtitle": "Tre righe di codice. I tuoi clienti si connettono a WhatsApp Business in autonomia — senza toccare Meta, senza burocrazia.",
-      "ctaPrimary": "Inizia gratis",
+      "ctaPrimary": "Inizia ora",
       "ctaSecondary": "Leggi la documentazione →",
       "ctaPlatform": "Accedi alla piattaforma",
-      "trustLine": "Prima connessione gratis · Nessuna carta di credito richiesta · Configurazione in 60 secondi"
+      "trustLine": "Nessuna carta di credito richiesta · Setup in 60 secondi · Prima connessione a €0"
     },
     "whyWhatsapp": {
       "sectionLabel": "Perché WhatsApp nel 2026",
@@ -25,28 +25,29 @@
       "titleMuted": "Il tuo software no.",
       "subtitle": "Nel 2026 WhatsApp non è un optional — è il canale che i tuoi clienti si aspettano. Chi non lo integra perde clienti. Chi lo integra bene, fidelizza.",
       "stats": {
-        "openRate": "Tasso di apertura WhatsApp",
-        "users": "Utenti WhatsApp attivi ogni giorno",
-        "demand": "Più richieste WhatsApp B2B rispetto al 2023"
+        "users": "Utenti WhatsApp attivi ogni mese",
+        "italy": "App di messaggistica più usata in Italia"
+      },
+      "statSources": {
+        "users": "Fonte: Meta Earnings Report, 2024",
+        "italy": "Fonte: DataReportal Digital 2024 Italy"
       },
       "smsCol": {
-        "title": "SMS è morto nel 2026.",
-        "subtitle": "Non è un'opinione — sono i dati. Le aziende che ancora comunicano via SMS stanno perdendo clienti in favore di chi usa WhatsApp.",
-        "smsReason1": "35% di tasso di apertura — contro 98% di WhatsApp. Il 65% dei tuoi messaggi finisce ignorato.",
-        "smsReason2": "Solo testo. Niente immagini, PDF, audio, video, bottoni interattivi.",
-        "smsReason3": "Zero prove di lettura. Non sai mai se il cliente ha letto o no.",
-        "smsReason4": "Costi SMS crescenti ogni anno. WhatsApp: ogni tuo cliente ha 1.000 conversazioni in entrata gratis/mese con Meta — nella maggior parte dei casi d'uso, il canale non costa nulla.",
-        "verdict": "Meta ha deprecato le notifiche SMS per i business nel 2025. WhatsApp è il nuovo canale ufficiale."
+        "title": "SMS: limitazioni concrete.",
+        "subtitle": "Il canale SMS funziona, ma ha limiti strutturali che WhatsApp supera nativamente.",
+        "smsReason1": "Tasso di apertura basso rispetto a WhatsApp — i messaggi aziendali via SMS vengono spesso ignorati o filtrati come spam.",
+        "smsReason2": "Solo testo. Niente immagini, PDF, audio, video, pulsanti interattivi o template strutturati.",
+        "smsReason3": "Zero conferme di lettura. Non hai modo di sapere se il cliente ha letto il messaggio.",
+        "smsReason4": "Costi per messaggio fissi e in aumento. WhatsApp Business API ha una struttura di costi basata sulle conversazioni, non sui messaggi singoli.",
+        "verdict": "WhatsApp è il canale ufficiale di Meta per la comunicazione business — con infrastruttura, template e API dedicate."
       },
       "clientCol": {
         "title": "I tuoi clienti lo chiedono già.",
         "subtitle": "Non devi convincerli — lo chiedono loro. La domanda è: il tuo software è pronto a rispondere?",
-        "clientReason1": "\"Posso contattarvi su WhatsApp?\" — la frase che senti ogni giorno dai tuoi clienti.",
-        "clientReason2": "I clienti finali dei tuoi clienti si aspettano supporto su WhatsApp, non email.",
-        "clientReason3": "Chi integra WhatsApp nel proprio SaaS vede +40% di engagement rispetto ai canali tradizionali.",
-        "clientReason4": "In Italia WhatsApp è usato dall'89% della popolazione. È dove vive il tuo mercato.",
-        "quote": "\"Appena abbiamo aggiunto il widget WhatsApp, i nostri clienti hanno smesso di chiamare il centralino. Tutto passa lì ora.\"",
-        "quoteAuthor": "— Cliente FusionWA, software house verticale assicurativo"
+        "clientReason1": "\"Posso contattarvi su WhatsApp?\" — la domanda che i tuoi clienti finali fanno ogni giorno alle aziende.",
+        "clientReason2": "WhatsApp è l'app di messaggistica dominante in Italia e in Europa. È dove le persone comunicano già.",
+        "clientReason3": "La comunicazione via WhatsApp è percepita come più diretta e personale rispetto all'email o all'SMS.",
+        "clientReason4": "Le software house che integrano WhatsApp differenziano il loro prodotto su un aspetto che i clienti vedono e usano ogni giorno."
       }
     },
     "features": {
@@ -74,7 +75,7 @@
       "sectionLabel": "Prezzi",
       "titleMain": "Nessun abbonamento.",
       "titleMuted": "Paghi solo le connessioni attive.",
-      "subtitle": "La prima connessione è sempre gratis. Dalla seconda in poi paghi per scaglioni — più clienti hai, meno paghi per connessione.",
+      "subtitle": "Prima connessione a €0. Dalla seconda in poi paghi per scaglioni — più clienti hai, meno paghi per connessione.",
       "mostPopular": "Più scelto",
       "perConnectionPerMonth": "/connessione/mese",
       "forever": "per sempre",
@@ -91,7 +92,7 @@
       "tiers": {
         "FREE": {
           "name": "Free",
-          "description": "La prima connessione è sempre gratis, per sempre."
+          "description": "Prima connessione a €0, senza scadenza."
         },
         "STARTER": {
           "name": "Starter",

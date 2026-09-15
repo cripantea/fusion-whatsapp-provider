@@ -3,9 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { FadeUp, StaggerChildren, StaggerItem } from "@/components/landing/motion";
 
 const STATS = [
-  { key: "openRate",   value: "98%",  sub: "vs 35% SMS" },
-  { key: "users",      value: "2B+",  sub: "daily active users" },
-  { key: "demand",     value: "3×",   sub: "vs 2023" },
+  { key: "users", value: "2B+", sourceKey: "users" },
+  { key: "italy", value: "#1",  sourceKey: "italy" },
 ] as const;
 
 const SMS_REASONS = [
@@ -40,13 +39,13 @@ export async function WhyWhatsappSection() {
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{t("subtitle")}</p>
         </FadeUp>
 
-        {/* Big stats */}
-        <StaggerChildren className="mb-16 grid grid-cols-1 gap-px border rounded-xl overflow-hidden sm:grid-cols-3">
+        {/* Verified stats */}
+        <StaggerChildren className="mb-16 grid grid-cols-1 gap-px overflow-hidden rounded-xl border sm:grid-cols-2">
           {STATS.map((stat) => (
             <StaggerItem key={stat.key} className="flex flex-col gap-1 bg-background p-8">
               <span className="text-4xl font-semibold tracking-tight text-primary">{stat.value}</span>
               <span className="text-sm font-medium">{t(`stats.${stat.key}`)}</span>
-              <span className="text-xs text-muted-foreground">{stat.sub}</span>
+              <span className="mt-1 text-xs text-muted-foreground/60">{t(`statSources.${stat.sourceKey}`)}</span>
             </StaggerItem>
           ))}
         </StaggerChildren>
@@ -54,7 +53,7 @@ export async function WhyWhatsappSection() {
         {/* Two columns */}
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
 
-          {/* Why WhatsApp beats SMS */}
+          {/* SMS limitations */}
           <FadeUp className="flex flex-col gap-6">
             <div>
               <h3 className="mb-1 font-semibold tracking-tight">{t("smsCol.title")}</h3>
@@ -73,7 +72,7 @@ export async function WhyWhatsappSection() {
             </div>
           </FadeUp>
 
-          {/* Why clients demand it */}
+          {/* Why clients want it */}
           <FadeUp className="flex flex-col gap-6">
             <div>
               <h3 className="mb-1 font-semibold tracking-tight">{t("clientCol.title")}</h3>
@@ -87,10 +86,6 @@ export async function WhyWhatsappSection() {
                 </li>
               ))}
             </ul>
-            <div className="rounded-lg border bg-card p-4">
-              <p className="text-sm italic text-muted-foreground">{t("clientCol.quote")}</p>
-              <p className="mt-2 text-xs font-medium">{t("clientCol.quoteAuthor")}</p>
-            </div>
           </FadeUp>
 
         </div>
