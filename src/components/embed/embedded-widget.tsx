@@ -112,30 +112,43 @@ export function EmbeddedWidget() {
 
   function connect() {
     if (!credentials || !data?.facebookConfigId || !window.FB) return;
+    const currentCredentials = credentials;
+    const facebookConfigId = data.facebookConfigId;
     setBusy(true);
     setError(null);
     signupDataRef.current = {};
-    window.FB.login(async (response) => {
+
+    async function completeConnection(response: { authResponse?: { code?: string } }) {
       const code = response.authResponse?.code;
-      if (!code) return setBusy(false);
+      if (!code) {
+        setBusy(false);
+        return;
+      }
       try {
         const callbackResponse = await fetch("/api/auth/facebook/callback", {
           method: "POST",
-          headers: { [API_KEY_HEADER]: credentials.apiKey, "Content-Type": "application/json" },
+          headers: { [API_KEY_HEADER]: currentCredentials.apiKey, "Content-Type": "application/json" },
           body: JSON.stringify({
             code,
             wabaId: signupDataRef.current.wabaId,
             phoneNumberId: signupDataRef.current.phoneNumberId,
-            externalCustomerId: credentials.customerId,
+            externalCustomerId: currentCredentials.customerId,
           }),
         });
         if (!callbackResponse.ok) throw new Error("Collegamento non riuscito");
-        await loadStatus(credentials);
+        await loadStatus(currentCredentials);
       } catch (reason) {
         setError(reason instanceof Error ? reason.message : "Errore");
       } finally { setBusy(false); }
+    }
+
+    // Il JSSDK Meta rifiuta esplicitamente callback di tipo AsyncFunction.
+    // La callback passata a FB.login deve quindi restare sincrona; il lavoro
+    // asincrono parte separatamente senza perdere il user gesture del click.
+    window.FB.login((response) => {
+      void completeConnection(response);
     }, {
-      config_id: data.facebookConfigId,
+      config_id: facebookConfigId,
       response_type: "code",
       override_default_response_type: true,
       scope: FACEBOOK_SCOPE,
