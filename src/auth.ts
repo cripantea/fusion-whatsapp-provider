@@ -27,8 +27,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
+        const user = await prisma.user.findUnique({
+          where: { email },
+          include: { agency: { select: { billingStatus: true } } },
+        });
+        if (!user || user.agency.billingStatus === "SUSPENDED") {
           return null;
         }
 

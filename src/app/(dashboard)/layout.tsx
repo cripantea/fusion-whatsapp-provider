@@ -19,8 +19,11 @@ export default async function DashboardLayout({
   // /onboarding/billing è fuori dal route group (dashboard) → nessun loop.
   const agency = await prisma.agency.findUnique({
     where: { id: session.user.agencyId },
-    select: { billingSetupCompletedAt: true },
+    select: { billingSetupCompletedAt: true, billingStatus: true },
   });
+  if (agency?.billingStatus === "SUSPENDED") {
+    redirect("/account-suspended");
+  }
   if (!agency?.billingSetupCompletedAt) {
     redirect("/onboarding/billing");
   }

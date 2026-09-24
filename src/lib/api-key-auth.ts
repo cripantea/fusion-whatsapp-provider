@@ -38,8 +38,11 @@ export async function authenticateApp(request: NextRequest) {
     return null;
   }
 
-  const app = await prisma.app.findUnique({ where: { apiKey } });
-  if (!app || app.revokedAt) {
+  const app = await prisma.app.findUnique({
+    where: { apiKey },
+    include: { agency: { select: { billingStatus: true } } },
+  });
+  if (!app || app.revokedAt || app.agency.billingStatus === "SUSPENDED") {
     return null;
   }
 

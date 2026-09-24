@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { ensureStripeCustomer } from "@/lib/stripe-customer";
 import { isSuperAdminEmail } from "@/lib/superadmin";
 import {
   getPriceIdForPlan,
@@ -24,6 +25,7 @@ async function requireSuperAdmin() {
   if (!session || !isSuperAdminEmail(session.user.email)) {
     throw new Error("Unauthorized");
   }
+  return session;
 }
 
 /**
@@ -241,4 +243,85 @@ export async function setAgencyPlatformLimitOverrideAction(input: {
   });
 
   revalidatePath("/admin");
+}
+
+/** Sospende l'operatività dell'account senza cancellare utenti, dati o connessioni. */
+export async function suspendAgencyAction(agencyId: string) {
+  const session = await requireSuperAdmin();
+  if (session.user.agencyId === agencyId) {
+    throw new Error("Non puoi sospendere l'account che contiene il tuo utente amministratore");
+  }
+
+  const agency = await prisma.agency.findUnique({ where: { id: agencyId }, select: { id: true } });
+  if (!agency) throw new Error("Account non trovato");
+
+  await prisma.agency.update({
+    where: { id: agencyId },
+    data: { billingStatus: "SUSPENDED", autoBillingEnabled: false },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/utenti");
+}
+
+/**
+ * Riattiva un account sospeso. READY viene ripristinato solo se il setup Stripe
+ * è realmente completo; altrimenti il cliente torna all'onboarding billing.
+ */
+export async function reactivateAgencyAction(agencyId: string) {
+  await requireSuperAdmin();
+
+  const agency = await prisma.agency.findUnique({
+    where: { id: agencyId },
+    select: {
+      billingStatus: true,
+      stripeCustomerId: true,
+      defaultPaymentMethodId: true,
+      billingSetupCompletedAt: true,
+    },
+  });
+  if (!agency) throw new Error("Account non trovato");
+  if (agency.billingStatus !== "SUSPENDED") throw new Error("L'account non è sospeso");
+
+  const isReady = Boolean(
+    agency.stripeCustomerId && agency.defaultPaymentMethodId && agency.billingSetupCompletedAt
+  );
+  await prisma.agency.update({
+    where: { id: agencyId },
+    data: { billingStatus: isReady ? "READY" : "NOT_CONFIGURED" },
+  });
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/utenti");
+}
+
+/** Genera un nuovo link Stripe Setup per sbloccare un cliente fermo nell'onboarding. */
+export async function createBillingSetupLinkAction(agencyId: string) {
+  await requireSuperAdmin();
+
+  const agency = await prisma.agency.findUnique({
+    where: { id: agencyId },
+    select: { id: true, billingStatus: true },
+  });
+  if (!agency) throw new Error("Account non trovato");
+  if (agency.billingStatus === "SUSPENDED") {
+    throw new Error("Riattiva l'account prima di generare il link");
+  }
+
+  const customerId = await ensureStripeCustomer(agencyId);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const checkoutSession = await stripe.checkout.sessions.create({
+    mode: "setup",
+    customer: customerId,
+    payment_method_types: ["card"],
+    billing_address_collection: "required",
+    tax_id_collection: { enabled: true },
+    customer_update: { name: "auto", address: "auto" },
+    success_url: `${appUrl}/onboarding/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${appUrl}/onboarding/billing`,
+    metadata: { agencyId },
+  });
+
+  if (!checkoutSession.url) throw new Error("Stripe non ha restituito il link di setup");
+  return { url: checkoutSession.url };
 }

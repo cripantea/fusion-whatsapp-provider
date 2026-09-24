@@ -72,6 +72,12 @@ jobs:
             APP_DIR="${DEPLOY_PATH:-/home/cristi/fusion-whatsapp-provider}"
             cd "$APP_DIR"
 
+            # Log applicativi persistenti sull'host, accanto al file .env.
+            # I container app (uid 1001) e worker (uid 1000) devono poter scrivere.
+            mkdir -p logs
+            chmod 0770 logs
+            setfacl -m u:1000:rwx,u:1001:rwx logs 2>/dev/null || chmod 0777 logs
+
             echo "==> Pull ultimo codice da main"
             git fetch origin main
             git checkout main

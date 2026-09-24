@@ -12,8 +12,10 @@ export default async function BillingOnboardingPage() {
 
   const agency = await prisma.agency.findUnique({
     where: { id: session.user.agencyId },
-    select: { billingSetupCompletedAt: true, name: true },
+    select: { billingSetupCompletedAt: true, billingStatus: true, name: true },
   });
+
+  if (agency?.billingStatus === "SUSPENDED") redirect("/account-suspended");
 
   // Se il setup è già completato, non serve stare qui
   if (agency?.billingSetupCompletedAt) redirect("/dashboard");

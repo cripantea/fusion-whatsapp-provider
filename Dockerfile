@@ -44,11 +44,12 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/run-with-file-logging.mjs ./scripts/run-with-file-logging.mjs
 
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
-CMD ["node", "server.js"]
+CMD ["node", "scripts/run-with-file-logging.mjs", "/app/logs/app.log", "node", "server.js"]
 
 # ---- worker: full-source image for the Redis webhook forwarder, cron jobs and Prisma CLI ----
 # Non può usare l'output "standalone" di Next.js: esegue script TypeScript sorgente
@@ -65,4 +66,4 @@ COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node . .
 USER node
 RUN npx prisma generate
-CMD ["npm", "run", "worker"]
+CMD ["node", "scripts/run-with-file-logging.mjs", "/app/logs/worker.log", "npm", "run", "worker"]
