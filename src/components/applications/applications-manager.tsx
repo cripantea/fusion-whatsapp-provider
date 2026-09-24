@@ -50,7 +50,7 @@ function buildIntegrationSnippet(apiKey: string) {
 }
 
 function buildMdGuide(appName: string, apiKey: string, webhookUrl: string | null): string {
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://fusionwa.io";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://fusionwa.com";
   return `# Guida Integrazione FusionWA — ${appName}
 
 > Documento generato automaticamente dalla dashboard FusionWA.

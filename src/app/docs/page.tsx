@@ -139,7 +139,7 @@ export default function DocsPage() {
             <P>
               Register at{" "}
               <Link href="/register" className="underline">
-                fusionwa.io/register
+                fusionwa.com/register
               </Link>
               . Then go to{" "}
               <Link href="/applicazioni" className="underline">
@@ -155,7 +155,7 @@ export default function DocsPage() {
             </P>
             <CodeBlock
               lang="html"
-              code={`<script src="https://fusionwa.io/sdk/v1.js"></script>
+              code={`<script src="https://fusionwa.com/sdk/v1.js"></script>
 <div id="fusionwa-widget"></div>
 <script>
   FusionWA.init({
@@ -165,6 +165,12 @@ export default function DocsPage() {
   });
 </script>`}
             />
+            <P>
+              The SDK renders a secure iframe hosted by <code>fusionwa.com</code>, so you do not
+              need to register your own domain with Meta. If your site uses a Content Security
+              Policy, allow <code>https://fusionwa.com</code> in both <code>script-src</code> and
+              <code>frame-src</code>.
+            </P>
 
             <H3>Step 3 — Customer connects through Meta Embedded Signup</H3>
             <P>
@@ -186,7 +192,7 @@ export default function DocsPage() {
             <H3>Step 5 — Send your first message</H3>
             <CodeBlock
               lang="bash"
-              code={`curl -X POST https://fusionwa.io/api/v1/messages/send \\
+              code={`curl -X POST https://fusionwa.com/api/v1/messages/send \\
   -H "X-FusionWA-API-Key: fwa_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -530,17 +536,17 @@ app.post("/webhook/whatsapp", express.json(), (req, res) => {
               lang="markdown"
               code={`# FusionWA Integration Context
 
-Read https://fusionwa.io/llms.txt for the full machine-readable specification.
+Read https://fusionwa.com/llms.txt for the full machine-readable specification.
 
 ## SDK Widget
-<script src="https://fusionwa.io/sdk/v1.js"></script>
+<script src="https://fusionwa.com/sdk/v1.js"></script>
 <div id="fusionwa-widget"></div>
 <script>
   FusionWA.init({ apiKey, customerId, containerId })
 </script>
 
 ## REST API
-Base URL: https://fusionwa.io/api/v1
+Base URL: https://fusionwa.com/api/v1
 Auth: X-FusionWA-API-Key: fwa_live_...
 
 POST /api/v1/messages/send

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { StaggerChildren, StaggerItem, FadeUp } from "@/components/landing/motion";
 
-const API_SNIPPET = `curl -X POST https://fusionwa.io/api/v1/messages/send \\
+const API_SNIPPET = `curl -X POST https://fusionwa.com/api/v1/messages/send \\
   -H "X-FusionWA-API-Key: fwa_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{

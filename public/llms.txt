@@ -35,7 +35,7 @@ WhatsApp Business accounts.
 Embed in your software so customers can connect on their own.
 
 ```html
-<script src="https://fusionwa.io/sdk/v1.js"></script>
+<script src="https://fusionwa.com/sdk/v1.js"></script>
 <div id="fusionwa-widget"></div>
 <script>
   FusionWA.init({
@@ -48,12 +48,14 @@ Embed in your software so customers can connect on their own.
 
 The widget shows a "Connect WhatsApp" button. On click, Meta Embedded Signup opens.
 After successful connection the widget shows "WhatsApp Connected (+country code...)".
+The SDK renders a FusionWA-hosted iframe; integrators do not need to register their domain with Meta.
+Sites using Content Security Policy must allow https://fusionwa.com in script-src and frame-src.
 
 AppUsers are created automatically on first `FusionWA.init()` call with a new customerId.
 
 ## REST API (server-side)
 
-Base URL: `https://fusionwa.io/api/v1`
+Base URL: `https://fusionwa.com/api/v1`
 Authentication: `X-FusionWA-API-Key: fwa_live_...` header on all requests.
 
 ### Send a template message
@@ -214,8 +216,8 @@ If you are integrating FusionWA using Claude Code, Cursor, Codex, or GitHub Copi
 6. Respond to webhooks with HTTP 200 immediately; process async if needed.
 
 Load this file:
-- Claude Code: `/add https://fusionwa.io/llms.txt`
+- Claude Code: `/add https://fusionwa.com/llms.txt`
 - Cursor: drag the file into chat as context
-- Codex CLI: `--context https://fusionwa.io/llms.txt`
+- Codex CLI: `--context https://fusionwa.com/llms.txt`
 
-Full documentation: https://fusionwa.io/docs
+Full documentation: https://fusionwa.com/docs

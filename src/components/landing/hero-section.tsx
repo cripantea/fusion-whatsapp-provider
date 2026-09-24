@@ -6,7 +6,7 @@ import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
 import { HeroEntrance, FadeIn } from "@/components/landing/motion";
 
 const SDK_SNIPPET = `<!-- 1. Load the widget -->
-<script src="https://fusionwa.io/sdk/v1.js"></script>
+<script src="https://fusionwa.com/sdk/v1.js"></script>
 <div id="wa-widget"></div>
 
 <!-- 2. Initialize -->

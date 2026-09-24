@@ -186,7 +186,7 @@ export default function SaasPage() {
                 <span className="ml-3 text-xs text-zinc-500">index.html</span>
               </div>
               <pre className="overflow-x-auto p-5 text-sm leading-relaxed text-zinc-300">
-                <code>{`<script src="https://fusionwa.io/sdk/v1.js"></script>
+                <code>{`<script src="https://fusionwa.com/sdk/v1.js"></script>
 <div id="wa-widget"></div>
 <script>
   FusionWA.init({
