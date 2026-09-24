@@ -25,7 +25,7 @@
         "description": "Ein einziger Endpunkt zu Meta, automatisch über eine Redis-Warteschlange mit automatischen Wiederholungen an den richtigen Kunden-Endpunkt weitergeleitet."
       },
       "multitenant": {
-        "title": "Multi-Tenant für Agenturen",
+        "title": "Multi-Tenant für Agenturen zwai",
         "description": "Jeder Kunde erhält seinen eigenen isolierten Workspace: separate Verbindungen, Tokens und Webhooks unter einer Agentur."
       },
       "noStorage": {
