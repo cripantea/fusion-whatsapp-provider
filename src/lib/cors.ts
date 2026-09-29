@@ -11,7 +11,7 @@ export function withCors(response: NextResponse): NextResponse {
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   response.headers.set(
     "Access-Control-Allow-Headers",
-    `Content-Type, ${API_KEY_HEADER}, ${API_SECRET_HEADER}`
+    `Content-Type, X-Requested-With, ${API_KEY_HEADER}, ${API_SECRET_HEADER}`
   );
   return response;
 }
