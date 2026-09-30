@@ -39,6 +39,60 @@ tags:
     description: Meta Embedded Signup OAuth callback. Context-dependent authentication.
 
 paths:
+  /api/v1/media/{mediaId}:
+    get:
+      tags: [Messaging]
+      summary: Download an image owned by a customer's connected phone
+      description: |
+        Server-to-server only. Supply the image.id received in the WhatsApp payload,
+        not the message ID. Requires an active customer and connected phone.
+        Meta verifies ownership against the server-selected phone_number_id.
+        JPEG, PNG and WebP only, maximum 5 MiB. No permanent storage.
+        Old or expired media may be unavailable. Rate limit: 120 requests/minute per App.
+        Proxy the response through your authenticated tenant-scoped backend;
+        never expose the API secret in a browser or put it in an image URL.
+      security:
+        - apiKey: []
+          apiSecret: []
+      parameters:
+        - in: path
+          name: mediaId
+          required: true
+          schema: { type: string, pattern: '^[0-9]{1,64}$' }
+        - in: query
+          name: externalCustomerId
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 255 }
+      responses:
+        '200':
+          description: Image bytes. Cache-Control private, no-store.
+          content:
+            image/jpeg:
+              schema: { type: string, format: binary }
+            image/png:
+              schema: { type: string, format: binary }
+            image/webp:
+              schema: { type: string, format: binary }
+        '400':
+          description: Invalid or missing parameters.
+        '401':
+          description: Invalid API key or secret.
+        '402':
+          description: Connection payment failed.
+        '404':
+          description: Image unavailable or ownership verification failed.
+        '409':
+          description: No active customer connection.
+        '413':
+          description: Image exceeds 5 MiB.
+        '415':
+          description: Unsupported image type.
+        '429':
+          description: Rate limited. Retry after 60 seconds.
+        '502':
+          description: Upstream download failed or media location rejected.
+        '504':
+          description: Upstream download timed out.
   /api/v1/widget/activate:
     post:
       tags: [SDK Widget]

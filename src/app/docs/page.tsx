@@ -56,6 +56,7 @@ const NAV = [
   { href: "#sdk", label: "SDK Widget" },
   { href: "#coexistence", label: "Coexistence" },
   { href: "#rest-api", label: "REST API" },
+  { href: "#image-media", label: "Received images" },
   { href: "#webhooks", label: "Webhooks" },
   { href: "#templates", label: "Templates" },
   { href: "#errors", label: "Errors" },
@@ -405,6 +406,27 @@ x-fusionwa-api-secret: <your-secret>
           </Section>
 
           {/* Webhooks */}
+          <Section id="image-media">
+            <H2>Download received images</H2>
+            <P>
+              Call GET /api/v1/media/&#123;mediaId&#125;?externalCustomerId=YOUR_CUSTOMER_ID
+              from your backend with both x-fusionwa-api-key and x-fusionwa-api-secret.
+              Store image.id from incoming, echo or history payloads when available;
+              the message ID is not a media ID.
+            </P>
+            <P>
+              The endpoint returns JPEG, PNG or WebP bytes (maximum 5 MiB), after checking
+              the application, customer and connected phone. Serve these bytes through
+              your own authenticated, tenant-scoped endpoint. Never expose the secret
+              in frontend code. Responses are private and not cached.
+            </P>
+            <P>
+              Media can expire or become unavailable; this endpoint is not a permanent
+              archive and cannot recover old messages whose media ID was not saved.
+              Limit: 120 requests per minute per application.
+              See the OpenAPI specification for error responses.
+            </P>
+          </Section>
           <Section id="webhooks">
             <H2>Webhooks</H2>
             <P>
