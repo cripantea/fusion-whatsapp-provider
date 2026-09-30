@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Menu, Flame } from "lucide-react";
+import { Menu } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { LogoutMenuItem } from "@/components/layout/logout-menu-item";
+import { FusionWALogo } from "@/components/fusionwa-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { auth } from "@/auth";
@@ -51,14 +52,10 @@ export async function Header() {
           <SheetHeader className="h-16 justify-center border-b px-4">
             <SheetTitle
               render={
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 font-semibold"
-                />
+                <Link href="/dashboard" className="flex items-center" />
               }
             >
-              <Flame className="size-5 text-primary" />
-              <span>{t("app.name")}</span>
+              <FusionWALogo />
             </SheetTitle>
           </SheetHeader>
           <div className="py-4">

@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { MessageSquareText, ShieldCheck, CreditCard, Zap } from "lucide-react";
+import { ShieldCheck, CreditCard, Zap } from "lucide-react";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { StripeActionButton } from "@/components/billing/stripe-action-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FusionWALogo } from "@/components/fusionwa-logo";
 
 export default async function BillingOnboardingPage() {
   const session = await auth();
@@ -23,10 +24,7 @@ export default async function BillingOnboardingPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-lg space-y-6">
-        <div className="flex items-center gap-2 font-semibold">
-          <MessageSquareText className="size-5 text-primary" />
-          <span>FusionWA</span>
-        </div>
+        <FusionWALogo />
 
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Configura il tuo billing</h1>

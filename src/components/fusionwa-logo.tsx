@@ -1,0 +1,59 @@
+import type { SVGProps } from "react";
+
+export function FusionWAIcon({ className, ...props }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="130 96 370 478"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden
+      {...props}
+    >
+      {/* Outer flame — sweeps up and left */}
+      <path
+        fillRule="nonzero"
+        fill="currentColor"
+        d="M235.75 386.64C234.52 408.39 241.48 425.14 255 441.02C269.51 458.05 290 472.77 309.91 483.07L324.4 490.58C329.39 493.16 334.16 495.86 338.62 499.48C354.25 512.16 358.62 533.22 347.73 549.63C340.43 560.64 329.17 567.05 316.02 568.18L305.98 568.21L298.03 566.96C277.27 563.73 240.8 543.09 223.11 528.93L210.31 518.68L203.84 513.14L195.91 506.07L176.97 487.06C169.13 479.19 162.98 470.4 157.11 460.92C142.27 437 135.51 409.76 137.65 381.66C140.97 338.05 162.84 306.27 193.19 276.17L236.33 233.23C235.95 260.98 248.07 281.1 267.28 299.66L276.05 307C281.15 311.27 286.49 315.43 292.27 318.72L304.39 325.63L326.36 336.6L336.04 341C355.61 349.92 372.07 356.94 389.77 370.26C412.5 387.36 427.26 410.64 426.35 439.58C426.04 449.63 423.67 459.41 419.46 468.57L410.33 484.04C399.61 468.53 383.1 454.8 366.2 447.76L345 438.93L302.41 422.56C289.15 417.47 266.25 404.43 256.9 395.09L239.4 377.63L236.43 374.45Z"
+      />
+      {/* Inner flame — curls forward and right */}
+      <path
+        fillRule="nonzero"
+        fill="currentColor"
+        d="M459.07 426.3C458.71 400.95 448.29 379.34 432.05 360.91C412.22 338.4 387.43 323.67 360.69 310.27C345.93 302.88 332.11 294.93 318.75 285.3L306.55 275.43C298.21 268.68 291.57 260.38 285.73 251.32C274.89 234.47 270.82 212.48 276.18 193.14C280 179.39 286.27 166.53 296.41 156.37L336.3 116.37L352.52 101.29L352.31 120.02L352.23 128.04C352 149.29 352.87 162.65 365.07 180.98C374.15 194.63 386.09 205.09 399.13 214.84L419.75 230.29C430.25 238.14 439.71 246.7 448.73 256.25C454.89 262.77 459.85 269.72 464.75 277.31C495.79 325.39 491.07 379.7 459.07 426.3Z"
+      />
+    </svg>
+  );
+}
+
+export function FusionWALogo({
+  className,
+  iconOnly = false,
+  size = "default",
+}: {
+  className?: string;
+  iconOnly?: boolean;
+  size?: "sm" | "default" | "lg";
+}) {
+  const iconCls =
+    size === "sm" ? "size-4 shrink-0 text-primary" :
+    size === "lg" ? "size-8 shrink-0 text-primary" :
+    "size-5 shrink-0 text-primary";
+
+  const textCls =
+    size === "sm" ? "text-sm font-bold tracking-tight" :
+    size === "lg" ? "text-xl font-bold tracking-tight" :
+    "text-sm font-bold tracking-tight";
+
+  return (
+    <span className={`inline-flex items-center gap-2 ${className ?? ""}`}>
+      <FusionWAIcon className={iconCls} />
+      {!iconOnly && (
+        <span className={textCls}>
+          <span className="text-foreground">Fusion</span>
+          <span className="text-primary">WA</span>
+        </span>
+      )}
+    </span>
+  );
+}

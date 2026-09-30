@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { PUBLIC_SIGNUP_ENABLED } from "@/lib/growth-mode";
+import { FusionWALogo } from "@/components/fusionwa-logo";
 
 export async function LandingFooter() {
   const t = await getTranslations("landing.footer");
@@ -11,7 +12,7 @@ export async function LandingFooter() {
     <footer className="border-t">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-semibold">FusionWA</span>
+          <FusionWALogo size="sm" />
           <p className="max-w-xs text-sm text-muted-foreground">{t("tagline")}</p>
         </div>
 
