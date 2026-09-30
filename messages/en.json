@@ -17,7 +17,8 @@
       "ctaPrimary": "Get started",
       "ctaSecondary": "Read the docs →",
       "ctaPlatform": "Access the platform",
-      "trustLine": "First connection free · 60-second customer onboarding · Coexistence supported"
+      "trustLine": "First connection free · 60-second customer onboarding · Coexistence supported",
+      "compatLabel": "Compatible with"
     },
     "howItWorks": {
       "sectionLabel": "How it works",
@@ -81,14 +82,38 @@
       "subtitle": "FusionWA integrates into your product. Your customers connect their own WhatsApp Business accounts — your software gets the API.",
       "flow": "Your SaaS integrates FusionWA once → each customer connects their own WhatsApp Business",
       "verticals": {
-        "crm": { "label": "CRM", "description": "Automated follow-ups, lead management" },
-        "booking": { "label": "Booking software", "description": "Appointment confirmations, reminders" },
-        "property": { "label": "Property management", "description": "Tenant communications, viewings" },
-        "beauty": { "label": "Beauty & salons", "description": "Reminders, promotions, retention" },
-        "hospitality": { "label": "Hospitality", "description": "Check-in info, concierge messages" },
-        "healthcare": { "label": "Healthcare & clinics", "description": "Appointment reminders, results" },
-        "automotive": { "label": "Automotive", "description": "Workshop updates, quotes" },
-        "fitness": { "label": "Fitness & sport", "description": "Class reminders, membership renewals" }
+        "crm": {
+          "label": "CRM",
+          "description": "Automated follow-ups, lead management"
+        },
+        "booking": {
+          "label": "Booking software",
+          "description": "Appointment confirmations, reminders"
+        },
+        "property": {
+          "label": "Property management",
+          "description": "Tenant communications, viewings"
+        },
+        "beauty": {
+          "label": "Beauty & salons",
+          "description": "Reminders, promotions, retention"
+        },
+        "hospitality": {
+          "label": "Hospitality",
+          "description": "Check-in info, concierge messages"
+        },
+        "healthcare": {
+          "label": "Healthcare & clinics",
+          "description": "Appointment reminders, results"
+        },
+        "automotive": {
+          "label": "Automotive",
+          "description": "Workshop updates, quotes"
+        },
+        "fitness": {
+          "label": "Fitness & sport",
+          "description": "Class reminders, membership renewals"
+        }
       }
     },
     "whyWhatsapp": {

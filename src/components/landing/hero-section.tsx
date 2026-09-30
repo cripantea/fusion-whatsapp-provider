@@ -136,6 +136,19 @@ export async function HeroSection() {
         </div>
       </FadeIn>
 
+      {/* Language compatibility row */}
+      <FadeIn delay={0.55} className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+        <span className="text-xs text-muted-foreground/50">{t("compatLabel")}</span>
+        {(["Node.js", "Python", "PHP", "Ruby", "cURL"] as const).map((lang) => (
+          <span
+            key={lang}
+            className="text-xs font-medium text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+          >
+            {lang}
+          </span>
+        ))}
+      </FadeIn>
+
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
     </section>
   );

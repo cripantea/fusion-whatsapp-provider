@@ -12,7 +12,8 @@
       "subtitle": "Connectez, gérez et surveillez l'API WhatsApp Business Cloud pour vos clients. Multi-tenant, sécurisée, prête pour la production.",
       "ctaPrimary": "Essai Gratuit",
       "ctaSecondary": "Connexion",
-      "ctaPlatform": "Accéder à la Plateforme"
+      "ctaPlatform": "Accéder à la Plateforme",
+      "compatLabel": "Compatible avec"
     },
     "features": {
       "title": "Tout ce qu'il faut pour gérer WhatsApp Business à grande échelle",

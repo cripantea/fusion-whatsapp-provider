@@ -197,13 +197,21 @@ async function handleSetupSessionCompleted(session: Stripe.Checkout.Session) {
     invoice_settings: { default_payment_method: paymentMethodId },
   });
 
-  // Idempotent: don't downgrade READY → READY again (also handles webhook replay)
+  const isFirstSetup = agency.billingStatus !== "READY";
+
+  // Idempotent: don't downgrade READY → READY again (also handles webhook replay).
+  // On first setup auto-enable autoBilling so users don't hit AUTOBILLING_DISABLED
+  // immediately after onboarding — consistent with "addebitata automaticamente" promise.
   await prisma.agency.update({
     where: { id: agencyId },
     data: {
       defaultPaymentMethodId: paymentMethodId,
-      billingSetupCompletedAt: agency.billingStatus === "READY" ? undefined : new Date(),
+      billingSetupCompletedAt: isFirstSetup ? new Date() : undefined,
       billingStatus: "READY",
+      ...(isFirstSetup ? {
+        autoBillingEnabled: true,
+        autoBillingAcceptedAt: new Date(),
+      } : {}),
     },
   });
 }

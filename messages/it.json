@@ -17,7 +17,8 @@
       "ctaPrimary": "Inizia ora",
       "ctaSecondary": "Leggi la documentazione →",
       "ctaPlatform": "Accedi alla piattaforma",
-      "trustLine": "Prima connessione a €0 · 60 secondi per il cliente · Coexistence inclusa"
+      "trustLine": "Prima connessione a €0 · 60 secondi per il cliente · Coexistence inclusa",
+      "compatLabel": "Compatibile con"
     },
     "howItWorks": {
       "sectionLabel": "Come funziona",
@@ -81,14 +82,38 @@
       "subtitle": "FusionWA si integra nel tuo prodotto. Sono i tuoi clienti a connettersi a WhatsApp Business — il tuo software ottiene l'API.",
       "flow": "Il tuo SaaS integra FusionWA una volta → ogni cliente connette il proprio WhatsApp Business",
       "verticals": {
-        "crm": { "label": "CRM", "description": "Follow-up automatici, gestione lead" },
-        "booking": { "label": "Prenotazioni", "description": "Conferme appuntamento, reminder" },
-        "property": { "label": "Gestione immobili", "description": "Comunicazioni inquilini, visite" },
-        "beauty": { "label": "Beauty & salon", "description": "Reminder, promozioni, fidelizzazione" },
-        "hospitality": { "label": "Hospitality", "description": "Check-in, servizi concierge" },
-        "healthcare": { "label": "Sanità & cliniche", "description": "Reminder visita, risultati esami" },
-        "automotive": { "label": "Automotive", "description": "Aggiornamenti officina, preventivi" },
-        "fitness": { "label": "Fitness & sport", "description": "Reminder lezioni, rinnovi abbonamento" }
+        "crm": {
+          "label": "CRM",
+          "description": "Follow-up automatici, gestione lead"
+        },
+        "booking": {
+          "label": "Prenotazioni",
+          "description": "Conferme appuntamento, reminder"
+        },
+        "property": {
+          "label": "Gestione immobili",
+          "description": "Comunicazioni inquilini, visite"
+        },
+        "beauty": {
+          "label": "Beauty & salon",
+          "description": "Reminder, promozioni, fidelizzazione"
+        },
+        "hospitality": {
+          "label": "Hospitality",
+          "description": "Check-in, servizi concierge"
+        },
+        "healthcare": {
+          "label": "Sanità & cliniche",
+          "description": "Reminder visita, risultati esami"
+        },
+        "automotive": {
+          "label": "Automotive",
+          "description": "Aggiornamenti officina, preventivi"
+        },
+        "fitness": {
+          "label": "Fitness & sport",
+          "description": "Reminder lezioni, rinnovi abbonamento"
+        }
       }
     },
     "whyWhatsapp": {
