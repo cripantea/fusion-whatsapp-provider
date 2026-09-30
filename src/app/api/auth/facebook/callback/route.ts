@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { API_KEY_HEADER, authenticateApp } from "@/lib/api-key-auth";
 import { assertTenantOwnedByAgency } from "@/lib/active-tenant";
-import { chargeConnectionActivation } from "@/lib/connection-billing";
 import { authorizeNewConnection } from "@/lib/connection-authorization";
+import { syncConnectionSubscription } from "@/lib/connection-subscription";
 import { corsPreflight, withCors } from "@/lib/cors";
 import { encrypt } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
@@ -210,19 +210,11 @@ async function handleTenantContext(params: {
     return NextResponse.json({ error: "Connessione già registrata da un altro account" }, { status: 403 });
   }
 
-  // Blocca il re-onboarding di una connessione con pagamento fallito:
-  // il billing va risolto dalla dashboard, non ri-eseguendo il flusso Meta.
-  if (existingConnection?.billingStatus === "PAYMENT_FAILED") {
-    return NextResponse.json({ error: "Payment required", reason: "PAYMENT_FAILED" }, { status: 402 });
-  }
-
-  let connectionBillingStatus: 'NOT_REQUIRED' | 'PENDING' = 'NOT_REQUIRED';
   if (!existingConnection) {
     const authResult = await authorizeNewConnection({ agencyId: session.user.agencyId, context: 'dashboard' });
     if (!authResult.allowed) {
       return NextResponse.json({ error: 'Limit reached', reason: authResult.reason }, { status: 403 });
     }
-    connectionBillingStatus = authResult.isFree ? 'NOT_REQUIRED' : 'PENDING';
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
@@ -233,17 +225,13 @@ async function handleTenantContext(params: {
   const displayPhoneNumber = await fetchDisplayPhoneNumber(phoneNumberId, oauthResult.accessToken);
   const encryptedAccessToken = encrypt(oauthResult.accessToken);
 
-  // Connessioni paganti iniziano in PENDING e vengono portate a CONNECTED solo dopo
-  // il pagamento riuscito. Le connessioni gratuite (prima) diventano CONNECTED subito.
-  const initialStatus = connectionBillingStatus === 'PENDING' ? 'PENDING' : 'CONNECTED';
-
   const connection = await prisma.whatsappConnection.upsert({
     where: { phoneNumberId },
     update: {
       wabaId,
       displayPhoneNumber,
-      // Re-autorizzazione di connessione esistente: ripristina CONNECTED (token refresh)
       status: "CONNECTED",
+      billingStatus: "NOT_REQUIRED",
       tenantId: targetTenant.id,
       appUserId: null,
       accessToken: encryptedAccessToken,
@@ -255,52 +243,19 @@ async function handleTenantContext(params: {
       wabaId,
       phoneNumberId,
       displayPhoneNumber,
-      status: initialStatus,
-      billingStatus: connectionBillingStatus,
+      status: "CONNECTED",
+      billingStatus: "NOT_REQUIRED",
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
       lastHeartbeatAt: new Date(),
     },
   });
 
-  // Addebito immediato per connessioni paganti
-  if (!existingConnection && connectionBillingStatus === 'PENDING') {
-    const chargeResult = await chargeConnectionActivation({
-      connectionId: connection.id,
-      agencyId: session.user.agencyId,
-    });
-
-    if (!chargeResult.success && chargeResult.requiresAction) {
-      return NextResponse.json({
-        status: "payment_pending",
-        requiresAction: true,
-        reason: "REQUIRES_ACTION",
-        connection: { id: connection.id, status: "PENDING", billingStatus: "PENDING" },
-      }, { status: 202 });
-    }
-
-    if (!chargeResult.success) {
-      return NextResponse.json({
-        status: "payment_failed",
-        error: "Pagamento non riuscito",
-        reason: "PAYMENT_FAILED",
-        connection: { id: connection.id, status: "PENDING", billingStatus: "PAYMENT_FAILED" },
-      }, { status: 402 });
-    }
-
-    // Payment succeeded — reload final state from DB (set by chargeConnectionActivation)
-    const paid = await prisma.whatsappConnection.findUniqueOrThrow({ where: { id: connection.id } });
-    return NextResponse.json({
-      status: "success",
-      connection: {
-        id: paid.id,
-        wabaId: paid.wabaId,
-        phoneNumberId: paid.phoneNumberId,
-        displayPhoneNumber: paid.displayPhoneNumber,
-        status: paid.status,
-        billingStatus: paid.billingStatus,
-      },
-    });
+  // Sync subscription quantity asynchronously — failure doesn't block the connection.
+  if (!existingConnection) {
+    syncConnectionSubscription(session.user.agencyId).catch((err) =>
+      console.error('[fb-callback] syncConnectionSubscription failed', err)
+    );
   }
 
   return NextResponse.json({
@@ -355,17 +310,11 @@ async function handleAppUserContext(
     return NextResponse.json({ error: "Connessione già registrata da un altro account" }, { status: 403 });
   }
 
-  if (existingConnection?.billingStatus === "PAYMENT_FAILED") {
-    return NextResponse.json({ error: "Payment required", reason: "PAYMENT_FAILED" }, { status: 402 });
-  }
-
-  let connectionBillingStatus: 'NOT_REQUIRED' | 'PENDING' = 'NOT_REQUIRED';
   if (!existingConnection) {
     const authResult = await authorizeNewConnection({ agencyId: app.agencyId, appId: app.id, context: 'sdk' });
     if (!authResult.allowed) {
       return NextResponse.json({ error: 'Limit reached', reason: authResult.reason }, { status: 403 });
     }
-    connectionBillingStatus = authResult.isFree ? 'NOT_REQUIRED' : 'PENDING';
   }
 
   const subscribed = await subscribeWabaWebhook(wabaId, oauthResult.accessToken);
@@ -376,14 +325,13 @@ async function handleAppUserContext(
   const displayPhoneNumber = await fetchDisplayPhoneNumber(phoneNumberId, oauthResult.accessToken);
   const encryptedAccessToken = encrypt(oauthResult.accessToken);
 
-  const initialStatus = connectionBillingStatus === 'PENDING' ? 'PENDING' : 'CONNECTED';
-
   const connection = await prisma.whatsappConnection.upsert({
     where: { phoneNumberId },
     update: {
       wabaId,
       displayPhoneNumber,
       status: "CONNECTED",
+      billingStatus: "NOT_REQUIRED",
       appUserId: appUser.id,
       tenantId: null,
       // Le connessioni AppUser non hanno un endpoint proprio per impostare
@@ -399,8 +347,8 @@ async function handleAppUserContext(
       wabaId,
       phoneNumberId,
       displayPhoneNumber,
-      status: initialStatus,
-      billingStatus: connectionBillingStatus,
+      status: "CONNECTED",
+      billingStatus: "NOT_REQUIRED",
       targetWebhookUrl: app.webhookUrl,
       accessToken: encryptedAccessToken,
       tokenExpiresAt: oauthResult.tokenExpiresAt,
@@ -408,42 +356,11 @@ async function handleAppUserContext(
     },
   });
 
-  if (!existingConnection && connectionBillingStatus === 'PENDING') {
-    const chargeResult = await chargeConnectionActivation({
-      connectionId: connection.id,
-      agencyId: app.agencyId,
-    });
-
-    if (!chargeResult.success && chargeResult.requiresAction) {
-      return NextResponse.json({
-        status: "payment_pending",
-        requiresAction: true,
-        reason: "REQUIRES_ACTION",
-        connection: { id: connection.id, status: "PENDING", billingStatus: "PENDING" },
-      }, { status: 202 });
-    }
-
-    if (!chargeResult.success) {
-      return NextResponse.json({
-        status: "payment_failed",
-        error: "Pagamento non riuscito",
-        reason: "PAYMENT_FAILED",
-        connection: { id: connection.id, status: "PENDING", billingStatus: "PAYMENT_FAILED" },
-      }, { status: 402 });
-    }
-
-    const paid = await prisma.whatsappConnection.findUniqueOrThrow({ where: { id: connection.id } });
-    return NextResponse.json({
-      status: "success",
-      connection: {
-        id: paid.id,
-        wabaId: paid.wabaId,
-        phoneNumberId: paid.phoneNumberId,
-        displayPhoneNumber: paid.displayPhoneNumber,
-        status: paid.status,
-        billingStatus: paid.billingStatus,
-      },
-    });
+  // Sync subscription quantity asynchronously — failure doesn't block the connection.
+  if (!existingConnection) {
+    syncConnectionSubscription(app.agencyId).catch((err) =>
+      console.error('[fb-callback] syncConnectionSubscription failed', err)
+    );
   }
 
   return NextResponse.json({

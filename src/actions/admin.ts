@@ -38,6 +38,7 @@ export async function unlockConnectionAction(connectionId: string) {
 
   const connection = await prisma.whatsappConnection.findUnique({
     where: { id: connectionId },
+    include: { tenant: true, appUser: { include: { app: true } } },
   });
   if (!connection) {
     throw new Error("Connessione non trovata");
@@ -46,7 +47,16 @@ export async function unlockConnectionAction(connectionId: string) {
     throw new Error("Si può sbloccare solo una connessione disconnessa o in errore");
   }
 
+  const agencyId = connection.tenant?.agencyId ?? connection.appUser?.app?.agencyId;
+
   await prisma.whatsappConnection.delete({ where: { id: connectionId } });
+
+  if (agencyId) {
+    const { syncConnectionSubscription } = await import("@/lib/connection-subscription");
+    syncConnectionSubscription(agencyId).catch((err) =>
+      console.error('[admin] syncConnectionSubscription after delete failed', err)
+    );
+  }
 
   revalidatePath("/admin");
 }

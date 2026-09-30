@@ -2,6 +2,7 @@ import type Stripe from "stripe";
 
 import type { AgencyBillingStatus, SubscriptionStatus } from "@/generated/prisma/enums";
 import { getPlanForPriceId, PLAN_MAX_CONNECTIONS } from "@/lib/plans";
+import { isConnectionSubscription } from "@/lib/connection-subscription";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 
@@ -89,6 +90,9 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 }
 
 export async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  // Connection-tier subscriptions are managed by syncConnectionSubscription — skip here.
+  if (isConnectionSubscription(subscription)) return;
+
   const customerId = resolveCustomerId(subscription.customer);
   const agency = await prisma.agency.findFirst({ where: { stripeCustomerId: customerId } });
 
@@ -117,6 +121,15 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
 }
 
 export async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  // Connection-tier subscriptions: clear the stored ID so we recreate on next activation.
+  if (isConnectionSubscription(subscription)) {
+    await prisma.agency.updateMany({
+      where: { stripeSubscriptionId: subscription.id },
+      data: { stripeSubscriptionId: null },
+    });
+    return;
+  }
+
   const customerId = resolveCustomerId(subscription.customer);
   const agency = await prisma.agency.findFirst({ where: { stripeCustomerId: customerId } });
 
